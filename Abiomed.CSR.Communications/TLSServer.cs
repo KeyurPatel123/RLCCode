@@ -64,7 +64,7 @@ namespace Abiomed.CSR.Communications
             {                
                 var listener = new TcpListener(IPAddress.Any, ServerPort);
                 listener.Start();
-                _log.Info("TLS Server Started");
+                _log.Info("TLS Server Started Success");
 
                 while (true)
                 {
