@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Console", "Abiomed.Console\Abiomed.Console.csproj", "{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Certificates", "Certificates", "{66C102ED-1FA2-4931-A843-27B6FBAF15CE}"
+	ProjectSection(SolutionItems) = preProject
+		512b-rsa-example-cert.der = 512b-rsa-example-cert.der
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.CSR.Communications", "Abiomed.CSR.Communications\Abiomed.CSR.Communications.csproj", "{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13FE805A-D802-48FC-AB6F-DFF1B34F2D39}"
+	ProjectSection(SolutionItems) = preProject
+		512b-rsa-example-cert.der = 512b-rsa-example-cert.der
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Models", "Abiomed.Models\Abiomed.Models.csproj", "{D3662849-0B27-4D08-BFF6-7F1537BCF015}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Business", "Abiomed.Business\Abiomed.Business.csproj", "{3BA379F9-7E33-4BE6-922C-64B9BE509C12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DependencyInjection", "Abiomed.DependencyInjection\Abiomed.DependencyInjection.csproj", "{4BA088F2-D6F0-4632-8A7F-87D6687CFEF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Repository", "Abiomed.Repository\Abiomed.Repository.csproj", "{133ECB86-A3DA-4636-9641-B10B6C8B2431}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Web", "Abiomed.Web\Abiomed.Web.csproj", "{102846B6-3F10-4784-9F21-4F174F135A6A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3662849-0B27-4D08-BFF6-7F1537BCF015}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3662849-0B27-4D08-BFF6-7F1537BCF015}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3662849-0B27-4D08-BFF6-7F1537BCF015}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3662849-0B27-4D08-BFF6-7F1537BCF015}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BA379F9-7E33-4BE6-922C-64B9BE509C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA379F9-7E33-4BE6-922C-64B9BE509C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BA379F9-7E33-4BE6-922C-64B9BE509C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA379F9-7E33-4BE6-922C-64B9BE509C12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BA088F2-D6F0-4632-8A7F-87D6687CFEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BA088F2-D6F0-4632-8A7F-87D6687CFEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BA088F2-D6F0-4632-8A7F-87D6687CFEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BA088F2-D6F0-4632-8A7F-87D6687CFEF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{133ECB86-A3DA-4636-9641-B10B6C8B2431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{133ECB86-A3DA-4636-9641-B10B6C8B2431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{133ECB86-A3DA-4636-9641-B10B6C8B2431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{133ECB86-A3DA-4636-9641-B10B6C8B2431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{102846B6-3F10-4784-9F21-4F174F135A6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{102846B6-3F10-4784-9F21-4F174F135A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{102846B6-3F10-4784-9F21-4F174F135A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{102846B6-3F10-4784-9F21-4F174F135A6A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
