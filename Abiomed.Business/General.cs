@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Abiomed.Business
 {
+    /// <summary>
+    /// General Business Logic Help Methods
+    /// </summary>
     public class General
     {
         public static string ByteArrayToHexString(byte[] bytes)
