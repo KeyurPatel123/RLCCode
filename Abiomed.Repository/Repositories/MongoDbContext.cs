@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,7 +13,7 @@ namespace Abiomed.Repository
     public class MongoDbContext
     {
         public const string CONNECTION_STRING_NAME = "MongoDbConnectionString";
-        public const string DATABASE_NAME = "Devices"; //todo make in app settings for different db's logging, devices, users, etc.
+        public const string DATABASE_NAME = "log4net"; //todo make in app settings for different db's logging, devices, users, etc.
 
         private static readonly IMongoClient _client;
         private static IMongoDatabase _database;
@@ -20,7 +22,7 @@ namespace Abiomed.Repository
         {
             var connectionString = ConfigurationManager.ConnectionStrings[CONNECTION_STRING_NAME].ConnectionString;            
             _client = new MongoClient();            
-            _database = _client.GetDatabase(DATABASE_NAME); // Set default DB
+            _database = _client.GetDatabase(DATABASE_NAME); // Set default DB           
         }
 
         /// <summary>
@@ -29,8 +31,8 @@ namespace Abiomed.Repository
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
         public IMongoCollection<TEntity> GetCollection<TEntity>()
-        {
-            return _database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");
+        {                            
+            return _database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");            
         }
 
         /// <summary>

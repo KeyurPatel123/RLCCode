@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Abiomed.Models;
 
 namespace Abiomed.Repository
 {
@@ -27,6 +28,7 @@ namespace Abiomed.Repository
     public class GetManyResult<TEntity> : Result where TEntity : class, new()
     {
         public IEnumerable<TEntity> Entities { get; set; }
+        
     }
 
     public class GetListResult<T> : Result

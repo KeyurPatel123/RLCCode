@@ -5,82 +5,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js"></script>
     <script src="~/scripts/angular-ui-router.min.js"></script>
     <script src="~/scripts/angular-animate.min.js"></script>
+    <script src="~/scripts/angular-cookie.min.js"></script>
     <script src="~/scripts/underscore-min.js"></script>
-    <script type="text/javascript" src="//player.wowza.com/player/0.2-latest/wowzaplayer.min.js"></script>
+    <script type="text/javascript" src="//player.wowza.com/player/latest/wowzaplayer.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="shortcut icon" href="Images/favicon.ico">
+    <link rel="shortcut icon" href="Content/Images/favicon.ico">
+    <base href="/">
     <title>ABIOMED - Remote Link</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <style>
-        #map {
-            height: 480px;
-        }
-
-        body {
-            background-color: #F5F5F5;
-        }
-
-        .HeaderMain {
-            height: 60px;
-            background-image: url(/Images/HeaderBg.png);
-            background-repeat: no-repeat;
-            background-position: left top;
-            padding-bottom: 80px;
-        }
-
-        .Block {
-            width: 50px;
-            height: 50px;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .LargeBlock {
-            width: 135px;
-            height: 65px;
-            display: inline-block;
-            cursor: pointer;
-            position: absolute;
-            border: 1px solid black;
-        }
-
-        .Red {
-            background-color: red;
-        }
-
-        .Yellow {
-            background-color: yellow;
-        }
-
-        .Grey {
-            background-color: grey;
-        }
-
-        .None {
-            background-color: lightgrey;
-        }
-
-        .WhiteText {
-            color: white;
-        }
-
-        .BlueText {
-            color: blue;
-        }
-    </style>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/Main.css" />    
 </head>
 <body ng-app="app">
-    <div class="HeaderMain Margin15">
-    </div>
+    <div class="HeaderMain Margin15" ng-hide="loggedIn === false">
+        {{root}}
+    </div>    
     <div class="container-fluid">
         <ui-view></ui-view>
     </div>
     <script src="App/scripts/app.config.js"> </script>
+    <script src="App/scripts/app.run.js"> </script>
+
+    <script src="App/scripts/login/login.controller.js"> </script>
     <script src="App/scripts/devices/devices.controller.js"> </script>
+
+    <script src="App/scripts/services/loginService.js"> </script>
+    <script src="App/scripts/services/videoService.js"> </script>
+
 </body>
 </html>

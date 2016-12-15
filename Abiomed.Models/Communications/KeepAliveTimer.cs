@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {
     public class KeepAliveTimer
     {
-        public static Timer _timer;
-        public string _identifier = String.Empty;
+        public Timer _timer;
+        public string _identifier = string.Empty;
         public event EventHandler ThresholdReached;
-
 
         public KeepAliveTimer(string identifier)
         {            
@@ -24,7 +22,7 @@ namespace Abiomed.Models
         }
 
         public void UpdateTimer()
-        {
+        {                        
             _timer.Stop();
             _timer.Start();
         }
@@ -33,7 +31,6 @@ namespace Abiomed.Models
         {
             _timer.Enabled = false;
             _timer.Stop();
-
 
             CommunicationsEvent eventArgs = new CommunicationsEvent();
             eventArgs.Identifier = _identifier;

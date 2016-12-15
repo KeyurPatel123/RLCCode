@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Repository", "Abiom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Web", "Abiomed.Web\Abiomed.Web.csproj", "{102846B6-3F10-4784-9F21-4F174F135A6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Communications.Service", "Abiomed.Communications.Service\Abiomed.Communications.Service.csproj", "{063F3003-01E7-446A-969A-062AEE5F4F83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.RLR.API", "Abiomed.RLR.API\Abiomed.RLR.API.csproj", "{34081798-A789-4F1B-85CC-06B713C9AB0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,14 @@ Global
 		{102846B6-3F10-4784-9F21-4F174F135A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{102846B6-3F10-4784-9F21-4F174F135A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{102846B6-3F10-4784-9F21-4F174F135A6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{063F3003-01E7-446A-969A-062AEE5F4F83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{063F3003-01E7-446A-969A-062AEE5F4F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{063F3003-01E7-446A-969A-062AEE5F4F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{063F3003-01E7-446A-969A-062AEE5F4F83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34081798-A789-4F1B-85CC-06B713C9AB0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34081798-A789-4F1B-85CC-06B713C9AB0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34081798-A789-4F1B-85CC-06B713C9AB0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34081798-A789-4F1B-85CC-06B713C9AB0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

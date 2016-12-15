@@ -10,6 +10,7 @@ using log4net.Repository.Hierarchy;
 using Abiomed.Repository;
 using Abiomed.Models;
 
+
 namespace Abiomed.DependencyInjection 
 {
     public class AutofacContainer
@@ -17,7 +18,7 @@ namespace Abiomed.DependencyInjection
         public static IContainer Container { get; set; }
 
         public void Build()
-        {
+        {            
             //LogConfig();
             log4net.Config.XmlConfigurator.Configure();
 
@@ -29,7 +30,7 @@ namespace Abiomed.DependencyInjection
 
             builder.RegisterType<TLSServer>().As<ITLSServer>();
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
-            builder.RegisterType<RLMDeviceList>();        
+            builder.RegisterType<RLMDeviceList>();
 
             Container = builder.Build();
 

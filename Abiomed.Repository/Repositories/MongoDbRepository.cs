@@ -142,15 +142,27 @@ namespace Abiomed.Repository
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        public async Task<GetManyResult<TEntity>> GetAll<TEntity>() where TEntity : class, new()
+        public async Task<GetManyResult<TEntity>> GetAll<TEntity>(int limit = -1) where TEntity : class, new()
         {
             var res = new GetManyResult<TEntity>();
+            List<TEntity> entities;
             try
             {
+                // note: Was await Async List rather to ToList, look into in the future@!
                 var collection = GetCollection<TEntity>();
-                var entities = await collection.Find(new BsonDocument()).ToListAsync();
+                entities = collection.Find(new BsonDocument()).ToList();                                    
+                
                 if (entities != null)
                 {
+                    entities.Reverse();
+
+                    // Only return subset
+                    // note: look into more how to only retrieve a  certain amount ahead of time
+                    if (limit != -1)
+                    {
+                        entities = entities.GetRange(0, limit);
+                    }
+                                        
                     res.Entities = entities;
                 }
                 res.Success = true;
@@ -438,7 +450,7 @@ namespace Abiomed.Repository
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
         private IMongoCollection<TEntity> GetCollection<TEntity>()
-        {
+        {           
             return _mongoDbContext.GetCollection<TEntity>();
         }
     }
