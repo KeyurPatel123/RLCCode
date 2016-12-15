@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace Abiomed.Models
         public string DeviceId = string.Empty;
 
         // Client  socket.
-        public SslStream workStream = null;
+        public NetworkStream workStream = null;
 
         // Max size of payload is 1024 + 6 bytes of header
         public const int BufferSize = 1030;

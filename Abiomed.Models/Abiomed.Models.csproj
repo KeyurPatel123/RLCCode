@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson, Version=2.3.0.157, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Bson.2.3.0\lib\net45\MongoDB.Bson.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,8 +54,15 @@
     <Compile Include="Communications\TCPStateObject.cs" />
     <Compile Include="Definitions.cs" />
     <Compile Include="Entities\EntityBase.cs" />
+    <Compile Include="Entities\logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RLMStatus.cs" />
+    <Compile Include="Web\Credentials.cs" />
+    <Compile Include="Web\RLMStreamList.cs" />
+    <Compile Include="Web\RLMStream.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

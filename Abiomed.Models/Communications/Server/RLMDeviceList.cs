@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,11 @@ namespace Abiomed.Models
     public class RLMDeviceList
     {
         #region Private        
-        private Dictionary<string, RLMDevice> _RLMDeviceList = new Dictionary<string, RLMDevice>();
+        private ConcurrentDictionary<string, RLMDevice> _RLMDeviceList = new ConcurrentDictionary<string, RLMDevice>();
         #endregion
 
         #region Public
-        public Dictionary<string, RLMDevice> RLMDevices
+        public ConcurrentDictionary<string, RLMDevice> RLMDevices
         {
             get { return _RLMDeviceList; }
             set { _RLMDeviceList = value; }

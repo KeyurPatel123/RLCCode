@@ -14,16 +14,14 @@ namespace Abiomed.Business
     public class RLMCommunication : IRLMCommunication
     {
         private readonly ILog _log;
-        private IMongoDbRepository _MongoDbRepository;
         private RLMDeviceList _RLMDeviceList;
         private string _currentDevice;
         private byte[] returnMessage;
         public event EventHandler SendMessage;
 
-        public RLMCommunication(ILog logger, IMongoDbRepository MongoDbRepository, RLMDeviceList RLMDeviceList)
+        public RLMCommunication(ILog logger, RLMDeviceList RLMDeviceList)
         {
             _log = logger;
-            _MongoDbRepository = MongoDbRepository;
             _RLMDeviceList = RLMDeviceList;            
        } 
 
@@ -98,13 +96,25 @@ namespace Abiomed.Business
 
         private void KeepAliveTimer_ThresholdReached(object sender, EventArgs e)
         {
-            _log.InfoFormat(@"Keep Alive Threshold Reached {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
+            RLMDevice RLMDevice;
+            _RLMDeviceList.RLMDevices.TryGetValue(_currentDevice, out RLMDevice);
 
-            // Throw away session info build session message and fire event to server
-            var ev = (CommunicationsEvent)e;
-            ev.Message = SessionCancelIndicator();
-            _RLMDeviceList.RLMDevices.Remove(ev.Identifier);            
-            SendMessage?.Invoke(sender, ev);
+            // If null, message already processed and session cleared
+            if (RLMDevice != null)
+            {
+                // Throw away session info build session message and fire event to server
+                _log.InfoFormat(@"Keep Alive Threshold Reached {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
+                
+                var ev = (CommunicationsEvent)e;
+                ev.Message = GenerateRequest(Definitions.SessionCloseIndicator);
+                RLMDevice rLMDevice;
+                _RLMDeviceList.RLMDevices.TryRemove(ev.Identifier, out rLMDevice);
+                SendMessage?.Invoke(sender, ev);
+            }
+            else
+            { 
+                _log.InfoFormat(@"Keep Alive Threshold Reached, with RLM already off list. {0}", _currentDevice);
+            }            
         }
 
         private byte[] KeepAlive(byte[] message, out RLMStatus status)
@@ -128,12 +138,6 @@ namespace Abiomed.Business
             return new byte[0];
         }
 
-        private byte[] SessionCancelIndicator()
-        {
-            var message = GenerateRequest(Definitions.SessionCloseIndicator);
-            return message;
-        }
-
         /// <summary>
         /// Generates message to be sent back to client
         /// </summary>
@@ -154,22 +158,65 @@ namespace Abiomed.Business
             return msg;
         }     
 
-        private bool CheckSequenceNumber(UInt16 sequence)
+        private bool ValidateMessage(byte[] dataMessage, out processMessageFunc<byte[], RLMStatus, byte[]> messageToProcess)
         {
             var status = true;
-            RLMDevice RLM;
-            _RLMDeviceList.RLMDevices.TryGetValue(_currentDevice, out RLM);
-            
-            // Check if exist, may be first round if so, ignore
-            if(RLM != null)
+            #region Validate Message ID
+            // Grab first two bytes to determine message type, if invalid exit
+            var msgId = BitConverter.ToUInt16(dataMessage.Take(2).Reverse().ToArray(), 0);
+
+            var validMessage = processMessage.TryGetValue(msgId, out messageToProcess);            
+            if(validMessage == false)
             {
-                // Ensure the current sequence is less than 1. If not, throw status flag
-                if((sequence - 1) != RLM.ClientSequence)
+                status = false;
+                _log.InfoFormat("RLM {0} invalid message type", _currentDevice);
+            }
+            #endregion
+
+            #region Payload
+            if(status)
+            {
+                var payloadBytes = BitConverter.ToUInt16(dataMessage.Skip(2).Take(2).Reverse().ToArray(), 0);
+                var difference = (dataMessage.Length - 6) - payloadBytes;
+                if (difference != 0)
                 {
                     status = false;
+                    _log.InfoFormat("RLM {0} invalid payload size, expected {1}, received {2}", _currentDevice, (dataMessage.Length - 6), payloadBytes);
                 }
-                RLM.ClientSequence = sequence;
+
             }
+            #endregion
+
+            #region Sequence Number and Session has started
+            if (status)
+            {
+                // Get sequence number and store
+                UInt16 sequence = BitConverter.ToUInt16(dataMessage.Skip(4).Take(2).ToArray(), 0);
+
+                RLMDevice RLM;
+                _RLMDeviceList.RLMDevices.TryGetValue(_currentDevice, out RLM);
+
+                // Check if exist, may be first round
+                if (RLM != null)
+                {                    
+                    // Ensure the current sequence is less than 1. If not, throw status flag
+                    if ((sequence - 1) != RLM.ClientSequence)
+                    {
+                        status = false;
+                        _log.InfoFormat("RLM {0} invalid sequence number expected {1}, received {2}", _currentDevice, (RLM.ClientSequence + 1), sequence);
+                    }
+                    RLM.ClientSequence = sequence;
+                }
+                // First round, make sure sequence = 0, but if Session Start okay!
+                // TODO TODO TODO!
+                else if(sequence != 0 || msgId != Definitions.SessionRequest)
+                {
+                    status = false;
+                    _log.InfoFormat("RLM {0} invalid sequence number or not session start message. expected 0, received sequence {1}, MSG", _currentDevice, sequence, msgId);
+                }
+            }
+            #endregion          
+
 
             return status;
         }
@@ -209,30 +256,23 @@ namespace Abiomed.Business
                 // Init return message
                 returnMessage = new byte[0];
 
-                // Get sequence number and store
-                UInt16 seq = BitConverter.ToUInt16(dataMessage.Skip(4).Take(2).ToArray(), 0);
-
                 // If valid sequence number continue
-                if (CheckSequenceNumber(seq))
+                processMessageFunc<byte[], RLMStatus, byte[]> messageToProcess;
+                if (ValidateMessage(dataMessage, out messageToProcess))
                 {
-                    // Grab first two bytes to determine message type
-                    UInt16 msgId = BitConverter.ToUInt16(dataMessage.Take(2).Reverse().ToArray(), 0);
-
-                    processMessageFunc<byte[], RLMStatus, byte[]> messageToProcess;
-                    if (processMessage.TryGetValue(msgId, out messageToProcess))
-                    {
-                        returnMessage = messageToProcess(dataMessage, out status);
-                    }
-                    else
-                    {
-                        // Send Cancel Request
-                        returnMessage = SessionCancelIndicator();
-                        _log.Info(@"Bad request");
-                    }
+                    // Validated, process message
+                    returnMessage = messageToProcess(dataMessage, out status);                   
                 }
                 else
-                {
-                    returnMessage = GenerateRequest(Definitions.SessionCloseIndicator);
+                {       
+                    // Error in data, send request to cancel Session and Close Stream!                           
+                    CommunicationsEvent communicationEvent = new CommunicationsEvent();
+                    communicationEvent.Identifier = _currentDevice;
+                    communicationEvent.Message = GenerateRequest(Definitions.SessionCloseIndicator);
+                    RLMDevice rLMDevice;
+                    _RLMDeviceList.RLMDevices.TryRemove(_currentDevice, out rLMDevice);
+
+                    SendMessage?.Invoke(this, communicationEvent);
                 }
                 
             }

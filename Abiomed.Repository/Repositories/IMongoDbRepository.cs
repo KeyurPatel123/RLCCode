@@ -68,7 +68,7 @@ namespace Abiomed.Repository
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        Task<GetManyResult<TEntity>> GetAll<TEntity>() where TEntity : class, new();
+        Task<GetManyResult<TEntity>> GetAll<TEntity>(int Limit) where TEntity : class, new();
 
         /// <summary>
         /// A generic Exists method

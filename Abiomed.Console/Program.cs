@@ -9,18 +9,18 @@ using Autofac;
 // Testing
 namespace Abiomed.Console
 {
-    class Program
+    public class Program
     {
         private static AutofacContainer autofac;
         static int Main(string[] args)
         {
             try
             {
-
+                System.Console.WriteLine("Console Started.......");
                 autofac = new AutofacContainer();
                 autofac.Build();
                 ITLSServer _tlsServer = AutofacContainer.Container.Resolve<ITLSServer>();
-
+                
                 _tlsServer.Run();                             
             }
             catch (Exception e)
