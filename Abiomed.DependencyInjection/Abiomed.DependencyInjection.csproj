@@ -54,8 +54,8 @@
       <HintPath>..\packages\MongoDB.Driver.Core.2.0.1\lib\net45\MongoDB.Driver.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -97,9 +97,9 @@
       <Project>{133ecb86-a3da-4636-9641-b10b6c8b2431}</Project>
       <Name>Abiomed.Repository</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Abiomed.CSR.Communications\Abiomed.CSR.Communications.csproj">
+    <ProjectReference Include="..\Abiomed.CSR.Communications\Abiomed.RLR.Communications.csproj">
       <Project>{28b0e1d3-612e-4ec5-803d-69adc2d6a07e}</Project>
-      <Name>Abiomed.CSR.Communications</Name>
+      <Name>Abiomed.RLR.Communications</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

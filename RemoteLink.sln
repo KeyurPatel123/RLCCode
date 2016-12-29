@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Certificates", "Certificate
 		512b-rsa-example-cert.der = 512b-rsa-example-cert.der
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.CSR.Communications", "Abiomed.CSR.Communications\Abiomed.CSR.Communications.csproj", "{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.RLR.Communications", "Abiomed.CSR.Communications\Abiomed.RLR.Communications.csproj", "{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13FE805A-D802-48FC-AB6F-DFF1B34F2D39}"
 	ProjectSection(SolutionItems) = preProject
@@ -30,6 +30,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Communications.Service", "Abiomed.Communications.Service\Abiomed.Communications.Service.csproj", "{063F3003-01E7-446A-969A-062AEE5F4F83}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.RLR.API", "Abiomed.RLR.API\Abiomed.RLR.API.csproj", "{34081798-A789-4F1B-85CC-06B713C9AB0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WEB", "WEB", "{E10884A0-7BE4-419F-9CA9-E74196E1C027}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Communications", "Communications", "{EE3D7FCB-A9FA-4C96-A0E1-BCE5F139B4AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,5 +80,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E} = {EE3D7FCB-A9FA-4C96-A0E1-BCE5F139B4AA}
+		{102846B6-3F10-4784-9F21-4F174F135A6A} = {E10884A0-7BE4-419F-9CA9-E74196E1C027}
+		{063F3003-01E7-446A-969A-062AEE5F4F83} = {EE3D7FCB-A9FA-4C96-A0E1-BCE5F139B4AA}
+		{34081798-A789-4F1B-85CC-06B713C9AB0F} = {E10884A0-7BE4-419F-9CA9-E74196E1C027}
 	EndGlobalSection
 EndGlobal

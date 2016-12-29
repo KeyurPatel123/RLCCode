@@ -2,18 +2,49 @@ angular
     .module('app')
     .controller('DevicesController', DevicesController);
 
-DevicesController.$inject = ['$uibModal', 'videoService'];
+DevicesController.$inject = ['$uibModal', '$q', 'dataService'];
 
 
-function DevicesController($uibModal, videoService) {
+function DevicesController($uibModal, $q, dataService) {
     var ViewModel = this;
     var WOWZA;
+    var promises = [dataService.getStreams(), dataService.getDevices()];
+
+    function displayDevices(data)
+    {
+        // First Array is live WOWZA streams
+        // Second is live RLM devices
+
+        // Update Bearer Info to match fonts
+        _.each(data[1], function (d) {
+            if (d.Bearer === "Ethernet")
+                d.Bearer = "desktop";
+            else if (d.Bearer === "Wifi24Ghz")
+                d.Bearer = "wifi";
+            else if (d.Bearer === "Wifi5Ghz")
+                d.Bearer = "wifi";
+            else if (d.Bearer === "LTE")
+                d.Bearer = "mobile";
+        })
+        ViewModel.Devices = data[1];
+    }
+
+    function getData()
+    {
+        $q.all(promises).then(function (data) {
+            displayDevices(data);
+        });       
+    }
+
     var activate = function () {
-        videoService.getStreams().then(function (data) {
+
+        getData();
+
+       /* dataService.getStreams().then(function (data) {
             ViewModel.Devices = data;
 
             // Fake data
-
+            /*
             // Add as default!
             //fa-question-circle-o
             
@@ -35,7 +66,7 @@ function DevicesController($uibModal, videoService) {
 
             ViewModel.Devices = tempDevices;            
             
-        });
+        });*/
     }
 
     ViewModel.Enlarge = function (device) {        
@@ -44,9 +75,9 @@ function DevicesController($uibModal, videoService) {
             template: "<i class='fa fa-{{connectionType}} fa-3x ModalConnectionTypeLogo' aria-hidden='true'></i><h3 class='text-center'>{{RLMSerial}} - {{start}}</h3><hr><div id='playerElement' style='width:100%; height:0; padding:0 0 56.25% 0'></div>",
             size: 'lg',
             controller: function ($scope) {                
-                $scope.RLMSerial = device.name;
-                $scope.connectionType = device.connectionType;
-                $scope.start = device.start;
+                $scope.RLMSerial = device.SerialNumber;
+                $scope.connectionType = device.Bearer;
+                $scope.start = device.ConnectionTime;
                 // Wrap in function to pass paramter
                 setTimeout(function () { StreamDevice(device.name) }, 250);
             },

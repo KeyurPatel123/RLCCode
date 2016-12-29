@@ -1,13 +1,12 @@
 ﻿using Abiomed.Models;
-using Abiomed.Repository;
+using Abiomed.Models.Communications;
 using log4net;
-using MongoDB.Bson;
+using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace Abiomed.Business
 {
@@ -52,6 +51,8 @@ namespace Abiomed.Business
 
                 RLMDevice rlmDevice = new RLMDevice()
                 {
+                    Identifier = _currentDevice,
+                    ConnectionTime = DateTime.UtcNow,
                     Bearer = sessionOpen.Bearer,
                     IfaceVer = sessionOpen.IfaceVer,
                     SerialNo = sessionOpen.SerialNo,
@@ -73,24 +74,153 @@ namespace Abiomed.Business
                 byte[] streamIndicator = new byte[0];
                 if (rlmDevice.Bearer != Definitions.Bearer.LTE)
                 {
-                    streamIndicator = GenerateRequest(Definitions.StreamViedoControlIndications);
+                    var videoControl = VideoControlGeneration(rlmDevice.Bearer, rlmDevice.SerialNo, Definitions.StreamVideoBase);
+                    streamIndicator = GenerateRequest(videoControl);
+                    _RLMDeviceList.RLMDevices[_currentDevice].Streaming = true;
                 }
                 else
                 {
-
+                    // Ask for image 3
+                    streamIndicator = GenerateRequest(Definitions.ScreenCaptureIndicator);
+                    _RLMDeviceList.RLMDevices[_currentDevice].FileTransfer = true;
                 }
 
                 // Append to current Byte[]
                 returnMessage = new byte[sessionMessage.Length + streamIndicator.Length];
                 sessionMessage.CopyTo(returnMessage, 0);
-                streamIndicator.CopyTo(returnMessage, sessionMessage.Length);                    
+                streamIndicator.CopyTo(returnMessage, sessionMessage.Length);
+
+                // Send Update
+                UpdateSubscribedServers();
             }
             catch(Exception e)
             {
-                _log.InfoFormat(@"Session Request Failure {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
+                _log.InfoFormat(@"Session Request Failure {0} Exception {1}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             
+            return returnMessage;
+        }
+
+        private byte[] VideoControlGeneration(Definitions.Bearer bearer, string serialNumber, List<byte> streamVideoControlIndications)
+        {
+            // todo look at bearer!
+
+            // Convert SerialNumber to ASCII, add to list and convert out as byte[]
+            var serialBytes = Encoding.ASCII.GetBytes(serialNumber);
+            streamVideoControlIndications.AddRange(serialBytes);
+            return streamVideoControlIndications.ToArray();
+        }
+
+        private byte[] ScreenCaptureResponse(byte[] message, out RLMStatus status)
+        {
+            status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success};
+
+            byte[] returnMessage = new byte[0];
+            try
+            {
+                ScreenCaptureResponse screenCaptureResponse = new ScreenCaptureResponse();
+                if (BitConverter.IsLittleEndian)
+                {
+                    screenCaptureResponse.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+                    screenCaptureResponse.UserRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);                    
+                }
+                else
+                {
+                    //Todo
+                    //state.payloadLength = BitConverter.ToUInt16(state.buffer, 2);
+                }
+
+                // todo; check for status and userRef
+                if(screenCaptureResponse.Status == 0 && screenCaptureResponse.UserRef == 3579)
+                {
+                    // Good to go!
+                    returnMessage = GenerateRequest(Definitions.FileOpenIndicator);
+                }
+                else
+                {
+                    // Error, figure out what to do 
+                }
+
+
+            }
+            catch(Exception e)
+            {
+                _log.InfoFormat(@"Screen Capture Response Failure {0} Exception {1}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo, e.ToString());
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
+            }
+            return returnMessage;
+        }
+
+        private byte[] FileOpenResponse(byte[] message, out RLMStatus status)
+        {
+            status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+
+            FileOpenResponse fileOpenResponse = new FileOpenResponse();
+
+            byte[] returnMessage = new byte[0];
+            try
+            {
+                if (BitConverter.IsLittleEndian)
+                {
+                    fileOpenResponse.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+                    fileOpenResponse.UserRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
+                    fileOpenResponse.Size = BitConverter.ToUInt16(message.Skip(10).Take(4).Reverse().ToArray(), 0);
+
+                    var time = BitConverter.ToUInt16(message.Skip(14).Take(8).Reverse().ToArray(), 0);
+                    fileOpenResponse.Time = DateTime.FromFileTimeUtc(time);
+                }
+                else
+                {
+                    //Todo
+                    //state.payloadLength = BitConverter.ToUInt16(state.buffer, 2);
+                }
+
+                // todo, add for block x not just 0
+                returnMessage = GenerateRequest(Definitions.FileReadIndicator);
+
+            }
+            catch (Exception e)
+            {
+                _log.InfoFormat(@"File Open Response Failure {0} Exception {1}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo, e.ToString());
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
+            }
+            return returnMessage;
+        }
+
+        private byte[] FileReadResponse(byte[] message, out RLMStatus status)
+        {
+            status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+
+            FileReadResponse fileReadResponse = new FileReadResponse();
+
+            byte[] returnMessage = new byte[0];
+            try
+            {
+                if (BitConverter.IsLittleEndian)
+                {
+                    var payloadBytes = BitConverter.ToUInt16(message.Skip(2).Take(2).Reverse().ToArray(), 0);
+                    fileReadResponse.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+                    fileReadResponse.UserRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
+                    fileReadResponse.Data = message.Skip(10).Take(payloadBytes).Reverse().ToArray();
+                }
+                else
+                {
+                    //Todo
+                    //state.payloadLength = BitConverter.ToUInt16(state.buffer, 2);
+                }
+
+                // todo, determine if full message, if so send file close ind and send off to Web Server, otherwise ask for next block
+
+                // Assume full message for now; send to IIS; send file close
+                SendImage(fileReadResponse.Data, _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
+                returnMessage = GenerateRequest(Definitions.FileCloseIndicator);
+            }
+            catch (Exception e)
+            {
+                _log.InfoFormat(@"File Open Response Failure {0} Exception {1}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo, e.ToString());
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
+            }
             return returnMessage;
         }
 
@@ -109,7 +239,11 @@ namespace Abiomed.Business
                 ev.Message = GenerateRequest(Definitions.SessionCloseIndicator);
                 RLMDevice rLMDevice;
                 _RLMDeviceList.RLMDevices.TryRemove(ev.Identifier, out rLMDevice);
+
+                // Send updated list
+                UpdateSubscribedServers();
                 SendMessage?.Invoke(sender, ev);
+
             }
             else
             { 
@@ -236,8 +370,12 @@ namespace Abiomed.Business
                         {Definitions.SessionRequest, SessionRequest},
                         {Definitions.KeepAlive, KeepAlive},
                         {Definitions.BufferStatusRequest, BufferStatusRequest},
-                        {Definitions.SessionCancel, SessionCancel }
+                        {Definitions.SessionCancel, SessionCancel },
+                        {Definitions.ScreenCaptureResponse, ScreenCaptureResponse},
+                        {Definitions.FileOpenResponse, FileOpenResponse },
+                        {Definitions.FileReadResponse, FileOpenResponse }
                     };
+
                 }
                 return processMessageDictionary;
             }
@@ -283,5 +421,68 @@ namespace Abiomed.Business
             return returnMessage;
         }
         #endregion
+
+        private void UpdateSubscribedServers()
+        {
+            var client = new RestClient("http://localhost/api/DeviceStatus");
+            var request = new RestRequest(Method.POST);
+
+            List<DeviceStatus> devices = new List<DeviceStatus>();
+            foreach(var device in _RLMDeviceList.RLMDevices)
+            {
+                DeviceStatus ds = new DeviceStatus { Bearer = device.Value.Bearer.ToString(), ConnectionTime = device.Value.ConnectionTime, SerialNumber = device.Value.SerialNo };
+                devices.Add(ds);
+            }
+
+            var deviceStatus = JsonConvert.SerializeObject(devices);
+
+            request.AddParameter("application/json; charset=utf-8", deviceStatus, ParameterType.RequestBody);
+
+
+
+            client.ExecuteAsync(request, response => {
+                Console.WriteLine(response.Content);
+            });
+        }
+
+        private void SendImage(byte[] image, string serialNumber)
+        {
+            var client = new RestClient("http://localhost/RLR/api/Image");
+            var request = new RestRequest(Method.POST);
+            RLMImage rLMImage = new RLMImage { Data = image, SerialNumber = serialNumber };
+            request.AddParameter(@"rLMImage", rLMImage);
+
+            //IRestResponse response;
+            client.ExecuteAsync(request, response => {
+                Console.WriteLine(response.Content);
+            });
+            
+        }
+
+        public bool StartVideo(string serialNumber)
+        {
+            bool status = true;
+            
+            // Go through list of active devices, find serial number and send message
+            var rlmDevice = _RLMDeviceList.RLMDevices.Values.FirstOrDefault(x => x.SerialNo == serialNumber);
+            
+            if(rlmDevice == null)
+            {
+                status = false;
+            }
+
+            if (status)
+            {
+                CommunicationsEvent ev = new CommunicationsEvent();
+                ev.Identifier = rlmDevice.Identifier;
+
+                var videoControl = VideoControlGeneration(rlmDevice.Bearer, rlmDevice.SerialNo, Definitions.StreamVideoBase);
+                // Update Generate Request to include device! Right now sequence will fail
+                ev.Message = GenerateRequest(videoControl);
+
+                SendMessage?.Invoke(this, ev);
+            }
+            return status;
+        }
     }
 }

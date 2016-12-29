@@ -98,8 +98,8 @@
       <HintPath>..\packages\MongoDB.Driver.Core.2.0.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -168,7 +168,7 @@
     <Content Include="App\scripts\login\login.controller.js" />
     <Content Include="App\scripts\login\login.template.html" />
     <Content Include="App\scripts\services\loginService.js" />
-    <Content Include="App\scripts\services\videoService.js" />
+    <Content Include="App\scripts\services\dataService.js" />
     <Content Include="Content\Images\favicon.ico" />
     <Content Include="Content\Images\HeaderBg.png" />
     <Content Include="Content\Images\Logo.png" />
@@ -202,6 +202,8 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\DeviceStatusController.cs" />
+    <Compile Include="API\ImageController.cs" />
     <Compile Include="API\LoginController.cs" />
     <Compile Include="API\VideoController.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />

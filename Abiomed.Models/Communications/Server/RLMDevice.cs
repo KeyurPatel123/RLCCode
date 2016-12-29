@@ -9,6 +9,8 @@ namespace Abiomed.Models
     public class RLMDevice
     {
         #region Private        
+        private string _identifier;
+        private DateTime _connectionTime;        
         private string _serialNo = string.Empty;
         private bool _streaming = false;
         private int _clientSequence = 0;
@@ -16,10 +18,24 @@ namespace Abiomed.Models
         private int _ifaceVer;
         private Definitions.Bearer _bearer = Definitions.Bearer.Unknown;
         private string _text;
-        private KeepAliveTimer _keepAliveTimer;        
+        private KeepAliveTimer _keepAliveTimer;
+        private int _block = 0;
+        private bool fileTransfer = false;
+
         #endregion
 
         #region Public
+        public string Identifier
+        {
+            get { return _identifier; }
+            set { _identifier = value; }
+        }
+
+        public DateTime ConnectionTime
+        {
+            get { return _connectionTime; }
+            set { _connectionTime = value; }
+        }
         public string SerialNo
         {
             get { return _serialNo; }
@@ -67,6 +83,20 @@ namespace Abiomed.Models
             get { return _keepAliveTimer; }
             set { _keepAliveTimer = value; }
         }
+
+        public int Block
+        {
+            get { return _block; }
+            set { _block = value; }
+        }
+
+        public bool FileTransfer
+        {
+            get { return fileTransfer; }
+            set { fileTransfer = value; }
+        }
+
+
         #endregion
     }
 }

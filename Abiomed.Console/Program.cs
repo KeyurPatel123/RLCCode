@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abiomed.DependencyInjection;
-using Abiomed.CSR.Communications;
+using Abiomed.RLR.Communications;
 using Autofac;
 // Testing
 namespace Abiomed.Console
@@ -16,12 +16,12 @@ namespace Abiomed.Console
         {
             try
             {
-                System.Console.WriteLine("Console Started.......");
+                System.Console.WriteLine("Enter port number ");
                 autofac = new AutofacContainer();
                 autofac.Build();
-                ITLSServer _tlsServer = AutofacContainer.Container.Resolve<ITLSServer>();
+                ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();
                 
-                _tlsServer.Run();                             
+                _tcpServer.Run();                             
             }
             catch (Exception e)
             {

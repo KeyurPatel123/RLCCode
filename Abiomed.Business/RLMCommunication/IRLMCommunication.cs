@@ -13,5 +13,6 @@ namespace Abiomed.Business
 
         byte[] ProcessMessage(string deviceId, byte[] dataMessage,out RLMStatus status);
 
+        bool StartVideo(string serialNumber);
     }
 }

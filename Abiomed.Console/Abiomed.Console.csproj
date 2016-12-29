@@ -57,6 +57,10 @@
       <HintPath>..\packages\MongoDB.Driver.Core.2.3.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -79,9 +83,9 @@
       <Project>{4ba088f2-d6f0-4632-8a7f-87d6687cfef0}</Project>
       <Name>Abiomed.DependencyInjection</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Abiomed.CSR.Communications\Abiomed.CSR.Communications.csproj">
+    <ProjectReference Include="..\Abiomed.CSR.Communications\Abiomed.RLR.Communications.csproj">
       <Project>{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}</Project>
-      <Name>Abiomed.CSR.Communications</Name>
+      <Name>Abiomed.RLR.Communications</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

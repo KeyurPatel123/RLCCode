@@ -3,11 +3,11 @@
         <div class="row">
             <div class="col-xs-12">
                 <div ng-click="devices.Enlarge(device)" ng-repeat="device in devices.Devices track by $index" class="LargeBlock">
-                    <span class="RLSerial">{{device.name}}</span>
-                    <i class="fa fa-{{device.connectionType}} fa-2x pull-right" aria-hidden="true"></i>     
+                    <span class="RLSerial">{{device.SerialNumber}}</span>
+                    <i class="fa fa-{{device.Bearer}} fa-2x pull-right" aria-hidden="true"></i>     
                     <hr/>
                     <div>Connection Start Time</div>  
-                    <div>{{device.start}}</div>                 
+                    <div>{{device.ConnectionTime}}</div>                 
                 </div>
             </div>
         </div>

@@ -34,6 +34,10 @@
       <HintPath>..\packages\MongoDB.Bson.2.3.0\lib\net45\MongoDB.Bson.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,7 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communications\BaseMessage.cs" />
+    <Compile Include="Communications\Client\FileReadResponse .cs" />
+    <Compile Include="Communications\Client\FileOpenResponse.cs" />
+    <Compile Include="Communications\Client\RLMImage.cs" />
+    <Compile Include="Communications\Client\ScreenCaptureResponse.cs" />
     <Compile Include="Communications\CommunicationsEvent.cs" />
+    <Compile Include="Communications\DeviceStatus.cs" />
     <Compile Include="Communications\KeepAliveTimer.cs" />
     <Compile Include="Communications\Server\RLMDeviceList.cs" />
     <Compile Include="Communications\Server\RLMDevice.cs" />

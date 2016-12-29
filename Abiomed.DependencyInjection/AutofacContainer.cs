@@ -1,5 +1,5 @@
 ﻿
-using Abiomed.CSR.Communications;
+using Abiomed.RLR.Communications;
 using Abiomed.Business;
 
 using Autofac;
@@ -19,7 +19,6 @@ namespace Abiomed.DependencyInjection
 
         public void Build()
         {            
-            //LogConfig();
             log4net.Config.XmlConfigurator.Configure();
 
             var builder = new ContainerBuilder();
@@ -28,7 +27,7 @@ namespace Abiomed.DependencyInjection
 
             builder.RegisterInstance(LogManager.GetLogger(@"Logger")).As<ILog>();
 
-            builder.RegisterType<TLSServer>().As<ITLSServer>();
+            builder.RegisterType<TCPServer>().As<ITCPServer>();
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
             builder.RegisterType<RLMDeviceList>();
 
