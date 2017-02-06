@@ -16,11 +16,9 @@ namespace Abiomed.Console
         {
             try
             {
-                System.Console.WriteLine("Enter port number ");
                 autofac = new AutofacContainer();
                 autofac.Build();
-                ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();
-                
+                ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();                
                 _tcpServer.Run();                             
             }
             catch (Exception e)

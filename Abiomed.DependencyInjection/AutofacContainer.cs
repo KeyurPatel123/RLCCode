@@ -30,7 +30,7 @@ namespace Abiomed.DependencyInjection
             builder.RegisterType<TCPServer>().As<ITCPServer>();
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
             builder.RegisterType<RLMDeviceList>();
-
+            builder.RegisterType<Configuration>();
             Container = builder.Build();
 
             ILog logger = Container.Resolve<ILog>();

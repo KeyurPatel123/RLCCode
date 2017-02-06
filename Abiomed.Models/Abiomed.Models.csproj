@@ -39,6 +39,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,6 +62,7 @@
     <Compile Include="Communications\Client\BearerOpen.cs" />
     <Compile Include="Communications\Client\SessionOpen.cs" />
     <Compile Include="Communications\TCPStateObject.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Definitions.cs" />
     <Compile Include="Entities\EntityBase.cs" />
     <Compile Include="Entities\logger.cs" />

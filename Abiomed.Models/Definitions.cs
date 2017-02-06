@@ -12,12 +12,16 @@ namespace Abiomed.Models
 
         public static int MsgHeaderLength = 6;
 
+        public static UInt16 SuccessStats = 0x8000;
+        public static UInt16 UserRef = 0x1234;
+
         #region Receiving 
         public static UInt16 SessionRequest = 0x8000;
-        public static UInt16 KeepAlive = 0x0004;
+        public static UInt16 KeepAlive = 0x8004;
         public static UInt16 BufferStatusRequest = 0x8201;
         public static UInt16 OpenBearerRequest = 0x8001;
         public static UInt16 SessionCancel = 0x8005;
+        public static UInt16 StreamVideoResponse = 0xC200;
         public static UInt16 ScreenCaptureResponse = 0xC202;
         public static UInt16 FileOpenResponse = 0xC300;
         public static UInt16 FileReadResponse = 0xC301;
@@ -25,7 +29,7 @@ namespace Abiomed.Models
         #endregion
 
         #region Send
-        public static byte[] SessionConfirm = new byte[] { 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01};
+        public static byte[] SessionConfirm = new byte[] { 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00};
         public static byte[] SessionCloseIndicator = new byte[] { 0x00, 0x05, 0x00, 0x00, 0x00, 0x00};
         
         #region Video

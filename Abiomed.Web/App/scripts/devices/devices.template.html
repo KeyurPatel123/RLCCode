@@ -11,5 +11,13 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div ng-click="devices.EnlargeStream(device)" ng-repeat="device in devices.Streams track by $index" class="LargeBlock">
+                   <div>{{device.name}}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

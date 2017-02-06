@@ -189,6 +189,7 @@
     </Content>
     <Content Include="Views\RLM\index.cshtml" />
     <Content Include="package.json" />
+    <Content Include="scripts\moment.min.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

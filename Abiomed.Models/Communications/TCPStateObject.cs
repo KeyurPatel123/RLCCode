@@ -13,6 +13,9 @@ namespace Abiomed.Models
         // Device Id
         public string DeviceId = string.Empty;
 
+        // TCP Client Object
+        public TcpClient TcpClient;
+        
         // Client  socket.
         public NetworkStream workStream = null;
 

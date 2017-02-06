@@ -1,0 +1,80 @@
+﻿#map {
+    height: 480px;
+}
+
+body {
+    background-color: #F5F5F5;
+}
+
+.HeaderMain {
+    height: 60px;
+    background-image: url(/Content/Images/HeaderBg.png);
+    background-repeat: no-repeat;
+    background-position: left top;
+    padding-bottom: 80px;
+}
+
+.Block {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.LargeBlock {
+    display: inline-block;
+    cursor: pointer;
+    margin: 10px;
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.ModalConnectionTypeLogo
+{
+    float: right;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+.RLSerial{
+    font-size: 18px;
+}
+
+hr {
+    border-top: 1px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+.RedText
+{
+    color:red;
+}
+.Red {
+    background-color: red;
+}
+
+.Yellow {
+    background-color: yellow;
+}
+
+.Grey {
+    background-color: grey;
+}
+
+.None {
+    background-color: lightgrey;
+}
+
+.WhiteText {
+    color: white;
+}
+
+.BlueText {
+    color: blue;
+}
+
+.Padding15
+{
+    padding:15px;
+}

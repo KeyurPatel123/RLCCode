@@ -8,7 +8,7 @@ DevicesController.$inject = ['$uibModal', '$q', 'dataService'];
 function DevicesController($uibModal, $q, dataService) {
     var ViewModel = this;
     var WOWZA;
-    var promises = [dataService.getStreams(), dataService.getDevices()];
+    var promises = [dataService.getDevices(), dataService.getStreams()];
 
     function displayDevices(data)
     {
@@ -16,7 +16,7 @@ function DevicesController($uibModal, $q, dataService) {
         // Second is live RLM devices
 
         // Update Bearer Info to match fonts
-        _.each(data[1], function (d) {
+        _.each(data[0], function (d) {
             if (d.Bearer === "Ethernet")
                 d.Bearer = "desktop";
             else if (d.Bearer === "Wifi24Ghz")
@@ -25,48 +25,31 @@ function DevicesController($uibModal, $q, dataService) {
                 d.Bearer = "wifi";
             else if (d.Bearer === "LTE")
                 d.Bearer = "mobile";
+
+            var time = moment(d.ConnectionTime);
+            d.ConnectionTime = time.fromNow();
         })
-        ViewModel.Devices = data[1];
+        ViewModel.Devices = data[0];
     }
 
     function getData()
     {
         $q.all(promises).then(function (data) {
-            displayDevices(data);
+
+            if (data[0] !== null)
+            {
+                displayDevices(data[0]);
+            }
+            
+            if (data[1].length > 0)
+            {
+                ViewModel.Streams = data[1];
+            }
         });       
     }
 
     var activate = function () {
-
-        getData();
-
-       /* dataService.getStreams().then(function (data) {
-            ViewModel.Devices = data;
-
-            // Fake data
-            /*
-            // Add as default!
-            //fa-question-circle-o
-            
-            ViewModel.Devices = [];
-            var type = "wifi";
-
-            var tempDevices = [];
-            for (var i = 12300; i < 12400; i++)
-            {
-                tempDevices.push({ name: "RL" + i, connectionType: type, start: new Date().toLocaleString() });
-                
-                if (type === "wifi")
-                    type = "desktop";
-                else if (type === "desktop")
-                    type = "mobile";
-                else if (type === "mobile")
-                    type = "wifi";
-            }
-
-            ViewModel.Devices = tempDevices;            
-            
-        });*/
+        getData();      
     }
 
     ViewModel.Enlarge = function (device) {        
@@ -92,6 +75,26 @@ function DevicesController($uibModal, $q, dataService) {
 
     }
 
+    // todo delete when linked
+    ViewModel.EnlargeStream = function (device) {
+        var modalInstance = $uibModal.open({
+            //template: "<h3>Hospital: {{Hospital}}, Alarm: {{Alarm}}, Last Alarm Time: {{AlarmTime}} </h3><hr>    <div id='playerElement' style='width:100%; height:0; padding:0 0 56.25% 0'></div>",
+            template: "<div id='playerElement' style='width:100%; height:0; padding:0 0 56.25% 0'></div>",
+            size: 'lg',
+            controller: function ($scope) {
+                // Wrap in function to pass paramter
+                setTimeout(function () { StreamDevice(device.name) }, 250);
+            },
+
+        });
+
+        // Modal closing, clean up Wowza
+        modalInstance.result.then(function () { },
+        function () {
+            WOWZA.destroy();
+        });
+
+    }
     function StreamDevice(streamName)
     {
         WOWZA = WowzaPlayer.create('playerElement',

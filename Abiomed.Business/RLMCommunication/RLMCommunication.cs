@@ -14,15 +14,17 @@ namespace Abiomed.Business
     {
         private readonly ILog _log;
         private RLMDeviceList _RLMDeviceList;
+        private Configuration _configuration;
         private string _currentDevice;
         private byte[] returnMessage;
         public event EventHandler SendMessage;
 
-        public RLMCommunication(ILog logger, RLMDeviceList RLMDeviceList)
+        public RLMCommunication(ILog logger, RLMDeviceList RLMDeviceList, Configuration Configuration)
         {
             _log = logger;
-            _RLMDeviceList = RLMDeviceList;            
-       } 
+            _RLMDeviceList = RLMDeviceList;
+            _configuration = Configuration;
+        } 
 
         private void BearerRequest(byte[] message)
         {
@@ -39,9 +41,9 @@ namespace Abiomed.Business
                 {
                     sessionOpen.MsgSeq = BitConverter.ToUInt16(message.Skip(4).Take(2).Reverse().ToArray(), 0);
                     sessionOpen.IfaceVer = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
-                    sessionOpen.SerialNo = Encoding.ASCII.GetString(message.Skip(8).Take(8).ToArray());
-                    sessionOpen.Bearer = (Definitions.Bearer)BitConverter.ToUInt16(message.Skip(16).Take(2).Reverse().ToArray(), 0);                    
-                    sessionOpen.Text = Encoding.ASCII.GetString(message.Skip(18).Take(message.Length - 18).ToArray());
+                    sessionOpen.SerialNo = Encoding.ASCII.GetString(message.Skip(8).Take(7).ToArray());
+                    sessionOpen.Bearer = (Definitions.Bearer)BitConverter.ToUInt16(message.Skip(15).Take(2).Reverse().ToArray(), 0);                    
+                    sessionOpen.Text = Encoding.ASCII.GetString(message.Skip(17).Take(message.Length - 18).ToArray());
                 }
                 else
                 {
@@ -108,8 +110,30 @@ namespace Abiomed.Business
 
             // Convert SerialNumber to ASCII, add to list and convert out as byte[]
             var serialBytes = Encoding.ASCII.GetBytes(serialNumber);
-            streamVideoControlIndications.AddRange(serialBytes);
-            return streamVideoControlIndications.ToArray();
+
+            // Add length 
+            List<byte> streamControl = new List<byte>(streamVideoControlIndications);                       
+            streamControl.Add(Convert.ToByte(serialNumber.Length));
+            streamControl.AddRange(serialBytes);
+            return streamControl.ToArray();
+        }
+
+        private byte[] StreamVideoResponse(byte[] message, out RLMStatus status)
+        {
+            status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+
+            // Check for status and user ref
+            var statusCode = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+            var userRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
+            
+            // Error checking
+            if(statusCode != Definitions.SuccessStats || userRef != Definitions.UserRef)
+            {
+                // Close Current Session
+                SessionCloseIndicator();
+            }
+
+            return new byte[0];
         }
 
         private byte[] ScreenCaptureResponse(byte[] message, out RLMStatus status)
@@ -139,10 +163,9 @@ namespace Abiomed.Business
                 }
                 else
                 {
-                    // Error, figure out what to do 
+                    // Close Current Session
+                    SessionCloseIndicator();
                 }
-
-
             }
             catch(Exception e)
             {
@@ -255,6 +278,7 @@ namespace Abiomed.Business
         {
             // Push back timer
             _RLMDeviceList.RLMDevices[_currentDevice].KeepAliveTimer.UpdateTimer();
+            _log.InfoFormat(@"Keep Alive RLM {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
             return new byte[0];
         }
@@ -262,12 +286,26 @@ namespace Abiomed.Business
         private byte[] BufferStatusRequest(byte[] message, out RLMStatus status)
         {
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+
+            // Check for status and user ref
+            var statusCode = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+            var userRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
+
+            // Error checking
+            if (statusCode != Definitions.SuccessStats || userRef != Definitions.UserRef)
+            {
+                // Close Current Session
+                SessionCloseIndicator();
+            }
+
             return new byte[0];
         }
 
         private byte[] SessionCancel(byte[] message, out RLMStatus status)
         {
             _log.InfoFormat(@"Session Cancel {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
+            // Push back timer, for the last time.
+            _RLMDeviceList.RLMDevices[_currentDevice].KeepAliveTimer.UpdateTimer();
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
             return new byte[0];
         }
@@ -284,10 +322,19 @@ namespace Abiomed.Business
             msg[3] = payload[0];
 
             // Update sequence number
-            UInt16 serverSequence =  _RLMDeviceList.RLMDevices[_currentDevice].ServerSequence++;
-            byte[] serverSequenceBytes = BitConverter.GetBytes(serverSequence);
-            msg[4] = serverSequenceBytes[0];
-            msg[5] = serverSequenceBytes[1];
+            RLMDevice device;
+            _RLMDeviceList.RLMDevices.TryGetValue(_currentDevice, out device);
+            if(device != null)
+            {
+                UInt16 serverSequence = device.ServerSequence++;
+                byte[] serverSequenceBytes = BitConverter.GetBytes(serverSequence);
+                msg[4] = serverSequenceBytes[0];
+                msg[5] = serverSequenceBytes[1];
+            }
+            else
+            {
+                // error device does not exist!
+            }
 
             return msg;
         }     
@@ -325,7 +372,7 @@ namespace Abiomed.Business
             if (status)
             {
                 // Get sequence number and store
-                UInt16 sequence = BitConverter.ToUInt16(dataMessage.Skip(4).Take(2).ToArray(), 0);
+                UInt16 sequence = BitConverter.ToUInt16(dataMessage.Skip(4).Take(2).Reverse().ToArray(), 0);
 
                 RLMDevice RLM;
                 _RLMDeviceList.RLMDevices.TryGetValue(_currentDevice, out RLM);
@@ -371,7 +418,8 @@ namespace Abiomed.Business
                         {Definitions.KeepAlive, KeepAlive},
                         {Definitions.BufferStatusRequest, BufferStatusRequest},
                         {Definitions.SessionCancel, SessionCancel },
-                        {Definitions.ScreenCaptureResponse, ScreenCaptureResponse},
+                        {Definitions.StreamVideoResponse, StreamVideoResponse},
+                        { Definitions.ScreenCaptureResponse, ScreenCaptureResponse},
                         {Definitions.FileOpenResponse, FileOpenResponse },
                         {Definitions.FileReadResponse, FileOpenResponse }
                     };
@@ -402,29 +450,35 @@ namespace Abiomed.Business
                     returnMessage = messageToProcess(dataMessage, out status);                   
                 }
                 else
-                {       
-                    // Error in data, send request to cancel Session and Close Stream!                           
-                    CommunicationsEvent communicationEvent = new CommunicationsEvent();
-                    communicationEvent.Identifier = _currentDevice;
-                    communicationEvent.Message = GenerateRequest(Definitions.SessionCloseIndicator);
-                    RLMDevice rLMDevice;
-                    _RLMDeviceList.RLMDevices.TryRemove(_currentDevice, out rLMDevice);
-
-                    SendMessage?.Invoke(this, communicationEvent);
+                {
+                    // Close Current Session
+                    SessionCloseIndicator();
                 }
                 
-            }
+           } 
             catch(Exception e)
             {
-                _log.Error(@"Exception ", e);                
+                _log.InfoFormat(@"RLM {0} already removed, during processing of message received", deviceId);                    
             }
             return returnMessage;
         }
         #endregion
 
+        private void SessionCloseIndicator()
+        {
+            // Error in data, send request to cancel Session and Close Stream!                           
+            CommunicationsEvent communicationEvent = new CommunicationsEvent();
+            communicationEvent.Identifier = _currentDevice;
+            communicationEvent.Message = GenerateRequest(Definitions.SessionCloseIndicator);
+            RLMDevice rLMDevice;
+            _RLMDeviceList.RLMDevices.TryRemove(_currentDevice, out rLMDevice);
+
+            SendMessage?.Invoke(this, communicationEvent);
+        }
+
         private void UpdateSubscribedServers()
         {
-            var client = new RestClient("http://localhost/api/DeviceStatus");
+            var client = new RestClient(_configuration.DeviceStatus);
             var request = new RestRequest(Method.POST);
 
             List<DeviceStatus> devices = new List<DeviceStatus>();
@@ -438,8 +492,6 @@ namespace Abiomed.Business
 
             request.AddParameter("application/json; charset=utf-8", deviceStatus, ParameterType.RequestBody);
 
-
-
             client.ExecuteAsync(request, response => {
                 Console.WriteLine(response.Content);
             });
@@ -447,7 +499,7 @@ namespace Abiomed.Business
 
         private void SendImage(byte[] image, string serialNumber)
         {
-            var client = new RestClient("http://localhost/RLR/api/Image");
+            var client = new RestClient(_configuration.ImageSend);
             var request = new RestRequest(Method.POST);
             RLMImage rLMImage = new RLMImage { Data = image, SerialNumber = serialNumber };
             request.AddParameter(@"rLMImage", rLMImage);
