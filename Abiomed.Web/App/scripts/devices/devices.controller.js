@@ -102,7 +102,7 @@ function DevicesController($uibModal, $q, dataService) {
                    "license": "PLAY1-8kFhe-MmMCt-pf9YE-G3P7D-xXX89",
                    "title": "",
                    "description": "",
-                   "sourceURL": "http://10.11.0.16:1935/live/" + streamName + "/playlist.m3u8",
+                   "sourceURL": "http://10.11.0.16:443/live/" + streamName + "/playlist.m3u8",
                    "autoPlay": true,
                    "volume": "0",
                    "mute": false,

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using log4net;
 using Abiomed.Business;
 using System.Linq;
-using Abiomed.Models;
 using System.Collections.Concurrent;
+using Abiomed.Models;
 
 namespace Abiomed.RLR.Communications
-{    public class TCPServer : ITCPServer
+{
+    public class TCPServer : ITCPServer
     {
         private readonly ILog _log;
         private IRLMCommunication _RLMCommunication;
