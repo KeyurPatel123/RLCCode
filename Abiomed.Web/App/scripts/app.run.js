@@ -1,3 +1,11 @@
+/*
+Remote Link - Copyright 2017 ABIOMED, Inc.
+--------------------------------------------------------
+Description:
+app.run.js: App Run
+--------------------------------------------------------
+Author: Alessandro Agnello 
+*/
 angular
     .module('app')
     .run(run);

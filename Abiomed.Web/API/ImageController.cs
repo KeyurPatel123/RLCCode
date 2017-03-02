@@ -1,12 +1,16 @@
-﻿using Abiomed.Models.Communications;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * ImageController.cs: Image Controller
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Models.Communications;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace Abiomed.Web.API
@@ -23,7 +27,7 @@ namespace Abiomed.Web.API
                     image.Save(@"C:\Development\MKS.png", ImageFormat.Png);  // Or Png
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
 
             }

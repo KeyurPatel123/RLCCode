@@ -1,15 +1,18 @@
-﻿
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * AutofacContainer.cs: Autofac Container
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using Abiomed.RLR.Communications;
 using Abiomed.Business;
-
 using Autofac;
 using log4net;
-using log4net.Appender;
-using log4net.Layout;
-using log4net.Repository.Hierarchy;
 using Abiomed.Repository;
 using Abiomed.Models;
-
 
 namespace Abiomed.DependencyInjection 
 {

@@ -1,10 +1,16 @@
-﻿using Abiomed.Models;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * DataRetrieval.cs: Data Retrieval for MongoDB Log
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using Abiomed.Models;
 using Abiomed.Repository;
 using log4net;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Abiomed.Business

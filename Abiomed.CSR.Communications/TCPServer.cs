@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * tcpserver.cs: ASYNCH TCP Server
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -49,16 +58,16 @@ namespace Abiomed.RLR.Communications
                     // Close Connection
                     handle.workStream.Close();
 
-                    _log.InfoFormat("Error: Closing RLM Connection {0}", handle.DeviceId);
+                    _log.InfoFormat("TCP Send: Closing RLM Connection {0}", handle.DeviceId);
                 }
                 else
                 {
-                    _log.Info("Error: RLM Connection already closed");
+                    _log.Info("TCP Send: RLM Connection already closed");
                 }
             }
             catch(Exception ex)
             {
-                _log.Error("Error: RLM Connection already closed", ex);
+                _log.Error("TCP Send: RLM Connection already closed", ex);
             }
         }
 
@@ -152,6 +161,10 @@ namespace Abiomed.RLR.Communications
 
                     // Process message
                     RLMStatus RLMStatus;
+
+                    // Check if multiple messages, if so separate and process individually
+                    //var messages = _RLMCommunication.SeperateMessages(receivedBuffer.ToArray());
+
                     byte[] returnMessage = _RLMCommunication.ProcessMessage(state.DeviceId, receivedBuffer.ToArray(), out RLMStatus);
 
                     // Send Message if there is something to send back
@@ -176,7 +189,7 @@ namespace Abiomed.RLR.Communications
                     // kill connection
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 TCPStateObject state = (TCPStateObject)ar.AsyncState;
                 state.workStream.Close();
@@ -185,7 +198,11 @@ namespace Abiomed.RLR.Communications
                 TCPStateObject tcpState;
                 tcpStateObjectList.TryRemove(state.DeviceId, out tcpState);
 
-                _log.InfoFormat("RLM {0} closed connection", state.DeviceId);                
+                RLMDevice device;
+                _RLMDeviceList.RLMDevices.TryRemove(state.DeviceId ,out device);
+                _RLMCommunication.UpdateSubscribedServers();
+
+                _log.InfoFormat("ReadCallback - RLM {0} closed connection", state.DeviceId);                
             }
         }
         

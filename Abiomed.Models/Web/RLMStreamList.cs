@@ -1,8 +1,13 @@
-﻿using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * RLMStreamList.cs: RLM Stream List Model
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {

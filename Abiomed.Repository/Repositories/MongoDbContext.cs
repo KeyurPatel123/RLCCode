@@ -1,4 +1,12 @@
-﻿using MongoDB.Bson;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * MongoDbContext.cs: Mongo DB Context REPO
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using System;

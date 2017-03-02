@@ -1,11 +1,13 @@
-﻿using Abiomed.Models;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * VideoController.cs: Video Controller
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Models;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Script.Serialization;
 
@@ -19,7 +21,6 @@ namespace Abiomed.Web
         {
             var data = new JavaScriptSerializer().Deserialize<object>(WowzaInfo());
 
-  
             RLMStreamList rLMStreams = new RLMStreamList();
             // fa-question-circle-o add as icon default!?
             return data;

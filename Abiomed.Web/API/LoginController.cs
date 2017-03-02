@@ -1,9 +1,12 @@
-﻿using Abiomed.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * LoginController.cs: Login Controller
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Models;
 using System.Web.Http;
 
 namespace Abiomed.Web.API

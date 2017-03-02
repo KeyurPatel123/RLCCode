@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * Result.cs: Generic Result Builder
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

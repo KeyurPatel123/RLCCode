@@ -1,11 +1,20 @@
+/*
+Remote Link - Copyright 2017 ABIOMED, Inc.
+--------------------------------------------------------
+Description:
+devices.controller.js: Devices Controller
+--------------------------------------------------------
+Author: Alessandro Agnello 
+*/
+
 angular
     .module('app')
     .controller('DevicesController', DevicesController);
 
-DevicesController.$inject = ['$uibModal', '$q', 'dataService'];
+DevicesController.$inject = ['$uibModal', '$q', '$timeout', 'dataService'];
 
 
-function DevicesController($uibModal, $q, dataService) {
+function DevicesController($uibModal, $q, $timeout, dataService) {
     var ViewModel = this;
     var WOWZA;
     var promises = [dataService.getDevices(), dataService.getStreams()];
@@ -14,22 +23,28 @@ function DevicesController($uibModal, $q, dataService) {
     {
         // First Array is live WOWZA streams
         // Second is live RLM devices
-
+        d.WifiType = "";
         // Update Bearer Info to match fonts
-        _.each(data[0], function (d) {
+        _.each(data, function (d) {
             if (d.Bearer === "Ethernet")
                 d.Bearer = "desktop";
             else if (d.Bearer === "Wifi24Ghz")
+            {
                 d.Bearer = "wifi";
+                d.WifiType = "2.4";
+            }
             else if (d.Bearer === "Wifi5Ghz")
+            {
                 d.Bearer = "wifi";
+                d.WifiType = "5";
+            }
             else if (d.Bearer === "LTE")
                 d.Bearer = "mobile";
 
             var time = moment(d.ConnectionTime);
             d.ConnectionTime = time.fromNow();
         })
-        ViewModel.Devices = data[0];
+        ViewModel.Devices = data;
     }
 
     function getData()
@@ -45,12 +60,23 @@ function DevicesController($uibModal, $q, dataService) {
             {
                 ViewModel.Streams = data[1];
             }
-        });       
+        });
+
+        // Start Polling
+        poller();
     }
 
     var activate = function () {
-        getData();      
+        getData();        
     }
+
+    var poller = function () {
+        dataService.getDevices().then(function(data)
+        {
+            displayDevices(data);
+            $timeout(poller, 3000);
+        });
+    };
 
     ViewModel.Enlarge = function (device) {        
         var modalInstance = $uibModal.open({
@@ -62,7 +88,15 @@ function DevicesController($uibModal, $q, dataService) {
                 $scope.connectionType = device.Bearer;
                 $scope.start = device.ConnectionTime;
                 // Wrap in function to pass paramter
-                setTimeout(function () { StreamDevice(device.name) }, 250);
+                setTimeout(function () { StreamDevice(device.SerialNumber) }, 250);
+
+                $timeout(poller, 3000);
+
+                function UpdateTime()
+                {
+                    //var time = moment(d.ConnectionTime);
+                    //d.ConnectionTime = time.fromNow();
+                }                
             },
             
         });
@@ -102,7 +136,7 @@ function DevicesController($uibModal, $q, dataService) {
                    "license": "PLAY1-8kFhe-MmMCt-pf9YE-G3P7D-xXX89",
                    "title": "",
                    "description": "",
-                   "sourceURL": "http://10.11.0.16:443/live/" + streamName + "/playlist.m3u8",
+                   "sourceURL": "http://13.92.255.38:443/live/" + streamName + "/playlist.m3u8",
                    "autoPlay": true,
                    "volume": "0",
                    "mute": false,

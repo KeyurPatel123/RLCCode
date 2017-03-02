@@ -1,9 +1,14 @@
-﻿using Abiomed.Business;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * LogController.cs: Log Controller
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Business;
 using Abiomed.Models;
 using Abiomed.Repository;
-using System;
-
-using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace Abiomed.RLR.API.API

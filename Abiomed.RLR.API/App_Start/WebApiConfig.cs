@@ -1,6 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * WebApiConfig.cs: Web API Config
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using System.Web.Http;
 
 namespace Abiomed.RLR.API

@@ -1,4 +1,13 @@
-﻿using System.Reflection;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * AssemblyInfo.cs: [Software Unit Description]
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

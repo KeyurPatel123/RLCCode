@@ -1,3 +1,11 @@
+/*
+Remote Link - Copyright 2017 ABIOMED, Inc.
+--------------------------------------------------------
+Description:
+app.config.js: App Config
+--------------------------------------------------------
+Author: Alessandro Agnello 
+*/
 angular
     .module('app', ['ui.router', 'ngAnimate', 'ngCookies', 'ui.bootstrap'])
     .config(configure);

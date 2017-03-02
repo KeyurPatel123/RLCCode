@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * HelperService.cs: Helper Service for REPO
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

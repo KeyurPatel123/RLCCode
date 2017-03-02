@@ -1,7 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * KeepAliveTimer.cs: Keep Alive Timer
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using System;
 using System.Timers;
 
 namespace Abiomed.Models
@@ -12,9 +18,9 @@ namespace Abiomed.Models
         public string _identifier = string.Empty;
         public event EventHandler ThresholdReached;
 
-        public KeepAliveTimer(string identifier)
+         public KeepAliveTimer(string identifier, int keepAliveTimer)
         {            
-            _timer = new Timer(5000);            
+            _timer = new Timer(keepAliveTimer);            
             _timer.AutoReset = false;
             _timer.Elapsed += SendCancelRequest;
             _identifier = identifier;
@@ -25,6 +31,12 @@ namespace Abiomed.Models
         {                        
             _timer.Stop();
             _timer.Start();
+        }
+
+        public void DestroyTimer()
+        {
+            _timer.Stop();
+            _timer.Dispose();
         }
 
         private void SendCancelRequest(object sender, ElapsedEventArgs e)

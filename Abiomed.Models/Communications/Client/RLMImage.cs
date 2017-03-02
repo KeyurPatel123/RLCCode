@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * RLMImage.cs: RLMImage Model
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
 
 namespace Abiomed.Models.Communications
 {

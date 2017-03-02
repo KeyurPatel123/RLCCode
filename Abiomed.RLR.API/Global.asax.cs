@@ -1,6 +1,12 @@
-﻿using Abiomed.RLR.Communications;
-using Autofac;
-using log4net;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * Global.asax.cs: Global ASAX
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using System.Web.Http;
 
 namespace Abiomed.RLR.API

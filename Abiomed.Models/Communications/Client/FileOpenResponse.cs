@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * FileOpenResponse.cs: Client File Open Response Msg Struct Model
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using System;
 
 namespace Abiomed.Models
 {

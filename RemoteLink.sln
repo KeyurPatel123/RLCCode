@@ -5,17 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Console", "Abiomed.Console\Abiomed.Console.csproj", "{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Certificates", "Certificates", "{66C102ED-1FA2-4931-A843-27B6FBAF15CE}"
-	ProjectSection(SolutionItems) = preProject
-		512b-rsa-example-cert.der = 512b-rsa-example-cert.der
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.RLR.Communications", "Abiomed.CSR.Communications\Abiomed.RLR.Communications.csproj", "{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13FE805A-D802-48FC-AB6F-DFF1B34F2D39}"
-	ProjectSection(SolutionItems) = preProject
-		512b-rsa-example-cert.der = 512b-rsa-example-cert.der
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Models", "Abiomed.Models\Abiomed.Models.csproj", "{D3662849-0B27-4D08-BFF6-7F1537BCF015}"
 EndProject

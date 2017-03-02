@@ -1,9 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * Configuration.cs: Configuration Reader
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using System;
 using System.Configuration;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {
@@ -13,12 +19,19 @@ namespace Abiomed.Models
         private const string localhost = @"localhost";
         private string _deviceStatus = @"http://localhost/api/DeviceStatus";
         private string _imageSend = @"http://localhost/RLR/api/Image";
-
+        private int _keepAliveTimer = 5000;
        
         #region Constructor
         public Configuration()
         {
-            // Get Configuration Data
+            // Configure Sections
+            connectionManager();
+            keepAliveTimerManager();
+        }
+        #endregion
+
+        private void connectionManager()
+        {
             var connectionManager = ConfigurationManager.GetSection("ConnectionManager") as System.Collections.Specialized.NameValueCollection;
             string type = connectionManager["RUN"].ToString();
             string WOWZA = connectionManager["WOWZA"].ToString();
@@ -31,12 +44,20 @@ namespace Abiomed.Models
                 StringBuilder str = new StringBuilder(_deviceStatus);
                 str.Replace(localhost, WEB);
 
+                _deviceStatus = str.ToString();
+
                 str = new StringBuilder(_imageSend);
                 str.Replace(localhost, WEB);
-            }
 
+                _imageSend = str.ToString();
+            }
         }
-        #endregion
+
+        private void keepAliveTimerManager()
+        {
+            var optionsManager = ConfigurationManager.GetSection("OptionsManager") as System.Collections.Specialized.NameValueCollection;
+            _keepAliveTimer = Convert.ToInt32(optionsManager["KeepAliveTimer"].ToString());
+        }
 
         public string DeviceStatus
         {
@@ -48,6 +69,12 @@ namespace Abiomed.Models
         {
             get { return _imageSend; }
             set { _imageSend = value; }
+        }
+
+        public int KeepAliveTimer
+        {
+            get { return _keepAliveTimer; }
+            set { _keepAliveTimer = value; }
         }
     }
 }

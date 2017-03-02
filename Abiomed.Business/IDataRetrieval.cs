@@ -1,10 +1,13 @@
-﻿using Abiomed.Models;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * IDataRetrieval.cs: Interface for Data Retrieval
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Models;
 using Abiomed.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Business
 {

@@ -1,3 +1,11 @@
+/*
+Remote Link - Copyright 2017 ABIOMED, Inc.
+--------------------------------------------------------
+Description:
+login.controller.js: Login Controller
+--------------------------------------------------------
+Author: Alessandro Agnello 
+*/
 angular
     .module('app')
     .controller('LoginController', LoginController);

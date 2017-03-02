@@ -1,10 +1,14 @@
-﻿using Abiomed.CLR.Models;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * Logger.cs: Logger for MONGODB & Log4Net
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {   

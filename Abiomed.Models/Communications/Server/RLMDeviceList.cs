@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * RLMDeviceList.cs: RLM Device List Model
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {

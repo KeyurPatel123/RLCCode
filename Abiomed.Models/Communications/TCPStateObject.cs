@@ -1,10 +1,15 @@
-﻿using System;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * TCPStateObject.cs: TCP State Object Model
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {

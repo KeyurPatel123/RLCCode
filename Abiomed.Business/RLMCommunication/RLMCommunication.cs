@@ -1,4 +1,13 @@
-﻿using Abiomed.Models;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * RLMCommunication.cs: Main Business Logic between RLM and RLR
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+
+using Abiomed.Models;
 using Abiomed.Models.Communications;
 using log4net;
 using Newtonsoft.Json;
@@ -7,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StackExchange.Redis;
+using System.Collections.Concurrent;
 
 namespace Abiomed.Business
 {
@@ -18,13 +29,22 @@ namespace Abiomed.Business
         private string _currentDevice;
         private byte[] returnMessage;
         public event EventHandler SendMessage;
+        private ConcurrentDictionary<string, RLMDevice> _oldDevices = new ConcurrentDictionary<string, RLMDevice>();
+      //  private ConnectionMultiplexer _redis;
+      //  private IDatabase _db;
+      //  private ISubscriber _sub;
+      //  private int messageCount = 1;
 
         public RLMCommunication(ILog logger, RLMDeviceList RLMDeviceList, Configuration Configuration)
         {
             _log = logger;
             _RLMDeviceList = RLMDeviceList;
             _configuration = Configuration;
-        } 
+            
+            //_redis = ConnectionMultiplexer.Connect("localhost");
+            //_db = _redis.GetDatabase();
+            //_sub = _redis.GetSubscriber();
+        }
 
         private void BearerRequest(byte[] message)
         {
@@ -59,10 +79,22 @@ namespace Abiomed.Business
                     IfaceVer = sessionOpen.IfaceVer,
                     SerialNo = sessionOpen.SerialNo,
                     ClientSequence = sessionOpen.MsgSeq,
-                    KeepAliveTimer = new KeepAliveTimer(_currentDevice)
+                    KeepAliveTimer = new KeepAliveTimer(_currentDevice, _configuration.KeepAliveTimer)
                 };
 
                 // Add or update dictionary
+                var device = _RLMDeviceList.RLMDevices.Where(x => x.Value.SerialNo == rlmDevice.SerialNo).FirstOrDefault();
+
+                if (!device.Equals(new KeyValuePair<string, RLMDevice>()))
+                {
+                    _log.InfoFormat(@"Found duplicate RLM Serial {0}", _RLMDeviceList.RLMDevices[device.Value.Identifier].SerialNo);
+
+                    device.Value.KeepAliveTimer.DestroyTimer();
+
+                    RLMDevice tempDevice;
+                    _RLMDeviceList.RLMDevices.TryRemove(device.Key, out tempDevice);
+                }                
+
                 _RLMDeviceList.RLMDevices[_currentDevice] = rlmDevice;
 
                 _RLMDeviceList.RLMDevices[_currentDevice].KeepAliveTimer.ThresholdReached += KeepAliveTimer_ThresholdReached;
@@ -74,6 +106,12 @@ namespace Abiomed.Business
 
                 // Check if we will video stream or screen grab
                 byte[] streamIndicator = new byte[0];
+
+                var videoControl = VideoControlGeneration(rlmDevice.Bearer, rlmDevice.SerialNo, Definitions.StreamVideoBase);
+                streamIndicator = GenerateRequest(videoControl);
+                _RLMDeviceList.RLMDevices[_currentDevice].Streaming = true;
+
+                /* Re-enable after M1
                 if (rlmDevice.Bearer != Definitions.Bearer.LTE)
                 {
                     var videoControl = VideoControlGeneration(rlmDevice.Bearer, rlmDevice.SerialNo, Definitions.StreamVideoBase);
@@ -86,7 +124,7 @@ namespace Abiomed.Business
                     streamIndicator = GenerateRequest(Definitions.ScreenCaptureIndicator);
                     _RLMDeviceList.RLMDevices[_currentDevice].FileTransfer = true;
                 }
-
+                */
                 // Append to current Byte[]
                 returnMessage = new byte[sessionMessage.Length + streamIndicator.Length];
                 sessionMessage.CopyTo(returnMessage, 0);
@@ -261,17 +299,16 @@ namespace Abiomed.Business
                 var ev = (CommunicationsEvent)e;
                 ev.Message = GenerateRequest(Definitions.SessionCloseIndicator);
                 RLMDevice rLMDevice;
-                _RLMDeviceList.RLMDevices.TryRemove(ev.Identifier, out rLMDevice);
-
-                // Send updated list
-                UpdateSubscribedServers();
+                _RLMDeviceList.RLMDevices.TryRemove(ev.Identifier, out rLMDevice);                
                 SendMessage?.Invoke(sender, ev);
-
             }
             else
             { 
                 _log.InfoFormat(@"Keep Alive Threshold Reached, with RLM already off list. {0}", _currentDevice);
-            }            
+            }
+
+            // Send updated list
+            UpdateSubscribedServers();
         }
 
         private byte[] KeepAlive(byte[] message, out RLMStatus status)
@@ -289,13 +326,13 @@ namespace Abiomed.Business
 
             // Check for status and user ref
             var statusCode = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
-            var userRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
 
             // Error checking
-            if (statusCode != Definitions.SuccessStats || userRef != Definitions.UserRef)
+            if (statusCode != Definitions.SuccessStats)
             {
                 // Close Current Session
-                SessionCloseIndicator();
+            // put back after M1 and discuss with CC   
+            // SessionCloseIndicator();
             }
 
             return new byte[0];
@@ -306,6 +343,7 @@ namespace Abiomed.Business
             _log.InfoFormat(@"Session Cancel {0}", _RLMDeviceList.RLMDevices[_currentDevice].SerialNo);
             // Push back timer, for the last time.
             _RLMDeviceList.RLMDevices[_currentDevice].KeepAliveTimer.UpdateTimer();
+            UpdateSubscribedServers();
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
             return new byte[0];
         }
@@ -341,6 +379,7 @@ namespace Abiomed.Business
 
         private bool ValidateMessage(byte[] dataMessage, out processMessageFunc<byte[], RLMStatus, byte[]> messageToProcess)
         {
+
             var status = true;
             #region Validate Message ID
             // Grab first two bytes to determine message type, if invalid exit
@@ -354,6 +393,9 @@ namespace Abiomed.Business
             }
             #endregion
 
+            return true;
+
+            // todo remove
             #region Payload
             if(status)
             {
@@ -441,8 +483,7 @@ namespace Abiomed.Business
 
                 // Init return message
                 returnMessage = new byte[0];
-
-                // If valid sequence number continue
+                
                 processMessageFunc<byte[], RLMStatus, byte[]> messageToProcess;
                 if (ValidateMessage(dataMessage, out messageToProcess))
                 {
@@ -456,7 +497,7 @@ namespace Abiomed.Business
                 }
                 
            } 
-            catch(Exception e)
+            catch(Exception)
             {
                 _log.InfoFormat(@"RLM {0} already removed, during processing of message received", deviceId);                    
             }
@@ -472,29 +513,56 @@ namespace Abiomed.Business
             communicationEvent.Message = GenerateRequest(Definitions.SessionCloseIndicator);
             RLMDevice rLMDevice;
             _RLMDeviceList.RLMDevices.TryRemove(_currentDevice, out rLMDevice);
-
+            UpdateSubscribedServers();
             SendMessage?.Invoke(this, communicationEvent);
         }
 
-        private void UpdateSubscribedServers()
+        public void UpdateSubscribedServers()
         {
-            var client = new RestClient(_configuration.DeviceStatus);
-            var request = new RestRequest(Method.POST);
+            //var status = General.CompareDictionaries(_oldDevices, _RLMDeviceList.RLMDevices);
+            //Console.WriteLine("Dict status " + status);
 
-            List<DeviceStatus> devices = new List<DeviceStatus>();
-            foreach(var device in _RLMDeviceList.RLMDevices)
+            // If not equal, update
+            //if (!status)
             {
-                DeviceStatus ds = new DeviceStatus { Bearer = device.Value.Bearer.ToString(), ConnectionTime = device.Value.ConnectionTime, SerialNumber = device.Value.SerialNo };
-                devices.Add(ds);
+                List<DeviceStatus> devices = new List<DeviceStatus>();
+
+                try
+                {
+                    foreach (var device in _RLMDeviceList.RLMDevices)
+                    {
+                        DeviceStatus ds = new DeviceStatus { Bearer = device.Value.Bearer.ToString(), ConnectionTime = device.Value.ConnectionTime, SerialNumber = device.Value.SerialNo };
+                        devices.Add(ds);
+                    }
+
+                    // Sort!
+
+                    var sortedDevices = devices.OrderBy(o => o.SerialNumber).ToList();
+
+                    //var deviceStatus = JsonConvert.SerializeObject(devices);
+                    //
+                    //_sub.Publish(@"RLMUpdate", deviceStatus);
+
+                    var client = new RestClient(_configuration.DeviceStatus);
+                    var request = new RestRequest(Method.POST);
+
+                    var deviceStatus = JsonConvert.SerializeObject(sortedDevices);
+
+                    request.AddParameter("application/json; charset=utf-8", deviceStatus, ParameterType.RequestBody);
+
+                    client.ExecuteAsync(request, response =>
+                    {
+                        Console.WriteLine(response.Content);
+                    });
+
+                    // Update Old Devices                    
+                    _oldDevices = new ConcurrentDictionary<string, RLMDevice>(_RLMDeviceList.RLMDevices);
+                }
+                catch (Exception)
+                {
+                    _log.Error(@"Error transmitted updated devices");
+                }
             }
-
-            var deviceStatus = JsonConvert.SerializeObject(devices);
-
-            request.AddParameter("application/json; charset=utf-8", deviceStatus, ParameterType.RequestBody);
-
-            client.ExecuteAsync(request, response => {
-                Console.WriteLine(response.Content);
-            });
         }
 
         private void SendImage(byte[] image, string serialNumber)
@@ -536,5 +604,45 @@ namespace Abiomed.Business
             }
             return status;
         }
+
+        public List<byte[]> SeperateMessages(byte[] dataMessage)
+        {
+            List<byte[]> messages = new List<byte[]>();
+            bool multipleMessages = false;
+
+            // Determine Payload
+            var payloadBytes = BitConverter.ToUInt16(dataMessage.Skip(2).Take(2).Reverse().ToArray(), 0);
+            var difference = (dataMessage.Length - 6) - payloadBytes;
+            if (difference != 0)
+            {
+                multipleMessages = true;
+                _log.InfoFormat(@"RLM sent multiple messages");
+            }
+
+            int offset = 0;
+            try
+            {
+                // Separate messages
+                while (multipleMessages)
+                {
+                    // Get length of message
+                    var messageBytes = BitConverter.ToUInt16(dataMessage.Skip(offset + 2).Take(2).Reverse().ToArray(), 0);
+
+                    // Grab message and add into List<byte[]>
+                    byte[] data = dataMessage.Skip(offset).Take(messageBytes + 6).ToArray();
+
+                    messages.Add(data);
+
+                    offset += data.Count();
+                    // Note: If message is incorrect, during validation of message individually, we will catch fault
+                }
+            }
+            catch(Exception)
+            {
+                _log.Error(@"Error passing multiple messages");                
+            }
+            return messages;
+        }
+
     }
 }

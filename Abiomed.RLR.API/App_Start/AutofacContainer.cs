@@ -1,15 +1,19 @@
-﻿using Abiomed.Business;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * AutofacContainer.cs: Autofac Container for RLR
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using Abiomed.Business;
 using Abiomed.RLR.Communications;
 using Abiomed.Models;
 using Abiomed.Repository;
 using Autofac;
 using Autofac.Integration.WebApi;
 using log4net;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
 
 namespace Abiomed.RLR.API

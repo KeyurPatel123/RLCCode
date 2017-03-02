@@ -1,4 +1,12 @@
-﻿using System.Web.Http;
+﻿/*
+ * Remote Link - Copyright 2017 ABIOMED, Inc.
+ * --------------------------------------------------------
+ * Description:
+ * WebApiConfig.cs: Web Api Config
+ * --------------------------------------------------------
+ * Author: Alessandro Agnello 
+*/
+using System.Web.Http;
 
 public class WebApiConfig
 {
