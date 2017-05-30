@@ -21,6 +21,8 @@ namespace Abiomed.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            AutofacContainer autofac = new AutofacContainer();
         }
     }
 }

@@ -7,41 +7,106 @@
  * Author: Alessandro Agnello 
 */
 
-using Abiomed.Models.Communications;
+using Abiomed.Models;
+using Abiomed.Repository;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web.Http;
 
 namespace Abiomed.Web.API
 {
     public class DeviceStatusController : ApiController
     {
-        private static List<DeviceStatus> deviceStatusList = null;
-        //ConnectionMultiplexer _redis;
-        //IDatabase _db;
-        //ISubscriber _sub;
+        private IDeviceStatusManager _deviceStatusManager;
+        private IEventManager _eventManager;
 
-        public DeviceStatusController()
+        // Todo refactor out Redis and put in own manager
+        public DeviceStatusController(IDeviceStatusManager deviceStatusManager, IEventManager eventManager)
         {
-          //  _redis = ConnectionMultiplexer.Connect("localhost");
-          //  _db = _redis.GetDatabase();
-          //  _sub = _redis.GetSubscriber();
-          //
-          //  _sub.Subscribe(@"RLMUpdate", (channel, message) => {
-          //      //deviceStatusList = (string)message;
-          //  });
-        }
-
+            _deviceStatusManager = deviceStatusManager;
+            _eventManager = eventManager;
+        }        
         
-        [HttpPost]
-        public void Post([FromBody]List<DeviceStatus> deviceStatus)
-        {            
-            deviceStatusList = deviceStatus;
-        }
 
         [HttpGet]
         public List<DeviceStatus> Get()
         {
-            return deviceStatusList;
+            return _deviceStatusManager.Devices;
         }
+        
+        [HttpPost]
+        [Route("api/DeviceStatus/SendKeepAlive/{serialNumber}")]
+        public void KeepAlive([FromUri]string serialNumber)
+        {
+           _eventManager.KeepAliveIndication(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/RLRLog/{serialNumber}")]
+        public string RLRLog([FromUri]string serialNumber)
+        {
+            // Ask for new version
+            _eventManager.OpenRLMLogFileIndication(serialNumber);
+
+            // Get last known version
+            // Search for all images with serial number
+            DirectoryInfo hdDirectoryInWhichToSearch = new DirectoryInfo(@"c:\\RLMLogs");
+            FileInfo[] filesInDir = hdDirectoryInWhichToSearch.GetFiles(serialNumber + "*");
+
+            string text = string.Empty;
+            if (filesInDir.Length > 0)
+            {
+                // Get latest
+                text = File.ReadAllText(filesInDir[filesInDir.Length -1].FullName);
+            }
+
+            return text;
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/GetBearerInfo/{serialNumber}")]
+        public void GetBearerInfo([FromUri]string serialNumber)
+        {
+            // Ask for updated list
+            _eventManager.BearerAuthenticationReadIndication(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/SendVideoStart/{serialNumber}")]
+        public void VideoStart([FromUri]string serialNumber)
+        {
+            _eventManager.StreamingVideoControlIndication(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/CloseSessionIndication/{serialNumber}")]
+        public void CloseSessionIndication([FromUri]string serialNumber)
+        {
+            _eventManager.CloseSessionIndication(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/BearerChangeIndication/{serialNumber}/{bearer}")]
+        public void SendUpdateBearer([FromUri]string serialNumber, string bearer)
+        {
+            _eventManager.BearerChangeIndication(serialNumber, bearer);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/CreateCredential")]
+        public void CreateCredential([FromBody]Authorization Device)
+        {
+            _eventManager.BearerAuthenticationUpdateIndication(Device, false);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/DeleteCredential")]
+        public void DeleteCredential([FromBody]Authorization Device)
+        {
+            _eventManager.BearerAuthenticationUpdateIndication(Device, true);
+        }        
     }
+
+
 }

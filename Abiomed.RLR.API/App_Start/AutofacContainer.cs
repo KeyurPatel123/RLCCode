@@ -12,7 +12,6 @@ using Abiomed.Models;
 using Abiomed.Repository;
 using Autofac;
 using Autofac.Integration.WebApi;
-using log4net;
 using System.Reflection;
 using System.Web.Http;
 
@@ -25,13 +24,10 @@ namespace Abiomed.RLR.API
 
         public AutofacContainer()
         {
-            log4net.Config.XmlConfigurator.Configure();
 
             var builder = new ContainerBuilder();
 
             builder.RegisterType<MongoRepository>().As<IMongoDbRepository>();
-
-            builder.RegisterInstance(LogManager.GetLogger(@"Logger")).As<ILog>();
 
             builder.RegisterType<TCPServer>().As<ITCPServer>();
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
@@ -50,10 +46,7 @@ namespace Abiomed.RLR.API
             // Set the dependency resolver to be Autofac.
             Container = builder.Build();
 
-            config.DependencyResolver = new AutofacWebApiDependencyResolver(Container);
-
-            //ILog logger = Container.Resolve<ILog>();
-            //logger.Info("Started RLR Web Service");
+            config.DependencyResolver = new AutofacWebApiDependencyResolver(Container);            
         }
     }
 }

@@ -9,7 +9,6 @@
 
 using Abiomed.Models;
 using Abiomed.Repository;
-using log4net;
 using System;
 using System.Threading.Tasks;
 
@@ -17,12 +16,10 @@ namespace Abiomed.Business
 {
     public class DataRetrieval : IDataRetrieval
     {        
-        private ILog _log;
         private IMongoDbRepository _mongoDbRepository;
 
-        public DataRetrieval(ILog logger, IMongoDbRepository mongoDbRepository)
-        {
-            _log = logger;
+        public DataRetrieval(IMongoDbRepository mongoDbRepository)
+        {            
             _mongoDbRepository = mongoDbRepository;
         }
 
@@ -35,9 +32,9 @@ namespace Abiomed.Business
                 task.Wait();
                 results = task.Result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                _log.ErrorFormat("Error retrieving log limit {0}, Exception {1}", limit, e.ToString());
+                //_log.ErrorFormat("Error retrieving log limit {0}, Exception {1}", limit, e.ToString());
             }
 
             return results;

@@ -15,7 +15,16 @@ dataService.$inject = ['$http'];
 function dataService($http) {
     return {
         getStreams: getStreams,
-        getDevices: getDevices
+        getDevices: getDevices,
+        sendKeepAlive: sendKeepAlive,
+        sendRLRLog: sendRLRLog,
+        getImageNames: getImageNames,
+        sendVideoStart: sendVideoStart,
+        getBearerInfo: getBearerInfo,
+        sendCloseSession: sendCloseSession,
+        sendUpdatedBearer: sendUpdatedBearer,
+        createCredential: createCredential,
+        deleteCredential: deleteCredential
     };
 
     function getStreams() {
@@ -34,6 +43,148 @@ function dataService($http) {
 
     function getDevices() {
         return $http.get('/api/DeviceStatus', {cache:false})
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendKeepAlive(serialNumber)
+    {
+        return $http.post('/api/DeviceStatus/SendKeepAlive/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendRLRLog(serialNumber) {
+
+        return $http.post('/api/DeviceStatus/RLRLog/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function getImageNames(serialNumber)
+    {
+        return $http.get('/api/Image/GetImageNames/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendVideoStart(serialNumber)
+    {
+        return $http.post('/api/DeviceStatus/SendVideoStart/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function getBearerInfo(serialNumber) {
+        return $http.post('/api/DeviceStatus/GetBearerInfo/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendCloseSession(serialNumber) {
+        return $http.post('/api/DeviceStatus/CloseSessionIndication/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendUpdatedBearer(serialNumber, bearer) {
+        return $http.post('/api/DeviceStatus/BearerChangeIndication/' + serialNumber + '/' + bearer)
+           .then(getDevicesComplete)
+           .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+   
+    function createCredential(device, authorization) {
+        var data =
+        {
+            'SerialNumber': device.SerialNumber,
+            'AuthorizationInfo': Authorization
+        };
+
+        return $http.post('/api/DeviceStatus/CreateCredential/', data)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function deleteCredential(device, authorization) {
+        var data =
+        {
+            'SerialNumber': device.SerialNumber,
+            'AuthorizationInfo': Authorization
+        };
+
+        return $http.post('/api/DeviceStatus/DeleteCredential/', data)
             .then(getDevicesComplete)
             .catch(getDevicesFailed);
 

@@ -1,18 +1,9 @@
 ﻿using Abiomed.Business;
 using Abiomed.RLR.Communications;
 using Abiomed.Models;
-using Abiomed.Repository;
 using Autofac;
-using log4net;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Abiomed.Communications.Service
 {
@@ -61,12 +52,8 @@ namespace Abiomed.Communications.Service
 
         private void Start()
         {
-            log4net.Config.XmlConfigurator.Configure();
-
             var builder = new ContainerBuilder();
-
-            builder.RegisterInstance(LogManager.GetLogger(@"Logger")).As<ILog>();
-
+        
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
             builder.RegisterType<TCPServer>().As<ITCPServer>();
             builder.RegisterType<RLMDeviceList>();

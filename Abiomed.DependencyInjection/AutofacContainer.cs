@@ -10,7 +10,6 @@
 using Abiomed.RLR.Communications;
 using Abiomed.Business;
 using Autofac;
-using log4net;
 using Abiomed.Repository;
 using Abiomed.Models;
 
@@ -22,22 +21,29 @@ namespace Abiomed.DependencyInjection
 
         public void Build()
         {            
-            log4net.Config.XmlConfigurator.Configure();
-
             var builder = new ContainerBuilder();
-                  
-            builder.RegisterType<MongoRepository>().As<IMongoDbRepository>();
 
-            builder.RegisterInstance(LogManager.GetLogger(@"Logger")).As<ILog>();
+            builder.RegisterType<LogManager>().As<ILogManager>().SingleInstance();
+            builder.RegisterGeneric(typeof(DocumentDBRepository<>)).SingleInstance();
+            builder.RegisterGeneric(typeof(RedisDbRepository<>)).As(typeof(IRedisDbRepository<>)).SingleInstance();
 
             builder.RegisterType<TCPServer>().As<ITCPServer>();
-            builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
-            builder.RegisterType<RLMDeviceList>();
-            builder.RegisterType<Configuration>();
-            Container = builder.Build();
+            builder.RegisterType<InsecureTcpServer>();
+            builder.RegisterType<Configuration>().SingleInstance();            
 
-            ILog logger = Container.Resolve<ILog>();
-            logger.Info(@"Starting Service");
+            #region RLM Communications
+            builder.RegisterType<RLMDeviceList>().SingleInstance();
+
+            builder.RegisterType<DigitiserCommunication>().As<IDigitiserCommunication>();
+            builder.RegisterType<FileTransferCommunication>().As<IFileTransferCommunication>();
+            builder.RegisterType<SessionCommunication>().As<ISessionCommunication>();
+            builder.RegisterType<StatusControlCommunication>().As<IStatusControlCommunication>();
+            builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
+
+            builder.RegisterType<KeepAliveManager>().As<IKeepAliveManager>().SingleInstance();
+            #endregion
+
+            Container = builder.Build();            
         }     
     }
 }

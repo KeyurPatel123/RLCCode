@@ -30,14 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.3.0\lib\net45\Autofac.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Autofac, Version=4.6.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.6.0\lib\net45\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="Microsoft.Azure.Documents.Client, Version=1.12.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="MongoDB.Bson, Version=2.3.0.157, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Bson.2.3.0\lib\net45\MongoDB.Bson.dll</HintPath>
       <Private>True</Private>
@@ -56,6 +52,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,11 +65,25 @@
     <Compile Include="DataRetrieval.cs" />
     <Compile Include="IDataRetrieval.cs" />
     <Compile Include="General.cs" />
-    <Compile Include="RLMCommunication\IRLMCommunication.cs" />
+    <Compile Include="ILogManager.cs" />
+    <Compile Include="KeepAliveManager\IKeepAliveManager.cs" />
+    <Compile Include="KeepAliveManager\KeepAliveManager.cs" />
+    <Compile Include="KeepAliveManager\KeepAliveTimer.cs" />
+    <Compile Include="LogManager.cs" />
+    <Compile Include="RLMCommunication\FileTransferCommunication.cs" />
+    <Compile Include="RLMCommunication\Interfaces\IFileTransferCommunication.cs" />
+    <Compile Include="RLMCommunication\Interfaces\ISessionCommunication.cs" />
+    <Compile Include="RLMCommunication\Interfaces\IRLMCommunication.cs" />
+    <Compile Include="RLMCommunication\Interfaces\IDigitiserCommunication.cs" />
+    <Compile Include="RLMCommunication\Interfaces\IStatusControlCommunication.cs" />
+    <Compile Include="RLMCommunication\DigitiserCommunication.cs" />
+    <Compile Include="RLMCommunication\StatusControlCommunication.cs" />
     <Compile Include="RLMCommunication\RLMCommunication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RLMCommunication\SessionCommunication.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,32 +9,130 @@ namespace Abiomed.Models
 {
     public static class Definitions
     {
+        public static string RemoveRLMDeviceRLR = @"RemoveRLMDeviceRLR";
+        public static string ImageCapture = @"ImageCapture";
+        public static string RLMDeviceSet = @"RLMDeviceSet";
+        public static string AddRLMDevice = @"AddRLMDevice";
+        public static string UpdateRLMDevice = @"UpdateRLMDevice";
+        public static string DeleteRLMDevice = @"DeleteRLMDevice";
+        public static string BearerInfoRLMDevice = @"BearerInfoRLMDevice";
+
+        public static int MaxBearerSlot = 20;
+
+        #region RLR to RLM Event
+        public static string KeepAliveIndicationEvent = @"KeepAliveIndication";
+        public static string BearerChangeIndicationEvent = @"BearerChangeIndication";
+        public static string StatusIndicationEvent = @"StatusIndication";
+        public static string BearerAuthenticationReadIndicationEvent = @"BearerAuthenticationReadIndication";
+        public static string BearerAuthenticationUpdateIndicationEvent = @"BearerAuthenticationUpdateIndication";
+        public static string StreamingVideoControlIndicationEvent = @"StreamingVideoControlIndication";
+        public static string ScreenCaptureIndicationEvent = @"ScreenCaptureIndication";
+        public static string OpenRLMLogFileIndicationEvent = @"OpenFileIndication";
+        public static string CloseSessionIndicationEvent = @"CloseSessionIndication";
+        #endregion
+
+        public enum RLMFileTransfer
+        {
+            ScreenCapture0 = 0,
+            ScreenCapture1 = 1,
+            ScreenCapture2 = 2,
+            ScreenCapture3 = 3,
+            ScreenCapture4 = 4,
+            ScreenCapture5 = 5,
+            ScreenCapture6 = 6,
+            ScreenCapture7 = 7,
+            RLMEventLog = 8
+        }
+        
         #region MsgTypes
 
         public static int MsgHeaderLength = 6;
 
         public static UInt16 SuccessStats = 0x8000;
         public static UInt16 UserRef = 0x1234;
+        public static UInt16 UserRefFileTransfer = 0x0DFD;
 
-        #region Receiving 
+        #region Receiving
+
+        #region Session
         public static UInt16 SessionRequest = 0x8000;
-        public static UInt16 KeepAlive = 0x8004;
+        public static UInt16 BearerRequest = 0x8001;
+        public static UInt16 BearerChangeResponse = 0xC002;
+        public static UInt16 CloseBearerRequest = 0x8003;
+        public static UInt16 KeepAliveRequest = 0x8004;
+        public static UInt16 CloseSessionRequest = 0x8005;
+        #endregion
+
+        #region Status Control
+        public static UInt16 StatusResponse = 0xC100;
+        public static UInt16 BearerAuthenticationUpdateResponse = 0xC101;
+        public static UInt16 BearerAuthenticationReadResponse = 0xC102;
+        public static UInt16 LimitWarningRequest = 0x8103;
+        public static UInt16 LimitCriticalRequest = 0x8104;
+        #endregion
+
+        #region Digitiser
+        public static UInt16 StreamVideoControlResponse = 0xC200;
         public static UInt16 BufferStatusRequest = 0x8201;
-        public static UInt16 OpenBearerRequest = 0x8001;
-        public static UInt16 SessionCancel = 0x8005;
-        public static UInt16 StreamVideoResponse = 0xC200;
         public static UInt16 ScreenCaptureResponse = 0xC202;
-        public static UInt16 FileOpenResponse = 0xC300;
-        public static UInt16 FileReadResponse = 0xC301;
+        #endregion
+
+        #region File Transfer
+        public static UInt16 OpenFileRequest = 0x8300;
+        public static UInt16 OpenFileResponse = 0xC300;
+        public static UInt16 DataReadRequest = 0x8301;
+        public static UInt16 DataReadResponse = 0x4301;
+        public static UInt16 CloseFileRequest = 0x8302;
+        public static UInt16 ClearFileResponse = 0xC303;
+        #endregion
 
         #endregion
 
         #region Send
-        public static byte[] SessionConfirm = new byte[] { 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00};
-        public static byte[] SessionCloseIndicator = new byte[] { 0x00, 0x05, 0x00, 0x00, 0x00, 0x00};
-        
-        #region Video
-        public static List<byte> StreamVideoBase = new List<byte> 
+
+        #region Session
+        public static byte[] SessionConfirm = new byte[] { 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00 };
+        public static byte[] BearerConfirm = new byte[] { 0x40, 0x01, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00 };
+        public static byte[] BearerChangeIndication = new byte[] { 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
+        public static byte[] CloseBearerConfirm = new byte[] { 0x40, 0x03, 0x00, 0x00, 0x00, 0x00};
+        public static byte[] KeepAliveIndication = new byte[] { 0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
+        public static byte[] CloseSessionIndication = new byte[] { 0x00, 0x05, 0x00, 0x00, 0x00, 0x00 };
+        #endregion
+
+        #region Status Control
+        public static byte[] StatusIndication = new byte[] { 0x01, 0x02, 0x00, 0x00, 0x00, 0x00};
+        public static List<byte> BearerAuthenticationUpdateIndication = new List<byte>
+        {
+            0x02, 0x00, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x00, // Bearer            
+            0x00, 0x00, // Slot
+            0x00, 0x00, // AuthInfo
+            // SSID and PSK will be added manually            
+        };
+
+        public static byte[] EmptySSIDPSK = new byte[]
+        {
+            0x00, 0x00
+        };
+
+        public static byte[] BearerAuthenticationReadIndication = new byte[]
+        {
+            0x01, 0x02, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x00, // Slot
+        };
+        public static byte[] LimitWarningConfirm = new byte[]  { 0x41, 0x03, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
+        public static byte[] LimitCriticalConfirm = new byte[] { 0x41, 0x04, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
+
+        #endregion
+
+        #region Digitiser
+        public static List<byte> StreamVideoControlIndication = new List<byte>
         {
             0x02, 0x00, // MSGID
             0x00, 0x00, // MsgLen
@@ -42,44 +141,135 @@ namespace Abiomed.Models
             0x00, 0x01, // Enable            
             0x00, 0x00, // Timeout - None
             0x00, 0x02, // Status Rate - Send every 2 seconds
-            0x10, 0x31, 0x33, 0x2e, 0x39, 0x32, 0x2e, 0x32, 0x35, 0x35, 0x2e, 0x33, 0x38, 0x3a, 0x34, 0x34, 0x33, // URL - 13.92.255.38:443
+            //0x16, 0x72, 0x74, 0x6d, 0x70, 0x3a, 0x2f, 0x2f, 0x72, 0x6c, 0x76, 0x2e, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2e, 0x63, 0x6f, 0x6d, // URL rtmp://rlv.abiomed.com
             0x0B, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2d, 0x52, 0x4c, 0x4d, // USN - abiomed-RLM
-            0x06, 0x24, 0x74, 0x72, 0x33, 0x40, 0x6d, // PWD - $tr3@m
+            0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
             0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
+        };
+
+        public static List<byte> StreamVideoControlIndicationRTMP = new List<byte>
+        {
+            0x02, 0x00, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x01, // Enable            
+            0x00, 0x00, // Timeout - None
+            0x00, 0x02, // Status Rate - Send every 2 seconds
+            0x16, 0x72, 0x74, 0x6d, 0x70, 0x3a, 0x2f, 0x2f, 0x72, 0x6c, 0x76, 0x2e, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2e, 0x63, 0x6f, 0x6d, // URL rtmp://rlv.abiomed.com
+            //0x10, 0x72, 0x74, 0x6d, 0x70, 0x3a, 0x2f, 0x2f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x68, 0x6f, 0x73, 0x74,
+            0x0B, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2d, 0x52, 0x4c, 0x4d, // USN - abiomed-RLM
+            0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
+            0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
+        };
+
+        public static List<byte> StreamVideoControlIndicationRTMPS = new List<byte>
+        {
+            0x02, 0x00, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x01, // Enable            
+            0x00, 0x00, // Timeout - None
+            0x00, 0x02, // Status Rate - Send every 2 seconds
+            0x17, 0x72, 0x74, 0x6d, 0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x72, 0x6c, 0x76, 0x2e, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2e, 0x63, 0x6f, 0x6d, // URL rtmps://rlv.abiomed.com
+            0x0B, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2d, 0x52, 0x4c, 0x4d, // USN - abiomed-RLM
+            0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
+            0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
+        };
+
+        public static byte[] ScreenCaptureIndicator = new byte[] 
+        {
+            0x02, 0x02, // MsgId
+            0x00, 0x04, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // User Ref
+            0x00, 0x00 // Screen 0
+        };
+
+        public static byte[] RLMLogCaptureIndicator = new byte[]
+        {
+            0x02, 0x02, // MsgId
+            0x00, 0x04, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // User Ref
+            0x00, 0x08  // Log
         };
 
         #endregion
 
-        #region File
-        // Screen 3
-        public static byte[] ScreenCaptureIndicator = new byte[] { 0x02, 0x02, 0x00, 0x04, 0x00, 0x00, 0x03 };
+        #region File Transfer
+        public static byte[] OpenFileConfirm = new byte[]
+        {
+            0x43, 0x00, //MSG ID
+            0x00, 0x10, //MSG LEN
+            0x00, 0x00, //MSG SEQ
+            0x80, 0x00, //Status
+            0x0D, 0xFD, //User Ref
+            0x00, 0x00, 0x00, 0x00, //Size
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Time
+        };
 
-        public static byte[] FileOpenIndicator = new byte[] {
+        public static byte[] OpenScreenFileIndication = new byte[] {
           0x03, 0x00,// MSG ID
           0x00, 0x00, // MSG LEN
           0x00, 0x00, // SEQ 
-          0x0D, 0xFC, // User Ref 3580
-          // /rlm/capture/1.png
-          0x12, 0x2F, 0x72, 0x6C, 0x6D, 0x2F, 0x63, 0x61, 0x70, 0x74, 0x75, 0x72, 0x65, 0x2F, 0x31, 0x2E, 0x70, 0x6E, 0x67          
+          0x12, 0x34, // User Ref 1234          
+          0x00, 0x00 // File ID
         };
 
-        public static byte[] FileReadIndicator = new byte[]
+        public static byte[] OpenRLMLogFileIndication = new byte[] {
+          0x03, 0x00,// MSG ID
+          0x00, 0x00, // MSG LEN
+          0x00, 0x00, // SEQ 
+          0x12, 0x34, // User Ref 1234          
+          0x00, 0x08 // File ID
+        };
+
+        public static List<byte> DataReadConfirm = new List<byte>
+       {
+            0x83, 0x01, //MSG ID
+            0x00, 0x04, //MSG LEN
+            0x00, 0x00, //MSG SEQ
+            0x80, 0x00,  //Status
+            0x0D, 0xFD, //User Ref
+            0x00, 0x00  //Data
+       };
+
+        public static byte[] DataReadIndication = new byte[]
         {
             0x83, 0x01, //MSG ID
             0x00, 0x04, //MSG LEN
             0x00, 0x00, //MSG SEQ
             0x0D, 0xFD, //User Ref
-            0x00, 0x00  //Block ID
+            0x00, 0x00, 0x00, 0x00  //Block ID
         };
 
-        public static byte[] FileCloseIndicator = new byte[]
+        public static byte[] CloseFileIndication = new byte[]
         {
-            0x03, 0x02,
-            0x00, 0x00,
-            0x00, 0x00
-        };        
-        #endregion
+            0x03, 0x02,//MSG ID
+            0x00, 0x00,//MSG LEN
+            0x00, 0x00 //MSG SEQ
+        };
 
+        public static byte[] ClearScreenFileIndication = new byte[]
+        {
+            0x03, 0x03,//MSG ID
+            0x00, 0x00,//MSG LEN
+            0x00, 0x00, //MSG SEQ
+            0x12, 0x34, // User Ref
+            0x00, 0x00 // Name String
+        };
+
+        public static byte[] ClearRLMLogFileIndication = new byte[]
+        {
+            0x03, 0x03,//MSG ID
+            0x00, 0x00,//MSG LEN
+            0x00, 0x00, //MSG SEQ
+            0x12, 0x34, // User Ref
+            0x00, 0x08 // Log
+        };
+        #endregion        
         #endregion
 
         #endregion
@@ -92,7 +282,7 @@ namespace Abiomed.Models
             FileTransfer = 3            
         };
 
-        public enum Bearer
+        public enum Bearer : int 
         {
             Unknown = -1,
             Ethernet = 0,
@@ -125,7 +315,8 @@ namespace Abiomed.Models
             NoConnectionAttemptedLasReboot = 5,
         };
 
-        enum AuthenicationType
+        [Serializable]
+        public enum AuthenicationType
         {
             Unknown = -1,
             None = 0,
@@ -135,6 +326,75 @@ namespace Abiomed.Models
             WPAPSK = 4,
             WPAEAP = 5,
             PEAP = 6
+        };
+        
+        [Serializable]
+        public enum LogMessageType
+        {
+            Unknown = -1,
+            #region Session
+            SessionRequest = 0,
+            SessionConfirm = 1,
+            BearerRequest = 2,
+            BearerConfirm = 3,
+            BearerChangeIndication = 4,
+            BearerChangeResponse = 5,
+            CloseBearerRequest = 6,
+            CloseBearerConfirm = 7,
+            KeepAliveRequest = 8,
+            KeepAliveIndication = 9,
+            CloseSessionRequest = 10,
+            CloseSessionIndication = 11,
+            #endregion
+
+            #region Status
+            StatusResponse = 12,
+            BearerAuthenticationUpdateResponse = 13,
+            BearerAuthenticationReadResponse = 14,
+            LimitWarningRequest = 15,
+            LimitCriticalRequest = 16,
+            StatusIndication = 17,
+            BearerAuthenticationUpdateIndication = 18,
+            BearerAuthenticationReadIndication = 19,
+            LimitWarningConfirm = 20,
+            LimitCriticalConfirm = 21,
+            #endregion
+
+            #region Digitizer
+            StreamingVideoControlResponse = 22,
+            BufferStatusRequest = 23,
+            ScreenCaptureResponse = 24,            
+            #endregion
+
+            #region File Transfer
+            FileOpenResponse = 25,
+            ClearFileResponse = 26
+            #endregion
+        };
+
+        public enum Status
+        {
+            Unknown = -1,
+            General = 0,
+            InvalidSequenceNumber = 1 ,
+            InvalidSerialNumber = 2 ,
+            InvalidSessionID = 3 ,
+            InvalidBearer = 4 ,
+            UnableVideoServer = 5 ,
+            InvalidLength = 6 ,
+            InvalidCommand = 7 ,
+            InsufficientBandwidth = 8 ,
+            VideoEnabled = 9 ,
+            VideoDisabled = 10,
+            FileOpen = 11,
+            FileFail = 12,
+            InvalidBlockFile = 13,
+            FileReadError = 14,
+            EthernetNotAvailable = 15,
+            WiFi24NotAvailable = 16,
+            WiFi5NotAvailable = 17,
+            LTENotAvailable = 18,
+            Valid = 0x8000
         };
     }
 }

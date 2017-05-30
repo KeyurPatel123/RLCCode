@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 
 namespace Abiomed.Models
@@ -16,13 +17,13 @@ namespace Abiomed.Models
     public class TCPStateObject
     {
         // Device Id
-        public string DeviceId = string.Empty;
+        public string DeviceIpAddress = string.Empty;
 
         // TCP Client Object
         public TcpClient TcpClient;
         
         // Client  socket.
-        public NetworkStream workStream = null;
+        public SslStream WorkStream = null;
 
         // Max size of payload is 1024 + 6 bytes of header
         public const int BufferSize = 1030;

@@ -7,7 +7,6 @@
  * Author: Alessandro Agnello 
 */
 using Abiomed.Models;
-using Abiomed.Models.Communications;
 using System.Collections.Generic;
 using System.Web.Http;
 

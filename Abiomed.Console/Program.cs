@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using Abiomed.DependencyInjection;
 using Abiomed.RLR.Communications;
 using Autofac;
+using System.Diagnostics;
+using Abiomed.Models;
 // Testing
 namespace Abiomed.Console
 {
@@ -25,10 +27,21 @@ namespace Abiomed.Console
         {
             try
             {
+                Trace.TraceInformation(@"Remote Link Server - Started");
                 autofac = new AutofacContainer();
                 autofac.Build();
-                ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();                
-                _tcpServer.Run();                             
+                Configuration _configuration =  AutofacContainer.Container.Resolve<Configuration>();
+
+                if (_configuration.Security)
+               {
+                    ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();
+                    _tcpServer.Run();
+               }
+               else
+               {
+                   InsecureTcpServer _tcpServer = AutofacContainer.Container.Resolve<InsecureTcpServer>();
+                   _tcpServer.Run();
+               }                             
             }
             catch (Exception e)
             {

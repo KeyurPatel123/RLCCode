@@ -25,7 +25,9 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.2</TypeScriptToolsVersion>
+    <ApplicationInsightsResourceId>/subscriptions/d737f537-7c27-4cc3-bb31-e2f0da8b6813/resourcegroups/ABMDResourceGroup/providers/microsoft.insights/components/RemoteLink</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/d737f537-7c27-4cc3-bb31-e2f0da8b6813/resourcegroups/ABMDResourceGroup/providers/microsoft.insights/components/RemoteLink</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,32 +47,39 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+    <Reference Include="Autofac, Version=4.6.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.6.0\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.WebApi2.4.0.1\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AI.DependencyCollector, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.1.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
+    <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.1.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+    <Reference Include="Microsoft.AI.DependencyCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.2.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.1.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.2.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AI.Web, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.1.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
+    <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.2.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AI.WindowsServer, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.1.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
+    <Reference Include="Microsoft.AI.Web, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.2.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.2.1.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+    <Reference Include="Microsoft.AI.WindowsServer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.2.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -169,16 +178,28 @@
     <Content Include="App\scripts\app.run.js" />
     <Content Include="App\scripts\app.config.js" />
     <Content Include="App\scripts\devices\devices.controller.js" />
+    <Content Include="App\scripts\devices\devices.image.template.html" />
+    <Content Include="App\scripts\devices\devices.settings.template.html" />
     <Content Include="App\scripts\devices\devices.template.html" />
     <Content Include="App\scripts\factories\poller.factory.js" />
     <Content Include="App\scripts\login\login.controller.js" />
     <Content Include="App\scripts\login\login.template.html" />
+    <Content Include="App\scripts\factories\signalRfactory.js" />
     <Content Include="App\scripts\services\loginService.js" />
     <Content Include="App\scripts\services\dataService.js" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\Images\abiomed-logo.png" />
+    <Content Include="Content\Images\clock_icon.png" />
     <Content Include="Content\Images\favicon.ico" />
     <Content Include="Content\Images\HeaderBg.png" />
+    <Content Include="Content\Images\image_icon.png" />
+    <Content Include="Content\Images\impella_icon.png" />
     <Content Include="Content\Images\Logo.png" />
     <Content Include="Content\Images\RLM.png" />
+    <Content Include="Content\Images\video_camera_icon.png" />
+    <Content Include="Content\Images\wifi_icon.png" />
     <Content Include="Content\Main.css" />
     <Content Include="Global.asax" />
     <Content Include="packages.config" />
@@ -186,9 +207,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="scripts\angular-animate.min.js" />
+    <Content Include="scripts\angular-bootstrap.js" />
     <Content Include="scripts\angular-cookie.min.js" />
     <Content Include="scripts\angular-ui-router.min.js" />
     <Content Include="scripts\angular.min.js" />
+    <Content Include="scripts\GrindPlayer.swf" />
+    <Content Include="scripts\jquery-3.2.1.min.js" />
+    <Content Include="scripts\jwplayer.flash.swf" />
+    <Content Include="scripts\jwplayer.js" />
+    <Content Include="scripts\jwplayer.loader.swf" />
+    <Content Include="scripts\SignalR2.2.1.js" />
     <Content Include="scripts\underscore-min.js" />
     <Content Include="Views\web.config">
       <SubType>Designer</SubType>
@@ -196,6 +224,8 @@
     <Content Include="Views\RLM\index.cshtml" />
     <Content Include="package.json" />
     <Content Include="scripts\moment.min.js" />
+    <None Include="Properties\PublishProfiles\RemoteLink - Web Deploy.pubxml" />
+    <Content Include="Service References\Application Insights\ConnectedService.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -213,10 +243,16 @@
     <Compile Include="API\ImageController.cs" />
     <Compile Include="API\LoginController.cs" />
     <Compile Include="API\VideoController.cs" />
+    <Compile Include="App_Start\AutofacContainer.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Business\DeviceStatusManager.cs" />
+    <Compile Include="Business\IEventManager.cs" />
+    <Compile Include="Business\IDeviceStatusManager.cs" />
     <Compile Include="Controllers\RLMController.cs" />
+    <Compile Include="Business\EventManager.cs" />
+    <Compile Include="ErrorHandler\AiHandleErrorAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -230,10 +266,21 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Abiomed.Business\Abiomed.Business.csproj">
+      <Project>{3BA379F9-7E33-4BE6-922C-64B9BE509C12}</Project>
+      <Name>Abiomed.Business</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj">
       <Project>{d3662849-0b27-4d08-bff6-7f1537bcf015}</Project>
       <Name>Abiomed.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Abiomed.Repository\Abiomed.Repository.csproj">
+      <Project>{133ECB86-A3DA-4636-9641-B10B6C8B2431}</Project>
+      <Name>Abiomed.Repository</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

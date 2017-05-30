@@ -7,10 +7,12 @@
  * Author: Alessandro Agnello 
 */
 
+using Newtonsoft.Json;
 using System;
 
 namespace Abiomed.Models
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class BaseMessage
     {
         #region Private
@@ -20,12 +22,14 @@ namespace Abiomed.Models
         #endregion
 
         #region Public
+        [JsonProperty]
         public UInt16 MsgId
         {
             get { return _msgId; }
             set { _msgId = value; }
         }
 
+        [JsonProperty]
         public UInt16 MsgLen
         {
             get { return _msgLen; }

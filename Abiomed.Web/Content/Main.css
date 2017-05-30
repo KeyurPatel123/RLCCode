@@ -3,15 +3,181 @@
 }
 
 body {
-    background-color: #F5F5F5;
+    background-color: #4f5b6d;
 }
 
 .HeaderMain {
-    height: 60px;
-    background-image: url(/Content/Images/HeaderBg.png);
-    background-repeat: no-repeat;
-    background-position: left top;
-    padding-bottom: 80px;
+    height: 90px;
+    Background: #fff;
+    Border-bottom: solid 10px #909AA8;
+}
+
+.Logo {
+    width:235px;
+    margin: 15px 0 0 45px;
+}
+
+.Card {
+    width:400px;
+    height:285px;
+    border-radius: 3px;
+    -webkit-box-shadow: 3px 3px 6px -3px rgba(0,0,0,0.5);
+    -moz-box-shadow: 3px 3px 6px -3px rgba(0,0,0,0.5);
+    box-shadow: 3px 3px 6px -3px rgba(0,0,0,0.5);
+    margin: 20px;
+    background-color:#fff;
+    display:inline-block;
+}
+
+
+.CardL1{
+    height:80px;
+    Background-color: #fff;    
+}
+
+.CardLevelLeft1{
+    width: 125px;
+    height:80px;
+    display: inline-block;
+    background:#cfd2d7;
+    background-image: url("/Content/Images/impella_icon.png");
+    background-size: 51px 39px;   
+    background-repeat:no-repeat;
+    background-position: center;
+    float:left;
+    Border-bottom: solid 1px #FFF;
+}
+
+.CardLevelRight1{
+    display: inline-block;
+    width:275px;
+    height:80px;
+    float:right;
+    Border-bottom: solid 1px #cfd2d7;
+}
+
+.CardLevelLeft2
+{
+     width: 125px;
+    height:62.5px;
+    display: inline-block;
+    background:#cfd2d7;
+    background-image: url("/Content/Images/wifi_icon.png");
+    background-size: 33px 33px;   
+    background-repeat:no-repeat;
+    background-position: center;
+    float:left;
+    Border-bottom: solid 1px #FFF;
+}
+
+.CardLevelRight2{
+    display: inline-block;
+    width:275px;
+    height:62.5px;
+    float:right;
+    Border-bottom: solid 1px #cfd2d7;
+}
+
+.CardLevelLeft3
+{
+     width: 125px;
+    height:62.5px;
+    display: inline-block;
+    background:#cfd2d7;
+    background-image: url("/Content/Images/clock_icon.png");
+    background-size: 33px 33px;   
+    background-repeat:no-repeat;
+    background-position: center;
+    float:left;
+    Border-bottom: solid 1px #FFF;
+}
+
+.CardLevelRight3{
+    display: inline-block;
+    width:275px;
+    height:62.5px;
+    float:right;
+    Border-bottom: solid 1px #cfd2d7;
+}
+
+.CardL2{
+    height:62.5px;
+}
+
+.CardLevelLeft4{
+    width: 100%;
+    height:80px;
+    display: inline-block;
+    background:#909AA8;
+    /*background-image: url("/Content/Images/video_camera_icon.png");
+    background-size: 50px 38px;   
+    background-repeat:no-repeat;
+    background-position: center;*/
+    float:left;
+}
+
+.Camera{
+    width: 50px;
+    float:left;
+    margin:20px 50px;
+    cursor: pointer;
+}
+
+.Image{
+    float:right;
+    color:white;
+    padding:20px 50px;
+    cursor: pointer;
+}
+
+
+.CardLevelRight4:hover
+{
+    background:#005fa9;
+}
+
+.CardLevelRight4{
+    display: inline-block;
+    width:275px;
+    height:80px;
+    float:right;
+    background:#909AA8;
+    cursor: pointer;
+}
+
+
+.SerialText
+{
+    font-size:32px;
+    font-family:Arial;
+    text-align: left;
+    padding-left:30px;
+    vertical-align: middle;
+    line-height: 80px; 
+    color:#909AA8;
+}
+
+.BearerText
+{
+    font-size:20px;
+    font-family:Arial;
+    text-align: left;
+    padding-left:30px;
+    vertical-align: middle;
+    line-height: 62.5px; 
+    color:#909AA8;
+}
+
+.ViewText
+{
+    font-size:32px;
+    font-family:Arial;
+    font-weight:bold;
+    text-align: left;
+    padding-left:30px;
+    vertical-align: middle;
+    line-height: 80px; 
+    color:#FFF;
 }
 
 .Block {

@@ -2,12 +2,22 @@
 <html>
 <head>
     <script src="~/scripts/angular.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="~/scripts/angular-bootstrap.js"></script>
     <script src="~/scripts/angular-ui-router.min.js"></script>
     <script src="~/scripts/angular-animate.min.js"></script>
     <script src="~/scripts/angular-cookie.min.js"></script>
     <script src="~/scripts/underscore-min.js"></script>
     <script src="~/scripts/moment.min.js"></script>
+
+    <!-- SignalR -->
+    <script src="~/scripts/jquery-3.2.1.min.js"></script>
+    <script src="~/scripts/SignalR2.2.1.js"></script>
+    <script src="http://localhost:8080/signalr/hubs"></script>
+       
+
+    <script src="~/scripts/jwplayer.js"></script>    
+    <script>jwplayer.key = "uKRuFyZbVRO2vqdgICcfAK+WZhFJS8LcMbBK8anMh/U=";</script>
+
     <script type="text/javascript" src="//player.wowza.com/player/latest/wowzaplayer.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="Content/Images/favicon.ico">
@@ -15,14 +25,14 @@
     <title>ABIOMED - Remote Link</title>
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-theme.min.css" >
+    <link rel="stylesheet" type="text/css" href="~/Content/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="/Content/Main.css" />    
 </head>
 <body ng-app="app">
     <div class="HeaderMain Margin15" ng-hide="loggedIn === false">
-        {{root}}
+        <img class="Logo" src="~/Content/Images/abiomed-logo.png" />
     </div>    
     <div class="container-fluid">
         <ui-view></ui-view>
@@ -31,6 +41,7 @@
     <script src="App/scripts/app.run.js"> </script>
 
     <script src="/App/scripts/factories/poller.factory.js"> </script>
+    <script src="/App/scripts/factories/signalRfactory.js"> </script>
 
     <script src="App/scripts/login/login.controller.js"> </script>
     <script src="App/scripts/devices/devices.controller.js"> </script>
