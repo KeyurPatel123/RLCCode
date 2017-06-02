@@ -151,10 +151,19 @@ namespace Abiomed.Business
             {
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
             }*/
-
-            var videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
             
-            videoControl = General.GenerateRequest(videoControl, rlmDevice);
+            // Remove Image Capture Timer
+            _keepAliveManager.ImageTimerDelete(deviceIpAddress);
+
+            byte[] videoControl = new byte[0];
+
+            // Check if already streaming, if so, do not send message.
+            if (!rlmDevice.Streaming)
+            {
+                videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
+                videoControl = General.GenerateRequest(videoControl, rlmDevice);
+                rlmDevice.Streaming = true;
+            }
 
             return videoControl;
         }
@@ -175,6 +184,31 @@ namespace Abiomed.Business
             return returnMessage;
         }
 
+        public byte[] VideoStop(string deviceIpAddress)
+        {
+            RLMDevice rlmDevice;
+            _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+
+            rlmDevice.Streaming = false;
+
+            byte[] returnMessage = General.GenerateRequest(Definitions.VideoStopIndicator, rlmDevice);
+
+            Trace.TraceInformation(@"Sending Video Stop {0}", rlmDevice.SerialNo);
+
+            return returnMessage;
+        }
+
+        public byte[] ImageStop(string deviceIpAddress)
+        {
+            RLMDevice rlmDevice;
+            _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+
+            // Shut off Request Image Timer
+            _keepAliveManager.ImageTimerDelete(deviceIpAddress);
+
+            Trace.TraceInformation(@"Stop Screen Capture {0}", rlmDevice.SerialNo);
+            return new byte[0];
+        }
         #endregion
     }
 }

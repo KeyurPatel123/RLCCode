@@ -80,6 +80,27 @@ namespace Abiomed.Web.API
         }
 
         [HttpPost]
+        [Route("api/DeviceStatus/SendVideoStop/{serialNumber}")]
+        public void VideoStop([FromUri]string serialNumber)
+        {
+            _eventManager.VideoStop(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/SendImageStart/{serialNumber}")]
+        public void ImageStart([FromUri]string serialNumber)
+        {
+            _eventManager.ScreenCaptureIndication(serialNumber);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/SendImageStop/{serialNumber}")]
+        public void ImageStop([FromUri]string serialNumber)
+        {
+            _eventManager.ImageStop(serialNumber);
+        }
+
+        [HttpPost]
         [Route("api/DeviceStatus/CloseSessionIndication/{serialNumber}")]
         public void CloseSessionIndication([FromUri]string serialNumber)
         {

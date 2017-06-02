@@ -25,6 +25,8 @@ namespace Abiomed.Web
         void BearerAuthenticationUpdateIndication(Authorization authorization, bool delete);
         void StreamingVideoControlIndication(string serialNumber);
         void ScreenCaptureIndication(string serialNumber);
+        void VideoStop(string serialNumber);
+        void ImageStop(string serialNumber);
         void OpenRLMLogFileIndication(string serialNumber);
         void CloseSessionIndication(string serialNumber);
         #endregion        

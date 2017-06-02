@@ -21,8 +21,9 @@ namespace Abiomed.Business
 
         #region Sending
         byte[] StreamingVideoControlIndication(string deviceIpAddress);
-
         byte[] ScreenCaptureIndication(string deviceIpAddress);
+        byte[] ImageStop(string deviceIpAddress);
+        byte[] VideoStop(string deviceIpAddress);
         
         #endregion
     }

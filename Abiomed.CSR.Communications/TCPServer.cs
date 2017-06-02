@@ -44,7 +44,9 @@ namespace Abiomed.RLR.Communications
             Definitions.StreamingVideoControlIndicationEvent,
             Definitions.ScreenCaptureIndicationEvent,
             Definitions.OpenRLMLogFileIndicationEvent,
-            Definitions.CloseSessionIndicationEvent
+            Definitions.CloseSessionIndicationEvent,
+            Definitions.VideoStopEvent,
+            Definitions.ImageStopEvent,
         };
 
         public TCPServer(IRLMCommunication RLMCommunication, Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)

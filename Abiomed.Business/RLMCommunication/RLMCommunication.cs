@@ -11,8 +11,6 @@ using Abiomed.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections.Concurrent;
 using Abiomed.Repository;
 using System.Diagnostics;
 
@@ -142,7 +140,9 @@ namespace Abiomed.Business
                         {Definitions.StreamingVideoControlIndicationEvent, _digitiserCommunication.StreamingVideoControlIndication },
                         {Definitions.ScreenCaptureIndicationEvent, _digitiserCommunication.ScreenCaptureIndication },
                         {Definitions.OpenRLMLogFileIndicationEvent, _fileTransferCommunication.OpenRLMLogFileIndication},
-                        {Definitions.CloseSessionIndicationEvent, _sessionCommunication.CloseSessionIndication }
+                        {Definitions.CloseSessionIndicationEvent, _sessionCommunication.CloseSessionIndication },
+                        {Definitions.VideoStopEvent, _digitiserCommunication.VideoStop },
+                        {Definitions.ImageStopEvent, _digitiserCommunication.ImageStop }
                     };
                 } 
                 return processMessageEventDictionary;

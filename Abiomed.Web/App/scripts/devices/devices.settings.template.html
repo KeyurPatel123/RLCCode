@@ -6,6 +6,17 @@
     </div>
     <br />
     <div class="col-xs-12" style="padding: 10px;">
+        <button ng-click="StartVideoClick()" type="button" class="btn btn-primary">Start Sending Video</button>
+        <button ng-click="StopVideoClick()" type="button" class="btn btn-danger">Stop Sending Video</button>
+    </div>
+    <br />
+    <div class="col-xs-12" style="padding: 10px;">
+        <button ng-click="StartImageClick()" type="button" class="btn btn-primary">Start Image Capture</button>
+        <button ng-click="StopImageClick()" type="button" class="btn btn-danger">Stop Image Capture</button>
+    </div>
+    <br />
+
+    <div class="col-xs-12" style="padding: 10px;">
         <button ng-click="RLRLogClick()" type="button" class="btn btn-primary">Get RLR Logs</button>
         <pre>{{RLRLog}}</pre>
     </div>

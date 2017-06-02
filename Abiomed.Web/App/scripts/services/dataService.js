@@ -20,6 +20,9 @@ function dataService($http) {
         sendRLRLog: sendRLRLog,
         getImageNames: getImageNames,
         sendVideoStart: sendVideoStart,
+        sendVideoStop: sendVideoStop,
+        sendImageStart: sendImageStart,
+        sendImageStop: sendImageStop,
         getBearerInfo: getBearerInfo,
         sendCloseSession: sendCloseSession,
         sendUpdatedBearer: sendUpdatedBearer,
@@ -103,6 +106,48 @@ function dataService($http) {
     function sendVideoStart(serialNumber)
     {
         return $http.post('/api/DeviceStatus/SendVideoStart/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendVideoStop(serialNumber) {
+        return $http.post('/api/DeviceStatus/SendVideoStop/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendImageStart(serialNumber) {
+        return $http.post('/api/DeviceStatus/SendImageStart/' + serialNumber)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function sendImageStop(serialNumber) {
+        return $http.post('/api/DeviceStatus/SendImageStop/' + serialNumber)
             .then(getDevicesComplete)
             .catch(getDevicesFailed);
 

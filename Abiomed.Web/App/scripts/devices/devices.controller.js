@@ -98,6 +98,23 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
                 {
                     dataService.sendKeepAlive(device.SerialNumber);
                 }
+
+                $scope.StartVideoClick = function ()
+                {
+                    dataService.sendStartVideo(device.SerialNumber);
+                }
+
+                $scope.StopVideoClick = function () {
+                    dataService.sendVideoStop(device.SerialNumber);
+                }
+
+                $scope.StartImageClick = function () {
+                    dataService.sendStartImage(device.SerialNumber);
+                }
+
+                $scope.StopImageClick = function () {
+                    dataService.sendImageStop(device.SerialNumber);
+                }
                 
                 // RLR Log click
                 $scope.RLRLogClick = function () {

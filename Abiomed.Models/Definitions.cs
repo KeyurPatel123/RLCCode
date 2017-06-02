@@ -27,6 +27,8 @@ namespace Abiomed.Models
         public static string BearerAuthenticationUpdateIndicationEvent = @"BearerAuthenticationUpdateIndication";
         public static string StreamingVideoControlIndicationEvent = @"StreamingVideoControlIndication";
         public static string ScreenCaptureIndicationEvent = @"ScreenCaptureIndication";
+        public static string VideoStopEvent = @"VideoStop";
+        public static string ImageStopEvent = @"ImageStop";
         public static string OpenRLMLogFileIndicationEvent = @"OpenFileIndication";
         public static string CloseSessionIndicationEvent = @"CloseSessionIndication";
         #endregion
@@ -162,7 +164,7 @@ namespace Abiomed.Models
             0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
             0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
         };
-
+        
         public static List<byte> StreamVideoControlIndicationRTMPS = new List<byte>
         {
             0x02, 0x00, // MSGID
@@ -176,6 +178,21 @@ namespace Abiomed.Models
             0x0B, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2d, 0x52, 0x4c, 0x4d, // USN - abiomed-RLM
             0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
             0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
+        };
+
+        public static byte[] VideoStopIndicator = new byte[]
+        {
+            0x02, 0x00, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x00, // Enable            
+            0x00, 0x00, // Timeout - None
+            0x00, 0x02, // Status Rate - Send every 2 seconds
+            0x00, 0x00, // URL
+            0x00, 0x00, // USN 
+            0x00, 0x00, // PWD 
+            0x00, 0x00, // Stream Application
         };
 
         public static byte[] ScreenCaptureIndicator = new byte[] 

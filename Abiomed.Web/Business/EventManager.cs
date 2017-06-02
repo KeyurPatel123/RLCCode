@@ -188,6 +188,18 @@ namespace Abiomed.Web
             _redisDbRepository.Publish(Definitions.ScreenCaptureIndicationEvent, device.DeviceIpAddress);
         }
 
+        public void VideoStop(string serialNumber)
+        {
+            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == serialNumber);
+            _redisDbRepository.Publish(Definitions.VideoStopEvent, device.DeviceIpAddress);
+        }
+
+        public void ImageStop(string serialNumber)
+        {
+            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == serialNumber);
+            _redisDbRepository.Publish(Definitions.ImageStopEvent, device.DeviceIpAddress);
+        }
+
         public void OpenRLMLogFileIndication(string serialNumber)
         {
             var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == serialNumber);
@@ -198,6 +210,6 @@ namespace Abiomed.Web
         {
             var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == serialNumber);
             _redisDbRepository.Publish(Definitions.CloseSessionIndicationEvent, device.DeviceIpAddress);
-        }
+        }        
     }
 }

@@ -114,6 +114,7 @@ namespace Abiomed.Business
 
                     var videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
                     streamIndicator = General.GenerateRequest(videoControl, rlmDevice);
+                    rlmDevice.Streaming = true;
                 }
                 else
                 {

@@ -23,6 +23,7 @@ namespace Abiomed.Models
         private int _clientSequence = 0;
         private UInt16 _serverSequence = 0;
         private int _ifaceVer = 0;
+        private bool _streaming = false;
         private Definitions.Bearer _bearer = Definitions.Bearer.Unknown;
         private string _text = string.Empty;
         private List<byte> _dataTransfer = new List<byte>();        
@@ -71,6 +72,11 @@ namespace Abiomed.Models
             set { _ifaceVer = value; }
         }
 
+        public bool Streaming
+        {
+            get { return _streaming; }
+            set { _streaming = value; }            
+        }
         public Definitions.Bearer Bearer
         {
             get { return _bearer; }

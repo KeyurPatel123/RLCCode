@@ -15,13 +15,12 @@ using Abiomed.Business;
 using System.Linq;
 using System.Collections.Concurrent;
 using Abiomed.Models;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Authentication;
-using System.Net.Security;
 using Abiomed.Repository;
 using System.Diagnostics;
 using System.Collections.Generic;
 using StackExchange.Redis;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Abiomed.RLR.Communications
 {
@@ -43,7 +42,9 @@ namespace Abiomed.RLR.Communications
             Definitions.StreamingVideoControlIndicationEvent,
             Definitions.ScreenCaptureIndicationEvent,
             Definitions.OpenRLMLogFileIndicationEvent,
-            Definitions.CloseSessionIndicationEvent
+            Definitions.CloseSessionIndicationEvent,
+            Definitions.VideoStopEvent,
+            Definitions.ImageStopEvent,
         };
 
         public InsecureTcpServer(IRLMCommunication RLMCommunication, Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
@@ -132,6 +133,7 @@ namespace Abiomed.RLR.Communications
                 state.TcpClient = handler;
                 state.WorkStream = networkStream;
                 state.DeviceIpAddress = handler.Client.RemoteEndPoint.ToString();
+
                 _tcpStateObjectList.TryAdd(state.DeviceIpAddress, state);
 
                 Trace.TraceInformation("RLM connected at connection {0}", state.DeviceIpAddress);
