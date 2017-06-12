@@ -12,11 +12,11 @@ namespace Abiomed.Models
     public class BearerAuthenticationReadResponse : BaseMessage
     {
         #region Private        
-        private Definitions.Status _status;
-        private int _userRef;
-        private int _slot;        
-        private int _bearer;
-        private BearerAuthInformation _bearerAuthInformation;
+        private Definitions.Status _status = Definitions.Status.Unknown;
+        private int _userRef = int.MaxValue;
+        private int _slot = int.MaxValue;        
+        private int _bearer = int.MaxValue;
+        private BearerAuthInformation _bearerAuthInformation = new BearerAuthInformation();
         #endregion
 
         #region Public

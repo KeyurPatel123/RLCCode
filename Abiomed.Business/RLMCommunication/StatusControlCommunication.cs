@@ -139,8 +139,8 @@ namespace Abiomed.Business
 
                 // Add bearer information to list
                 bearerAuthenticationReadResponse.BearerAuthInformation.AuthType = (Definitions.AuthenicationType)BitConverter.ToUInt16(message.Skip(12).Take(2).Reverse().ToArray(), 0);
-                var SSIDLength = BitConverter.ToUInt16(message.Skip(14).Take(1).ToArray(), 0);
-                bearerAuthenticationReadResponse.BearerAuthInformation.SSID = BitConverter.ToString(message.Skip(15).Take(SSIDLength).Reverse().ToArray(), 0);
+                var SSIDLength = message.Length - 15;
+                bearerAuthenticationReadResponse.BearerAuthInformation.SSID = Encoding.ASCII.GetString(message.Skip(15).Take(SSIDLength).ToArray());
                 rlmDevice.BearerAuthInformationList.Add(bearerAuthenticationReadResponse.BearerAuthInformation);
 
                 // Determine if you need another to request another slot

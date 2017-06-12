@@ -154,6 +154,7 @@ namespace Abiomed.Business
             // Init return message
             byte[] returnMessage = new byte[0];
 
+            // Sample
             try
             {                
                 // Split up messages via token '-'

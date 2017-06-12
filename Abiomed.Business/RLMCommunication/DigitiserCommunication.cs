@@ -145,12 +145,11 @@ namespace Abiomed.Business
         {
             RLMDevice rlmDevice;
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-            List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;
-            /*List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;
+            List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;            
             if (_configuration.Security)
             {
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
-            }*/
+            }
             
             // Remove Image Capture Timer
             _keepAliveManager.ImageTimerDelete(deviceIpAddress);

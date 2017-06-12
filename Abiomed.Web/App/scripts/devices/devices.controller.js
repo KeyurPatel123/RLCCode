@@ -101,7 +101,7 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
 
                 $scope.StartVideoClick = function ()
                 {
-                    dataService.sendStartVideo(device.SerialNumber);
+                    dataService.sendVideoStart(device.SerialNumber);
                 }
 
                 $scope.StopVideoClick = function () {
@@ -109,7 +109,7 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
                 }
 
                 $scope.StartImageClick = function () {
-                    dataService.sendStartImage(device.SerialNumber);
+                    dataService.sendImageStart(device.SerialNumber);
                 }
 
                 $scope.StopImageClick = function () {
@@ -226,9 +226,8 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
         playerInstance.setup({
             playlist: [{
                 sources: [
-                  { file: "rtmp://rlv.abiomed.com:443/live/" + streamName},
-                  { file: "rtsp://rlv.abiomed.com:443/live/" + streamName},
-                  { file: "http://rlv.abiomed.com:443/live/" + streamName + "/playlist.m3u8" },
+                    { file: "rtmps://rlv.abiomed.com:443/live/RL11223"},
+                    { file: "https://rlv.abiomed.com:443/live/RL11223/playlist.m3u8" },
                 ],
             }],
             width: "100%",

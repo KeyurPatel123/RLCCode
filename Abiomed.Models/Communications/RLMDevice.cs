@@ -32,7 +32,7 @@ namespace Abiomed.Models
         private uint _fileTransferSize;
         private RLMFileTransfer _fileTransferType;
         private UInt16 _bearerSlotNumber = 0;
-        private List<BearerAuthInformation> _bearerAuthInformationList;
+        private List<BearerAuthInformation> _bearerAuthInformationList = new List<BearerAuthInformation>();
 
         #endregion
 

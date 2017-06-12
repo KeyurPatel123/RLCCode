@@ -23,7 +23,7 @@ namespace Abiomed.SignalRSelfHost
             // use http://*:8080 to bind to all addresses. 
             // See http://msdn.microsoft.com/en-us/library/system.net.httplistener.aspx 
             // for more information.
-            using (WebApp.Start<Startup>(_configuration.SignalRConnection))
+            using (WebApp.Start<Startup>("http://*:8080"))
             {
                 Console.WriteLine("Server running on {0}", _configuration.SignalRConnection);
                 Console.ReadLine();

@@ -45,7 +45,10 @@ namespace Abiomed.Business
             KeepAliveTimer keepAliveTimer;
             _rlmConnections.TryGetValue(deviceIpAddress, out keepAliveTimer);
             
-            keepAliveTimer.PingTimer();
+            if(keepAliveTimer != null)
+            {
+                keepAliveTimer.PingTimer();
+            }            
         }
         
         private void TimerExpiredCallback(object sender, ElapsedEventArgs e, string deviceIpAddress)

@@ -106,11 +106,10 @@ namespace Abiomed.Business
                 if (rlmDevice.Bearer != Definitions.Bearer.LTE)
                 {
                     List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;
-                    // todo put back
-                    //if (_configuration.Security)
-                    //{
-                    //    secureStream = Definitions.StreamVideoControlIndicationRTMPS;
-                    //}
+                    if (_configuration.Security)
+                    {
+                        secureStream = Definitions.StreamVideoControlIndicationRTMPS;
+                    }
 
                     var videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
                     streamIndicator = General.GenerateRequest(videoControl, rlmDevice);

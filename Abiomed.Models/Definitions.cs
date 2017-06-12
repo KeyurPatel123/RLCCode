@@ -164,7 +164,7 @@ namespace Abiomed.Models
             0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
             0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
         };
-        
+      
         public static List<byte> StreamVideoControlIndicationRTMPS = new List<byte>
         {
             0x02, 0x00, // MSGID

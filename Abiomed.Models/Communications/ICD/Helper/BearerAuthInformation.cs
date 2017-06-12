@@ -11,6 +11,7 @@ using static Abiomed.Models.Definitions;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerAuthInformation
     {
         private Bearer _bearerType =  Bearer.Unknown;

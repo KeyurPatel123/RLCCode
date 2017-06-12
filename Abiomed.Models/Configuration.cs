@@ -77,7 +77,7 @@ namespace Abiomed.Models
                 _documentDBConnection = DocDbConnectionUri;
                 _documentDBConnectionPassword = DocDbConnectionPwd;
                 _redisConnect = RedisCon;
-                _signalRConnection = @"rlw.abiomed.com:8080";
+                _signalRConnection = @"http://13.82.178.248:80";
             }
         }
 
