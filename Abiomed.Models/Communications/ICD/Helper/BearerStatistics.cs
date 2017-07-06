@@ -10,6 +10,7 @@ using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerStatistics
     {
         private UInt64 _bytes;

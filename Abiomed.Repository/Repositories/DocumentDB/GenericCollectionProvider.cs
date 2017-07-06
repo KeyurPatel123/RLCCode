@@ -47,19 +47,25 @@ namespace Abiomed.Repository
         /// If a collection with the collection id from <see cref="GetCollectionId"/> exists, 
         /// returns the instance. If the collection does not exist, creates a new instance and returns it.
         /// </summary>
+        /// <param name="collectionId">The Optional CollectionId</param>
         /// <returns>Document collection where the documents are stored</returns>
-        public async Task<DocumentCollection> CreateOrGetCollection()
+        public async Task<DocumentCollection> CreateOrGetCollection(string collectionId = "")
         {
+            if (string.IsNullOrEmpty(collectionId))
+            {
+                collectionId = this.GetCollectionId();
+            }
+
             var collection =
                 this.documentClient.CreateDocumentCollectionQuery(await this.databaseProvider.GetDbSelfLink())
-                .Where(c => c.Id == this.GetCollectionId())
+                .Where(c => c.Id == collectionId)
                 .AsEnumerable()
                 .FirstOrDefault();
 
             return collection ??
                  await this.documentClient.CreateDocumentCollectionAsync(
                     await this.databaseProvider.GetDbSelfLink(),
-                    new DocumentCollection { Id = this.GetCollectionId() });
+                    new DocumentCollection { Id = collectionId });
         }
 
         /// <summary>
@@ -67,9 +73,9 @@ namespace Abiomed.Repository
         /// to obtain the collection.
         /// </summary>
         /// <returns>Collection documents link</returns>
-        public virtual async Task<string> GetCollectionDocumentsLink()
+        public virtual async Task<string> GetCollectionDocumentsLink(string collectionId = "")
         {
-            return (await this.CreateOrGetCollection()).DocumentsLink;
+            return (await this.CreateOrGetCollection(collectionId)).DocumentsLink;
         }
 
         /// <summary>

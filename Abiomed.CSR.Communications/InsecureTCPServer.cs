@@ -28,6 +28,7 @@ namespace Abiomed.RLR.Communications
     {       
         private IRLMCommunication _RLMCommunication;
         private Configuration _configuration;
+        private ILogManager _logManager;
         private ConcurrentDictionary<string, TCPStateObjectInsecure> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObjectInsecure>();
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
@@ -87,7 +88,17 @@ namespace Abiomed.RLR.Communications
                 var listener = new TcpListener(IPAddress.Any, _configuration.TcpPort);
                 listener.Start();
                 Trace.TraceInformation("Insecure TCP Server Started Success");
-                
+
+                // Session Request Simulation
+                SessionRequest sessionRequest = new SessionRequest();
+
+                sessionRequest.MsgSeq = 14;
+                sessionRequest.IfaceVer = 16;
+                sessionRequest.SerialNo = "RLM112233";
+                sessionRequest.Bearer = Definitions.Bearer.Ethernet;
+                sessionRequest.Text = "Insecure TCP Server Started Success";
+                _logManager = new LogManager();
+                _logManager.Create("123.11.99.1234", "RLM112233", sessionRequest, Definitions.LogMessageType.SessionRequest);
 
                 while (true)
                 {

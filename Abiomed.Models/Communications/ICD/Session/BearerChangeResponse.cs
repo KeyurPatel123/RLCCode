@@ -7,8 +7,11 @@
  * Author: Alessandro Agnello 
 */
 
+using System;
+
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerChangeResponse : BaseMessage
     {
         #region Private                

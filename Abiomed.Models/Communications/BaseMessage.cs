@@ -13,6 +13,7 @@ using System;
 namespace Abiomed.Models
 {
     [JsonObject(MemberSerialization.OptIn)]
+    [Serializable]
     public class BaseMessage
     {
         #region Private

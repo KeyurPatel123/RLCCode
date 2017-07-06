@@ -10,6 +10,7 @@ using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class LimitRequest
     {
         private Definitions.Bearer _bearer = Definitions.Bearer.Unknown;

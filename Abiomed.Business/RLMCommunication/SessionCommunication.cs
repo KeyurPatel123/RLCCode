@@ -43,6 +43,7 @@ namespace Abiomed.Business
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
                 SessionRequest sessionRequest = new SessionRequest();
 
+                // the Skip, Take & Reverse is used to reverse BigEndian Data...
                 sessionRequest.MsgSeq = BitConverter.ToUInt16(message.Skip(4).Take(2).Reverse().ToArray(), 0);
                 sessionRequest.IfaceVer = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
                 sessionRequest.SerialNo = Encoding.ASCII.GetString(message.Skip(8).Take(7).ToArray());
@@ -59,17 +60,12 @@ namespace Abiomed.Business
                     ClientSequence = sessionRequest.MsgSeq,
                 };
 
-                // Check if already online,
+                // Check if already online, 
                 bool deviceOnline = _redisDbRepository.StringKeyExist(rlmDevice.SerialNo);
 
-                string addedOrUpdatedDevice = Definitions.AddRLMDevice;
-                
                 // If device online, update device
-                if (deviceOnline)
-                {
-                    addedOrUpdatedDevice = Definitions.UpdateRLMDevice;
-                }
-
+                string addedOrUpdatedDevice = deviceOnline ? Definitions.UpdateRLMDevice : Definitions.AddRLMDevice;
+                
                 // Add/Update set and publish message
                 _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
                 _redisDbRepository.AddToSet(Definitions.RLMDeviceSet, rlmDevice.SerialNo);
@@ -101,7 +97,6 @@ namespace Abiomed.Business
 
                 streamIndicator = General.GenerateRequest(Definitions.ScreenCaptureIndicator, rlmDevice);
                 rlmDevice.FileTransferType = Definitions.RLMFileTransfer.ScreenCapture0;
-
                               
                 if (rlmDevice.Bearer != Definitions.Bearer.LTE)
                 {
@@ -114,12 +109,6 @@ namespace Abiomed.Business
                     var videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
                     streamIndicator = General.GenerateRequest(videoControl, rlmDevice);
                     rlmDevice.Streaming = true;
-                }
-                else
-                {
-                    // Ask for image 0
-                    streamIndicator = General.GenerateRequest(Definitions.ScreenCaptureIndicator, rlmDevice);
-                    rlmDevice.FileTransferType = Definitions.RLMFileTransfer.ScreenCapture0;
                 }
 
                 // Append to current Byte[]

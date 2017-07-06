@@ -33,15 +33,15 @@ namespace Abiomed.Console
                 Configuration _configuration =  AutofacContainer.Container.Resolve<Configuration>();
 
                 if (_configuration.Security)
-               {
+                {
                     ITCPServer _tcpServer = AutofacContainer.Container.Resolve<ITCPServer>();
                     _tcpServer.Run();
-               }
-               else
-               {
-                   InsecureTcpServer _tcpServer = AutofacContainer.Container.Resolve<InsecureTcpServer>();
-                   _tcpServer.Run();
-               }                             
+                }
+                else
+                {
+                    InsecureTcpServer _tcpServer = AutofacContainer.Container.Resolve<InsecureTcpServer>();
+                    _tcpServer.Run();
+                }                             
             }
             catch (Exception e)
             {

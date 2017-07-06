@@ -7,11 +7,11 @@
  * Author: Alessandro Agnello 
 */
 
-
 using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BufferStatusRequest : BaseMessage
     {
         private UInt16 _status = 0;

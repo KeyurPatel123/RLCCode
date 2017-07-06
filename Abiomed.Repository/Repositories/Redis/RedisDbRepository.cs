@@ -145,12 +145,25 @@ namespace Abiomed.Repository
 
         public void Publish(RedisChannel channel, RedisValue msg)
         {
-            _subscriber.Publish(channel, msg);
+            try
+            {
+                _subscriber.Publish(channel, msg);
+            } catch (Exception EX)
+            {
+                _subscriber.Publish(channel, msg);
+            }
         }
 
         public void Subscribe(RedisChannel channel, Action<RedisChannel, RedisValue> callback)
         {
-            _subscriber.Subscribe(channel, callback);
+            try
+            {
+                _subscriber.Subscribe(channel, callback);
+            } catch (Exception EX)
+            {
+                // Retry
+                _subscriber.Subscribe(channel, callback);
+            }
         }
 
         public void Subscribe(List<RedisChannel> channel, Action<RedisChannel, RedisValue> callback)

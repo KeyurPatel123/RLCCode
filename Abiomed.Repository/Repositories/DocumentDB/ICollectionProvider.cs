@@ -22,7 +22,7 @@ namespace Abiomed.Repository
         /// Creates or gets the document collection.
         /// </summary>
         /// <returns>Document collection where the documents are stored</returns>
-        Task<DocumentCollection> CreateOrGetCollection();
+        Task<DocumentCollection> CreateOrGetCollection(string collectionId = "");
 
         /// <summary>
         /// Gets the collection documents link
@@ -31,6 +31,6 @@ namespace Abiomed.Repository
         /// Collection documents link of the collection that is created by
         /// <see cref="CreateOrGetCollection"/>
         /// </returns>
-        Task<string> GetCollectionDocumentsLink();
+        Task<string> GetCollectionDocumentsLink(string collectionId = "");
     }
 }

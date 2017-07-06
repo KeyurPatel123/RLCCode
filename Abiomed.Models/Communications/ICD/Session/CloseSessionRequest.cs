@@ -6,9 +6,11 @@
  * --------------------------------------------------------
  * Author: Alessandro Agnello 
 */
+using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class CloseSessionRequest : BaseMessage
     {
         #region Private        
