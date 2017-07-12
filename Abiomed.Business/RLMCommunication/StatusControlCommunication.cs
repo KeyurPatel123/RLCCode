@@ -136,19 +136,23 @@ namespace Abiomed.Business
                 bearerAuthenticationReadResponse.Status = (Definitions.Status)BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
                 bearerAuthenticationReadResponse.UserRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
                 bearerAuthenticationReadResponse.Slot = BitConverter.ToUInt16(message.Skip(10).Take(2).Reverse().ToArray(), 0);
+                bearerAuthenticationReadResponse.Bearer = (Definitions.Bearer)BitConverter.ToUInt16(message.Skip(12).Take(2).Reverse().ToArray(), 0);
 
                 // Add bearer information to list
-                bearerAuthenticationReadResponse.BearerAuthInformation.AuthType = (Definitions.AuthenicationType)BitConverter.ToUInt16(message.Skip(12).Take(2).Reverse().ToArray(), 0);
-                var SSIDLength = message.Length - 15;
-                bearerAuthenticationReadResponse.BearerAuthInformation.SSID = Encoding.ASCII.GetString(message.Skip(15).Take(SSIDLength).ToArray());
-                rlmDevice.BearerAuthInformationList.Add(bearerAuthenticationReadResponse.BearerAuthInformation);
+                bearerAuthenticationReadResponse.BearerAuthInformation.AuthType = (Definitions.AuthenicationType)BitConverter.ToUInt16(message.Skip(14).Take(2).Reverse().ToArray(), 0);
+                var SSIDLength = message.Length - 17;
+                bearerAuthenticationReadResponse.BearerAuthInformation.SSID = Encoding.ASCII.GetString(message.Skip(17).Take(SSIDLength).ToArray());
+
+                rlmDevice.BearerAuthInformationList.Add(bearerAuthenticationReadResponse);
 
                 // Determine if you need another to request another slot
-                if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
+                if (rlmDevice.BearerSlotNumber >= 3)
+                //if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
                 {
                     // Add bearer info into REDIS, clean up RLMDevice, and PUB Message 
                     _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
                     rlmDevice.BearerSlotNumber = 0;
+                    rlmDevice.BearerAuthInformationList.Clear();
                     _redisDbRepository.Publish(Definitions.BearerInfoRLMDevice, rlmDevice.SerialNo);
                 }
                 else
@@ -238,6 +242,41 @@ namespace Abiomed.Business
 
             return returnMessage;
         }
+
+        public byte[] BearerPriorityConfirm(string deviceIpAddress, byte[] message, out RLMStatus status)
+        {
+            byte[] returnMessage = new byte[0];
+            try
+            {
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+
+                BearerPriorityConfirm bearerPriorityConfirm = new BearerPriorityConfirm();
+                bearerPriorityConfirm.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+
+
+                RLMDevice rlmDevice;
+                _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+
+                if (bearerPriorityConfirm.Status != Definitions.SuccessStats)
+                {
+                    status.Status = RLMStatus.StatusEnum.Failure;
+                    Trace.TraceInformation(@"Bearer Priority Confirm Response Failure {0}", rlmDevice.SerialNo);
+                }
+                else
+                {
+                    Trace.TraceInformation(@"Bearer Priority Confirm Response {0}", rlmDevice.SerialNo);
+                }
+
+                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, bearerPriorityConfirm, Definitions.LogMessageType.BearerPriorityConfirm);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceInformation(@"Bearer Priority Confirm Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
+            }
+
+            return returnMessage;
+        }
         #endregion
 
         #region Sending
@@ -262,7 +301,7 @@ namespace Abiomed.Business
             return returnMessage;
         }
 
-        public byte[] BearerAuthenticationUpdateIndication(string deviceIpAddress, Authorization authorization)
+        public byte[] BearerAuthenticationUpdateIndication(string deviceIpAddress, WifiCredentials wifiCredentials)
         {
             byte[] returnMessage = new byte[0];
             try
@@ -270,34 +309,24 @@ namespace Abiomed.Business
                 var returnList = Definitions.BearerAuthenticationUpdateIndication;
 
                 // Update Slot
-                returnList[11] = Convert.ToByte(authorization.AuthorizationInfo.Slot);
+                returnList[11] = Convert.ToByte(wifiCredentials.Slot);
 
-                // If note deleting add messages
-                if (!authorization.AuthorizationInfo.DeleteCredential)
-                {
-                    // Build Up Message
-                    returnList[9] = Convert.ToByte(authorization.AuthorizationInfo.BearerType);
-                    returnList[13] = Convert.ToByte(authorization.AuthorizationInfo.AuthType);
+                // Build Up Message                    
+                returnList[13] = Convert.ToByte(wifiCredentials.AuthType);
 
-                    // Get string length and convert ASCII to byte 
-                    byte SSIDLength = Convert.ToByte(authorization.AuthorizationInfo.SSID.Length);
-                    byte[] SSID = Encoding.ASCII.GetBytes(authorization.AuthorizationInfo.SSID);
+                // Get string length and convert ASCII to byte 
+                byte SSIDLength = Convert.ToByte(wifiCredentials.SSID.Length);
+                byte[] SSID = Encoding.ASCII.GetBytes(wifiCredentials.SSID);
 
-                    byte PSKLength = Convert.ToByte(authorization.AuthorizationInfo.PSK.Length);
-                    byte[] PSK = Encoding.ASCII.GetBytes(authorization.AuthorizationInfo.PSK);
+                byte PSKLength = Convert.ToByte(wifiCredentials.PSK.Length);
+                byte[] PSK = Encoding.ASCII.GetBytes(wifiCredentials.PSK);
 
-                    // Add all messages
-                    returnList.Add(SSIDLength);
-                    returnList.AddRange(SSID);
-                    returnList.Add(PSKLength);
-                    returnList.AddRange(PSK);
-                }
-                else
-                {
-                    // Add empty SSID and PSK for Deleting
-                    returnList.AddRange(Definitions.EmptySSIDPSK);
-                }
-
+                // Add all messages
+                returnList.Add(SSIDLength);
+                returnList.AddRange(SSID);
+                returnList.Add(PSKLength);
+                returnList.AddRange(PSK);
+                
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
@@ -312,7 +341,31 @@ namespace Abiomed.Business
 
             return returnMessage;
         }
-        
+
+        public byte[] BearerSlotDelete(string deviceIpAddress, WifiCredentials wifiDelete)
+        {
+            byte[] returnMessage = new byte[0];
+            try
+            {
+                var returnList = Definitions.BearerAuthenticationUpdateIndication;
+
+                // Update Slot
+                returnList[11] = Convert.ToByte(wifiDelete.Slot);
+
+                // Add empty SSID and PSK for Deleting
+                returnList.AddRange(Definitions.EmptySSIDPSK);
+
+                RLMDevice rlmDevice;
+                _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+                returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(@"Bearer Delete Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+            }
+            return returnMessage;
+        }
+
         public byte[] BearerAuthenticationReadIndication(string deviceIpAddress)
         {
             byte[] returnMessage = new byte[0];
@@ -327,7 +380,7 @@ namespace Abiomed.Business
                 byte[] bearerSlotNumberBytes = BitConverter.GetBytes(rlmDevice.BearerSlotNumber++);
 
                 // todo check
-                returnList[9] = bearerSlotNumberBytes[1];
+                returnList[9] = bearerSlotNumberBytes[0];
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
 
                 Trace.TraceInformation(@"Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
@@ -339,7 +392,38 @@ namespace Abiomed.Business
             }
 
             return returnMessage;
-        }       
-        #endregion        
+        }
+        
+        public byte[] BearerPriorityIndication(string deviceIpAddress, BearerPriority bearerPriority)
+        {
+            byte[] returnMessage = Definitions.BearerPriorityIndication;
+            try
+            {                
+                RLMDevice rlmDevice;
+                _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+
+                // Build Up Message
+                byte ethernet = Convert.ToByte(bearerPriority.Ethernet);
+                byte wifi = Convert.ToByte(bearerPriority.WiFi);
+                byte cellular = Convert.ToByte(bearerPriority.Cellular);
+
+                // Set Settings
+                returnMessage[7] = ethernet;
+                returnMessage[9] = wifi;
+                returnMessage[11] = cellular;
+
+                Trace.TraceInformation(@"Bearer Priority Indication {0}", rlmDevice.SerialNo);
+                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, string.Format("Bearer Priority Indication {0}", rlmDevice.SerialNo), Definitions.LogMessageType.BearerPriorityIndication);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(@"BearerPriority Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+            }
+
+            return returnMessage;
+        }
+
+
+        #endregion
     }
 }

@@ -34,17 +34,15 @@
             <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'LTE'">LTE</label>
         </div>
         <button type="button" class="btn btn-success" ng-click="UpdateBearerClick()">Update</button>
-    </div>    
-    <br />
-    <!--<div class="col-xs-12" style="padding:10px -10px;">
-        <button type="button" class="btn btn-success" ng-click="GetStatusClick()">Get Status of Bearer</button>
-        <pre>Status of each Bearer<br />
-        Ethernet: - <br />
-        Wifi 2.4 Ghz: -<br />
-        Wifi 5 Ghz: -<br />
-        LTE: -</pre>
     </div>
-    <br/>-->
+    <div>
+        <pre>Update Bearer Selection: {{BearerSelection}}</pre>
+        <select ng-model="BearerSelected" ng-options="x for x in BearerSelectionList"></select>
+        <button ng-click="AddBearer()">Add</button>
+        <button ng-show="EnableBearer==true" ng-click="UpdateBearerPriority()">Update</button>
+    </div>
+    <br />
+    <br />
     <div class="col-xs-12" style="padding:10px -10px;">
         <button type="button" class="btn btn-success" ng-click="GetAuthInfoClick()">Read Authentication Info</button>
         <table class="table">
@@ -59,25 +57,16 @@
                     <td>Delete</td>                 
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>0</td>
-                    <td><select ng-model="Bearer" ng-options="x for x in Bearers"></select></td>
-                    <td><select ng-model="AuthType" ng-options="x for x in AuthTypes"></select></td>
-                    <td><input style="width:75px;" type="text" name="SSID" value="ABC"></td>
-                    <td><input style="width:75px;" type="password" name="PSK" value=""></td>
-                    <td><button ng-click="CreateCredential(authorization)" type="button" class="btn btn-primary">Create/Update</button></td>                    
+            <tbody>              
+                <tr ng-repeat="authorization in AuthorizationList.bearerInfoList track by $index">
+                    <td><input style="width:75px;" type="text" name="Slot" value="{{authorization.Slot}}"></td>
+                    <td>WiFi</td>
+                    <td><select ng-model="authorization.BearerAuthInformation.BearerType" ng-options="x for x in AuthTypes"></select></td>
+                    <td><input style="width:75px;" type="text" name="SSID" ng-model="authorization.BearerAuthInformation.SSID" ></td>
+                    <td><input style="width:75px;" type="password" name="PSK" ng-model="authorization.BearerAuthInformation.PSK"></td>
+                    <td><button ng-click="CreateCredential(authorization)" type="button" class="btn btn-primary">Create/Update</button></td>
                     <td><button ng-click="DeleteCredential(authorization)" type="button" class="btn btn-danger">Delete</button></td>
                 </tr>
-                <tr ng-repeat="authorization in AuthorizationList track by $index"">
-                    <td><input style="width:75px;" type="text" name="Slot" value="0"></td>
-                    <td><select ng-model="Bearer" ng-options="x for x in Bearers"></select></td>
-                    <td><select ng-model="AuthType" ng-options="x for x in AuthTypes"></select></td>
-                    <td><input style="width:75px;" type="text" name="SSID" ng-model="SSID"></td>
-                    <td><input style="width:75px;" type="password" name="PSK" ng-model="PSK"></td>
-                    <td><button ng-click="CreateCredential(authorization)" type="button" class="btn btn-primary">Create/Update</button></td>                    
-                    <td><button ng-click="DeleteCredential(authorization)" type="button" class="btn btn-danger">Delete</button></td>
-                </tr>                
             </tbody>
         </table>
     </div>

@@ -7,15 +7,18 @@
  * Author: Alessandro Agnello 
 */
 
+using System;
+
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerAuthenticationReadResponse : BaseMessage
     {
         #region Private        
         private Definitions.Status _status = Definitions.Status.Unknown;
         private int _userRef = int.MaxValue;
         private int _slot = int.MaxValue;        
-        private int _bearer = int.MaxValue;
+        private Definitions.Bearer _bearer = Definitions.Bearer.Wifi24Ghz;
         private BearerAuthInformation _bearerAuthInformation = new BearerAuthInformation();
         #endregion
 
@@ -38,7 +41,7 @@ namespace Abiomed.Models
             set { _slot = value; }
         }
 
-        public int Bearer
+        public Definitions.Bearer Bearer
         {
             get { return _bearer; }
             set { _bearer = value; }

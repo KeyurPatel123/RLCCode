@@ -39,6 +39,8 @@ namespace Abiomed.RLR.Communications
             Definitions.StatusIndicationEvent,
             Definitions.BearerAuthenticationReadIndicationEvent,
             Definitions.BearerAuthenticationUpdateIndicationEvent,
+            Definitions.BearerDeleteEvent,
+            Definitions.BearerPriorityIndicationEvent,
             Definitions.StreamingVideoControlIndicationEvent,
             Definitions.ScreenCaptureIndicationEvent,
             Definitions.OpenRLMLogFileIndicationEvent,

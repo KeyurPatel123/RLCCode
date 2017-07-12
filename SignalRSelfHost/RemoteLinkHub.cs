@@ -3,6 +3,7 @@ using Abiomed.Models;
 using Abiomed.Repository;
 using Autofac;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,8 +52,10 @@ namespace Abiomed.SignalRSelfHost
             //Clients.All.BearerCommunicationsStatus();
         }
 
-        public void BearerSettings(string deviceSerialNo, List<BearerAuthInformation> bearerInfoList)
-        {            
+        public void BearerSettings(string deviceSerialNo, List<BearerAuthenticationReadResponse> bearerInfoList)
+        {
+            string output = JsonConvert.SerializeObject(bearerInfoList);
+
             Clients.All.BearerSettings(deviceSerialNo, bearerInfoList);
         }
         #endregion

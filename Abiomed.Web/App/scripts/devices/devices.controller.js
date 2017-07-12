@@ -147,14 +147,13 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
                     });
                 });
 
-                $scope.UpdateBearerClick = function()
-                {
+                $scope.UpdateBearerClick = function () {
                     dataService.sendUpdatedBearer(device.SerialNumber, $scope.radioModel);
                 }
 
-                $scope.GetStatusClick = function()
+                $scope.UpdateBearerPriority = function()
                 {
-                    console.log("Get Status");
+                    dataService.priorityBearerUpdate(device.SerialNumber, $scope.BearerSelection);
                 }
 
                 $scope.GetAuthInfoClick = function()
@@ -165,7 +164,31 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
                 $scope.Bearers = ["Wifi 2.4Ghz", "Wifi 5Ghz"];
                 $scope.Bearer = $scope.connectionType;
 
-                $scope.AuthTypes = ["None", "802.1X", "WEP", "WPA", "WPA-PSK", "WPA-EAP", "PEAP"];
+                $scope.BearerSelectionList = ["Ethernet", "Wifi", "LTE"];
+                $scope.BearerSelected = "Ethernet";
+                $scope.BearerSelection = [];
+                $scope.EnableBearer = false;
+                $scope.AddBearer = function ()
+                {
+                    var found = _.contains($scope.BearerSelection, $scope.BearerSelected);
+
+                    if (!found) {
+                        $scope.BearerSelection.push($scope.BearerSelected);
+
+                        if ($scope.BearerSelection.length >= 3) {
+                            $scope.EnableBearer = true;
+                        }
+                        $scope.$digest();
+                    }
+                }
+
+                $scope.UpdateBearer = function ()
+                {
+                    // Get List and bring over MVC
+
+                }
+
+                $scope.AuthTypes = ["None", "WEP", "WPA", "WPAPSK"];
                 $scope.AuthType = "None";
 
                 $scope.CreateCredential = function(credentials)
@@ -178,6 +201,21 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
                 }
 
                 $scope.$on('BearerSettings', function (event, data) {
+                    console.log(data);
+                    _.each(data.bearerInfoList, function (d) {
+                        console.log(d.BearerAuthInformation.AuthType);
+                        switch (d.BearerAuthInformation.AuthType)
+                        {
+                            case 0:
+                                d.BearerAuthInformation.BearerType = "None";
+                                break;
+                            default:
+                            case 4:
+                                d.BearerAuthInformation.BearerType = "WPAPSK";
+                                break;
+
+                        }
+                    });
                     $scope.AuthorizationList = data;
                     $scope.$digest();
                 });

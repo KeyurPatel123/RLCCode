@@ -25,6 +25,8 @@ namespace Abiomed.Models
         public static string StatusIndicationEvent = @"StatusIndication";
         public static string BearerAuthenticationReadIndicationEvent = @"BearerAuthenticationReadIndication";
         public static string BearerAuthenticationUpdateIndicationEvent = @"BearerAuthenticationUpdateIndication";
+        public static string BearerDeleteEvent = @"BearerDeleteEvent";
+        public static string BearerPriorityIndicationEvent = @"BearerPriorityIndicationEvent";
         public static string StreamingVideoControlIndicationEvent = @"StreamingVideoControlIndication";
         public static string ScreenCaptureIndicationEvent = @"ScreenCaptureIndication";
         public static string VideoStopEvent = @"VideoStop";
@@ -59,18 +61,18 @@ namespace Abiomed.Models
         #region Session
         public static UInt16 SessionRequest = 0x8000;
         public static UInt16 BearerRequest = 0x8001;
-        public static UInt16 BearerChangeResponse = 0xC002;
-        public static UInt16 CloseBearerRequest = 0x8003;
         public static UInt16 KeepAliveRequest = 0x8004;
-        public static UInt16 CloseSessionRequest = 0x8005;
+        public static UInt16 SessionCloseRequest = 0x8003;
+        public static UInt16 SessionCloseResponse = 0xC002;
         #endregion
 
         #region Status Control
         public static UInt16 StatusResponse = 0xC100;
         public static UInt16 BearerAuthenticationUpdateResponse = 0xC101;
         public static UInt16 BearerAuthenticationReadResponse = 0xC102;
+        public static UInt16 BearerPriorityConfirm = 0x4105;
         public static UInt16 LimitWarningRequest = 0x8103;
-        public static UInt16 LimitCriticalRequest = 0x8104;
+        public static UInt16 LimitCriticalRequest = 0x8104;        
         #endregion
 
         #region Digitiser
@@ -95,21 +97,21 @@ namespace Abiomed.Models
         #region Session
         public static byte[] SessionConfirm = new byte[] { 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00 };
         public static byte[] BearerConfirm = new byte[] { 0x40, 0x01, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00 };
-        public static byte[] BearerChangeIndication = new byte[] { 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
-        public static byte[] CloseBearerConfirm = new byte[] { 0x40, 0x03, 0x00, 0x00, 0x00, 0x00};
+        public static byte[] BearerChangeIndication = new byte[] { 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00 };
+        public static byte[] SessionCloseConfirm = new byte[] { 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00};
         public static byte[] KeepAliveIndication = new byte[] { 0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
-        public static byte[] CloseSessionIndication = new byte[] { 0x00, 0x05, 0x00, 0x00, 0x00, 0x00 };
+        public static byte[] CloseSessionIndication = new byte[] { 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20};
         #endregion
 
         #region Status Control
         public static byte[] StatusIndication = new byte[] { 0x01, 0x02, 0x00, 0x00, 0x00, 0x00};
         public static List<byte> BearerAuthenticationUpdateIndication = new List<byte>
         {
-            0x02, 0x00, // MSGID
+            0x01, 0x01, // MSGID
             0x00, 0x00, // MsgLen
             0x00, 0x00, // MsgSeq
             0x12, 0x34, // UserRef
-            0x00, 0x00, // Bearer            
+            0x00, 0x01, // Bearer            
             0x00, 0x00, // Slot
             0x00, 0x00, // AuthInfo
             // SSID and PSK will be added manually            
@@ -128,6 +130,17 @@ namespace Abiomed.Models
             0x12, 0x34, // UserRef
             0x00, 0x00, // Slot
         };
+
+        public static byte[] BearerPriorityIndication = new byte[] 
+        {
+            0x81, 0x05, // MSGID
+            0x00, 0x08, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x00, 0xFF, // Ethernet
+            0x00, 0xFF, // Wifi
+            0x00, 0xFF, // Cellular
+        };
+
         public static byte[] LimitWarningConfirm = new byte[]  { 0x41, 0x03, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
         public static byte[] LimitCriticalConfirm = new byte[] { 0x41, 0x04, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 };
 
@@ -148,6 +161,21 @@ namespace Abiomed.Models
             0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
             0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
         };
+        /*
+        public static List<byte> StreamVideoControlIndication = new List<byte>
+        {
+            0x02, 0x00, // MSGID
+            0x00, 0x00, // MsgLen
+            0x00, 0x00, // MsgSeq
+            0x12, 0x34, // UserRef
+            0x00, 0x01, // Enable            
+            0x00, 0x00, // Timeout - None
+            0x00, 0x02, // Status Rate - Send every 2 seconds
+            //0x16, 0x72, 0x74, 0x6d, 0x70, 0x3a, 0x2f, 0x2f, 0x72, 0x6c, 0x76, 0x2e, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2e, 0x63, 0x6f, 0x6d, // URL rtmp://rlv.abiomed.com
+            0x0B, 0x61, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x64, 0x2d, 0x52, 0x4c, 0x4d, // USN - abiomed-RLM
+            0x06, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, // PWD - Stream                  
+            0x04, 0x6c, 0x69, 0x76, 0x65, // Stream Application - live
+        };*/
 
         public static List<byte> StreamVideoControlIndicationRTMP = new List<byte>
         {
@@ -355,12 +383,12 @@ namespace Abiomed.Models
             BearerRequest = 2,
             BearerConfirm = 3,
             BearerChangeIndication = 4,
-            BearerChangeResponse = 5,
+            SessionCloseResponse = 5,
             CloseBearerRequest = 6,
             CloseBearerConfirm = 7,
             KeepAliveRequest = 8,
             KeepAliveIndication = 9,
-            CloseSessionRequest = 10,
+            SessionCloseRequest = 10,
             CloseSessionIndication = 11,
             #endregion
 
@@ -373,8 +401,8 @@ namespace Abiomed.Models
             StatusIndication = 17,
             BearerAuthenticationUpdateIndication = 18,
             BearerAuthenticationReadIndication = 19,
-            LimitWarningConfirm = 20,
-            LimitCriticalConfirm = 21,
+            BearerPriorityIndication = 20,
+            BearerPriorityConfirm = 27,
             #endregion
 
             #region Digitizer

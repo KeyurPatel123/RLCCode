@@ -26,7 +26,7 @@ namespace Abiomed.Business
         byte[] OpenRLMLogFileIndication(string deviceIpAddress);
         byte[] DataReadConfirm(string deviceIpAddress);
         byte[] DataReadIndication(string deviceIpAddress);
-        byte[] CloseFileInfication(string deviceIpAddress);
+        byte[] CloseFileIndication(string deviceIpAddress);
         byte[] ClearFileIndication(string deviceIpAddress);
         #endregion
     }

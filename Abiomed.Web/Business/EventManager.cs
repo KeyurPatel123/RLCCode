@@ -146,34 +146,49 @@ namespace Abiomed.Web
             _redisDbRepository.Publish(Definitions.BearerAuthenticationReadIndicationEvent, device.DeviceIpAddress);
         }
 
-        public void BearerAuthenticationUpdateIndication(Authorization authorization, bool delete)
+        public void BearerAuthenticationUpdateIndication(WifiCredentials wifiCredentials)
         {
-            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == authorization.SerialNumber);
+            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == wifiCredentials.SerialNumber);
 
-            if(delete)
-            {
-                StringBuilder build = new StringBuilder(device.DeviceIpAddress);
-                build.Append("-");
-                build.Append(authorization.AuthorizationInfo.Slot);
-
-                _redisDbRepository.Publish(Definitions.BearerAuthenticationUpdateIndicationEvent, build.ToString());
-            }
-            else
-            {
                 // Build string - Serial#, slot, bearer, authentication type, SSID, PSK
                 StringBuilder build = new StringBuilder(device.DeviceIpAddress);                
                 build.Append("-");
-                build.Append(authorization.AuthorizationInfo.Slot);
+                build.Append(wifiCredentials.Slot);                                
                 build.Append("-");
-                build.Append(authorization.AuthorizationInfo.BearerType);
+                build.Append(wifiCredentials.AuthType);
                 build.Append("-");
-                build.Append(authorization.AuthorizationInfo.AuthType);
+                build.Append(wifiCredentials.SSID);
                 build.Append("-");
-                build.Append(authorization.AuthorizationInfo.SSID);
-                build.Append("-");
-                build.Append(authorization.AuthorizationInfo.PSK);
+                build.Append(wifiCredentials.PSK);
                 _redisDbRepository.Publish(Definitions.BearerAuthenticationUpdateIndicationEvent, build.ToString());
-            }
+        }
+
+        public void BearerDeleteIndication(WifiCredentials authorization)
+        {
+            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == authorization.SerialNumber);
+
+          
+                StringBuilder build = new StringBuilder(device.DeviceIpAddress);
+                build.Append("-");
+                build.Append(authorization.Slot);
+
+                _redisDbRepository.Publish(Definitions.BearerDeleteEvent, build.ToString());
+          
+        }
+
+        public void BearerPriorityIndication(BearerPriorityUpdate bearerPriorityUpdate)
+        {
+            var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == bearerPriorityUpdate.SerialNumber);
+            StringBuilder build = new StringBuilder(device.DeviceIpAddress);
+            build.Append("-");
+            build.Append(bearerPriorityUpdate.BearerPriority.Ethernet);
+            build.Append("-");
+            build.Append(bearerPriorityUpdate.BearerPriority.WiFi);
+            build.Append("-");
+            build.Append(bearerPriorityUpdate.BearerPriority.Cellular);
+
+            _redisDbRepository.Publish(Definitions.BearerPriorityIndicationEvent, build.ToString());
+
         }
 
         public void StreamingVideoControlIndication(string serialNumber)

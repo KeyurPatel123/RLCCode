@@ -11,6 +11,8 @@ using Abiomed.Models;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Threading;
+using Abiomed.Repository;
 
 namespace Abiomed.Business
 {
@@ -20,13 +22,15 @@ namespace Abiomed.Business
         private ILogManager _logManager;
         private RLMDeviceList _rlmDeviceList;
         private Configuration _configuration;
+        private IRedisDbRepository<RLMDevice> _redisDbRepository;
 
-        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogManager logManager, RLMDeviceList rlmDeviceList, Configuration configuration)
+        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogManager logManager, RLMDeviceList rlmDeviceList, Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
         {            
             _keepAliveManager = keepAliveManager;
             _logManager = logManager;
             _rlmDeviceList = rlmDeviceList;
             _configuration = configuration;
+            _redisDbRepository = redisDbRepository;
         }
 
         #region Receiving
@@ -83,15 +87,22 @@ namespace Abiomed.Business
                 // Error checking
                 if (bufferStatusRequest.Status != Definitions.SuccessStats)
                 {
-                    status.Status = RLMStatus.StatusEnum.Failure;
+                    // Temo???
+                    //status.Status = RLMStatus.StatusEnum.Failure;
+                    returnMessage = VideoStop(deviceIpAddress);
+
+                    // Wait 10 Seconds and send video start
+                    TimerCallback tmCallback = KickStartVideo;
+                    Timer timer = new Timer(tmCallback, deviceIpAddress, 10000, -1);
                 }
 
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 _keepAliveManager.Ping(deviceIpAddress);
 
-                Trace.TraceInformation(@"Buffer Status Request {0}", deviceIpAddress);
-                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, bufferStatusRequest, Definitions.LogMessageType.BufferStatusRequest);
+                // Put back with Config Verbose flag
+                //Trace.TraceInformation(@"Buffer Status Request {0}", deviceIpAddress);
+                //_logManager.Create(deviceIpAddress, rlmDevice.SerialNo, bufferStatusRequest, Definitions.LogMessageType.BufferStatusRequest);
             }
             catch (Exception e)
             {
@@ -150,7 +161,10 @@ namespace Abiomed.Business
             {
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
             }
-            
+
+            // Temp
+            secureStream = Definitions.StreamVideoControlIndication;
+
             // Remove Image Capture Timer
             _keepAliveManager.ImageTimerDelete(deviceIpAddress);
 
@@ -207,6 +221,18 @@ namespace Abiomed.Business
 
             Trace.TraceInformation(@"Stop Screen Capture {0}", rlmDevice.SerialNo);
             return new byte[0];
+        }
+
+        // Temp Function????
+        private void KickStartVideo(object obj)
+        {
+            // convert obj to string
+            string deviceIpAddress = (string)obj;
+
+            Trace.TraceInformation(@"Starting Video after 10 seconds {0}", deviceIpAddress);
+
+            // Send message to start 
+            _redisDbRepository.Publish(Definitions.StreamingVideoControlIndicationEvent, deviceIpAddress);
         }
         #endregion
     }

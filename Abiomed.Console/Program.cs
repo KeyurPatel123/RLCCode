@@ -8,15 +8,16 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Abiomed.DependencyInjection;
 using Abiomed.RLR.Communications;
 using Autofac;
 using System.Diagnostics;
 using Abiomed.Models;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using RestSharp;
+using Newtonsoft.Json;
 // Testing
 namespace Abiomed.Console
 {
@@ -25,6 +26,7 @@ namespace Abiomed.Console
         private static AutofacContainer autofac;
         static int Main(string[] args)
         {
+           // MakeRequest();            
             try
             {
                 Trace.TraceInformation(@"Remote Link Server - Started");
@@ -48,6 +50,19 @@ namespace Abiomed.Console
                 System.Console.Write(e.InnerException.ToString());
             }
             return 0;     
+        }
+
+        static async void MakeRequest()
+        {
+            var client = new RestClient("https://eastus2.api.cognitive.microsoft.com/vision/v1.0/ocr");
+            var request = new RestRequest(Method.POST);
+            request.AddQueryParameter("language", "en");
+            request.AddHeader("Ocp-Apim-Subscription-Key", "ed94b5293b3347d29764f97c93bf5868");
+            request.AddFile("image", @"C:\RLMImages\RL12345.png");
+            request.AddHeader("Content -Type", "multipart/form-data");
+            var response = client.Execute(request);
+
+
         }
     }
 }

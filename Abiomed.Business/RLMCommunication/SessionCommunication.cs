@@ -101,15 +101,18 @@ namespace Abiomed.Business
 
                 streamIndicator = General.GenerateRequest(Definitions.ScreenCaptureIndicator, rlmDevice);
                 rlmDevice.FileTransferType = Definitions.RLMFileTransfer.ScreenCapture0;
-
                               
                 if (rlmDevice.Bearer != Definitions.Bearer.LTE)
                 {
+                    
                     List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;
                     if (_configuration.Security)
                     {
                         secureStream = Definitions.StreamVideoControlIndicationRTMPS;
                     }
+
+                    // Remove
+                    //secureStream = Definitions.StreamVideoControlIndication;
 
                     var videoControl = General.VideoControlGeneration(true, rlmDevice.SerialNo, secureStream);
                     streamIndicator = General.GenerateRequest(videoControl, rlmDevice);
@@ -165,26 +168,26 @@ namespace Abiomed.Business
             return returnMessage;
         }
 
-        public byte[] BearerChangeResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
+        public byte[] SessionCloseResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             byte[] returnMessage = new byte[0];
             try
             {
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-                BearerChangeResponse bearerChangeResponse = new BearerChangeResponse();
-                bearerChangeResponse.Status = (Definitions.Status)BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+                SessionCloseResponse sessionCloseResponse = new SessionCloseResponse();
+                sessionCloseResponse.Status = (Definitions.Status)BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
 
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
 
-                // Todo look at status and verify okay, look at REDIS for message queue!
+                // The status will indicate rather to keep the session going. For this, we should not do any error checking.
 
-                Trace.TraceInformation(@"Bearer Change Response {0}", rlmDevice.SerialNo);
-                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, bearerChangeResponse, Definitions.LogMessageType.BearerChangeResponse);
+                Trace.TraceInformation(@"Session Close Response {0}", rlmDevice.SerialNo);
+                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, sessionCloseResponse, Definitions.LogMessageType.SessionCloseResponse);
             }
             catch (Exception e)
             {
-                Trace.TraceError(@"Bearer Change Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                Trace.TraceError(@"Session Close Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -196,7 +199,9 @@ namespace Abiomed.Business
             byte[] returnMessage = new byte[0];
             try
             {
+                // temp
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
+                /*
                 CloseBearerRequest closeBearerRequest = new CloseBearerRequest();
                 closeBearerRequest.BearerStatistics.Bytes = BitConverter.ToUInt64(message.Skip(6).Take(8).Reverse().ToArray(), 0);
                 closeBearerRequest.BearerStatistics.Frames = BitConverter.ToInt32(message.Skip(14).Take(4).Reverse().ToArray(), 0);
@@ -209,6 +214,7 @@ namespace Abiomed.Business
 
                 Trace.TraceInformation(@"Close Bearer Request {0}", rlmDevice.SerialNo);
                 _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, closeBearerRequest, Definitions.LogMessageType.CloseBearerRequest);
+                */
             }
             catch (Exception e)
             {
@@ -225,59 +231,35 @@ namespace Abiomed.Business
 
             RLMDevice rlmDevice;
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-            Trace.TraceInformation(@"Keep Alive Request {0}", rlmDevice.SerialNo);
+
+            // Put back with flag : Trace.TraceInformation(@"Keep Alive Request {0}", rlmDevice.SerialNo);
 
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
             return new byte[0];
         }
 
-        public byte[] CloseSessionRequest(string deviceIpAddress, byte[] message, out RLMStatus status)
+        public byte[] SessionCloseRequest(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             byte[] returnMessage = new byte[0];
             try
             {
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-                CloseSessionRequest closeSessionRequest = new CloseSessionRequest();
+                SessionCloseRequest sessionCloseRequest = new SessionCloseRequest();
+                sessionCloseRequest.Bearer = (Definitions.Bearer)BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
+                sessionCloseRequest.Status = (Definitions.Status)BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
 
-                #region Ethernet 
-                closeSessionRequest.Ethernet.Bytes = BitConverter.ToUInt64(message.Skip(6).Take(8).Reverse().ToArray(), 0);                
-                closeSessionRequest.Ethernet.Frames = BitConverter.ToInt32(message.Skip(14).Take(4).Reverse().ToArray(), 0);
-                closeSessionRequest.Ethernet.Seq = BitConverter.ToInt32(message.Skip(18).Take(2).Reverse().ToArray(), 0);
-                closeSessionRequest.Ethernet.Count = BitConverter.ToInt32(message.Skip(20).Take(2).Reverse().ToArray(), 0);
-                #endregion
-
-                #region Wifi 2.4 
-                closeSessionRequest.Wifi24.Bytes = BitConverter.ToUInt64(message.Skip(22).Take(8).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi24.Frames = BitConverter.ToInt32(message.Skip(30).Take(4).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi24.Seq = BitConverter.ToInt32(message.Skip(34).Take(2).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi24.Count = BitConverter.ToInt32(message.Skip(36).Take(2).Reverse().ToArray(), 0);
-                #endregion
-
-                #region Wifi 5
-                closeSessionRequest.Wifi5.Bytes = BitConverter.ToUInt64(message.Skip(38).Take(8).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi5.Frames = BitConverter.ToInt32(message.Skip(46).Take(4).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi5.Seq = BitConverter.ToInt32(message.Skip(50).Take(2).Reverse().ToArray(), 0);
-                closeSessionRequest.Wifi5.Count = BitConverter.ToInt32(message.Skip(52).Take(2).Reverse().ToArray(), 0);
-                #endregion
-
-                #region LTE 
-                closeSessionRequest.LTE.Bytes = BitConverter.ToUInt64(message.Skip(54).Take(8).Reverse().ToArray(), 0);
-                closeSessionRequest.LTE.Frames = BitConverter.ToInt32(message.Skip(62).Take(4).Reverse().ToArray(), 0);
-                closeSessionRequest.LTE.Seq = BitConverter.ToInt32(message.Skip(66).Take(2).Reverse().ToArray(), 0);
-                closeSessionRequest.LTE.Count = BitConverter.ToInt32(message.Skip(68).Take(2).Reverse().ToArray(), 0);
-                #endregion
+                // No need to check status as RLM is going to shutdown either upon Session Close Confirm or destory it's own TCP session.
 
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-
-                Trace.TraceInformation(@"Close Session Request {0}", rlmDevice.SerialNo);
-                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, closeSessionRequest, Definitions.LogMessageType.CloseSessionRequest);
-
-                // todo close session afterwards????
+                
+                returnMessage = General.GenerateRequest(Definitions.SessionCloseConfirm, rlmDevice);
+                Trace.TraceInformation(@"Session Close Request {0}", rlmDevice.SerialNo);
+                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, sessionCloseRequest, Definitions.LogMessageType.SessionCloseRequest);                
             }
             catch (Exception e)
             {
-                Trace.TraceInformation(@"Close Session Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                Trace.TraceInformation(@"Session Close Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -295,9 +277,9 @@ namespace Abiomed.Business
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
 
                 returnMessage = General.GenerateRequest(Definitions.BearerChangeIndication, rlmDevice);
-
+                 
                 // Replace with correct bearer
-                returnMessage[Definitions.BearerChangeIndication.Length - 1] = Convert.ToByte(bearer);
+                returnMessage[7] = Convert.ToByte(bearer);
 
                 Trace.TraceInformation(@"Updated bearer to {0}, RLM Serial: {1}", bearer, rlmDevice.SerialNo);
                 _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, string.Format("Updated bearer to {0}", bearer), Definitions.LogMessageType.BearerChangeIndication);
@@ -322,7 +304,7 @@ namespace Abiomed.Business
             return returnMessage;
         }
 
-        public byte[] CloseSessionIndication(string deviceIpAddress)
+        public byte[] SessionCloseIndication(string deviceIpAddress)
         {
             byte[] returnMessage = new byte[0];
 

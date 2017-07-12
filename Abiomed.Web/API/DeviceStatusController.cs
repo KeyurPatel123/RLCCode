@@ -21,7 +21,6 @@ namespace Abiomed.Web.API
         private IDeviceStatusManager _deviceStatusManager;
         private IEventManager _eventManager;
 
-        // Todo refactor out Redis and put in own manager
         public DeviceStatusController(IDeviceStatusManager deviceStatusManager, IEventManager eventManager)
         {
             _deviceStatusManager = deviceStatusManager;
@@ -116,17 +115,25 @@ namespace Abiomed.Web.API
 
         [HttpPost]
         [Route("api/DeviceStatus/CreateCredential")]
-        public void CreateCredential([FromBody]Authorization Device)
+        public void CreateCredential([FromBody]WifiCredentials Device)
         {
-            _eventManager.BearerAuthenticationUpdateIndication(Device, false);
+            _eventManager.BearerAuthenticationUpdateIndication(Device);
         }
 
         [HttpPost]
         [Route("api/DeviceStatus/DeleteCredential")]
-        public void DeleteCredential([FromBody]Authorization Device)
+        public void DeleteCredential([FromBody]WifiCredentials Device)
         {
-            _eventManager.BearerAuthenticationUpdateIndication(Device, true);
-        }        
+            _eventManager.BearerDeleteIndication(Device);
+        }
+
+        [HttpPost]
+        [Route("api/DeviceStatus/PriorityBearerUpdate")]
+        public void PriorityBearerUpdate([FromBody]BearerPriorityUpdate bearerPriorityUpdate)
+        {
+            _eventManager.BearerPriorityIndication(bearerPriorityUpdate);
+        }
+        
     }
 
 

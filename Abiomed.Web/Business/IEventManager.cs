@@ -22,7 +22,10 @@ namespace Abiomed.Web
         void BearerChangeIndication(string serialNumber, string bearer);
         void StatusIndication(string serialNumber);
         void BearerAuthenticationReadIndication(string serialNumber);
-        void BearerAuthenticationUpdateIndication(Authorization authorization, bool delete);
+        void BearerAuthenticationUpdateIndication(WifiCredentials authorization);
+        void BearerDeleteIndication(WifiCredentials authorization);
+        void BearerPriorityIndication(BearerPriorityUpdate bearerPriorityUpdate);
+
         void StreamingVideoControlIndication(string serialNumber);
         void ScreenCaptureIndication(string serialNumber);
         void VideoStop(string serialNumber);

@@ -27,7 +27,8 @@ function dataService($http) {
         sendCloseSession: sendCloseSession,
         sendUpdatedBearer: sendUpdatedBearer,
         createCredential: createCredential,
-        deleteCredential: deleteCredential
+        deleteCredential: deleteCredential,
+        priorityBearerUpdate: priorityBearerUpdate
     };
 
     function getStreams() {
@@ -206,7 +207,10 @@ function dataService($http) {
         var data =
         {
             'SerialNumber': device.SerialNumber,
-            'AuthorizationInfo': Authorization
+            'Slot': authorization.Slot,
+            'AuthType': authorization.BearerAuthInformation.BearerType,
+            'SSID': authorization.BearerAuthInformation.SSID,
+            'PSK': authorization.BearerAuthInformation.PSK,            
         };
 
         return $http.post('/api/DeviceStatus/CreateCredential/', data)
@@ -226,10 +230,34 @@ function dataService($http) {
         var data =
         {
             'SerialNumber': device.SerialNumber,
-            'AuthorizationInfo': Authorization
-        };
+            'Slot': authorization.Slot
+        };       
 
         return $http.post('/api/DeviceStatus/DeleteCredential/', data)
+            .then(getDevicesComplete)
+            .catch(getDevicesFailed);
+
+        function getDevicesComplete(response) {
+            return response.data;
+        }
+
+        function getDevicesFailed(error) {
+            //logger.error('XHR Failed for getAvengers.' + error.data);
+        }
+    }
+
+    function priorityBearerUpdate(serialNumber, priority) {
+        var data =
+            {
+                'SerialNumber': serialNumber,                
+                'BearerPriority': {
+                    'Ethernet': _.indexOf(priority, "Ethernet"),
+                    'Wifi': _.indexOf(priority, "Wifi"),
+                    'Cellular': _.indexOf(priority, "LTE")
+                }
+            };
+
+        return $http.post('/api/DeviceStatus/PriorityBearerUpdate/', data)
             .then(getDevicesComplete)
             .catch(getDevicesFailed);
 

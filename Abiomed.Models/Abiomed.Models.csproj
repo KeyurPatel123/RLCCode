@@ -61,8 +61,8 @@
     <Compile Include="Communications\ICD\Helper\BearerAuthInformation.cs" />
     <Compile Include="Communications\ICD\Helper\LimitRequest.cs" />
     <Compile Include="Communications\ICD\Helper\BearerInformation.cs" />
-    <Compile Include="Communications\ICD\Session\BearerChangeResponse.cs" />
-    <Compile Include="Communications\ICD\Session\CloseSessionRequest.cs" />
+    <Compile Include="Communications\ICD\Session\SessionCloseResponse.cs" />
+    <Compile Include="Communications\ICD\Session\SessionCloseRequest.cs" />
     <Compile Include="Communications\ICD\Session\CloseBearerRequest.cs" />
     <Compile Include="Communications\ICD\FileTransfer\FileReadResponse.cs" />
     <Compile Include="Communications\ICD\FileTransfer\FileOpenResponse.cs" />
@@ -71,7 +71,9 @@
     <Compile Include="Communications\ICD\StatusControl\BearerAuthenticationReadResponse.cs" />
     <Compile Include="Communications\ICD\StatusControl\BearerAuthenticationUpdateIndication.cs" />
     <Compile Include="Communications\ICD\StatusControl\BearerAuthenticationUpdateResponse.cs" />
+    <Compile Include="Communications\ICD\StatusControl\BearerPriorityConfirm.cs" />
     <Compile Include="Communications\ICD\StatusControl\LimitCriticalRequest.cs" />
+    <Compile Include="Communications\ICD\StatusControl\BearerPriority.cs" />
     <Compile Include="Communications\ICD\StatusControl\LimitWarningRequest.cs" />
     <Compile Include="Communications\ICD\StatusControl\StatusResponse.cs" />
     <Compile Include="Communications\ICD\StreamingVideoControlResponse.cs" />
@@ -79,7 +81,8 @@
     <Compile Include="Communications\ICD\Digitiser\BufferStatusRequest.cs" />
     <Compile Include="Communications\CommunicationsEvent.cs" />
     <Compile Include="Communications\PartialPayload.cs" />
-    <Compile Include="Web\Authorization.cs" />
+    <Compile Include="Web\BearerPriorityUpdate.cs" />
+    <Compile Include="Web\WifiCredentials.cs" />
     <Compile Include="Web\DeviceStatus.cs" />
     <Compile Include="Communications\RLMDeviceList.cs" />
     <Compile Include="Communications\RLMDevice.cs" />

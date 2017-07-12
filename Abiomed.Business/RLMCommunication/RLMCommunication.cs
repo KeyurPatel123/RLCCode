@@ -56,16 +56,16 @@ namespace Abiomed.Business
                         #region Session
                         {Definitions.SessionRequest, _sessionCommunication.SessionRequest},
                         {Definitions.BearerRequest, _sessionCommunication.BearerRequest},
-                        {Definitions.BearerChangeResponse, _sessionCommunication.BearerChangeResponse},
-                        {Definitions.CloseBearerRequest, _sessionCommunication.CloseBearerRequest},
                         {Definitions.KeepAliveRequest, _sessionCommunication.KeepAliveRequest},
-                        {Definitions.CloseSessionRequest, _sessionCommunication.CloseSessionRequest},
+                        {Definitions.SessionCloseResponse, _sessionCommunication.SessionCloseResponse},
+                        {Definitions.SessionCloseRequest, _sessionCommunication.SessionCloseRequest},
                         #endregion
 
                         #region Status Control
                         {Definitions.StatusResponse, _statusControlCommunication.StatusResponse},
                         {Definitions.BearerAuthenticationUpdateResponse, _statusControlCommunication.BearerAuthenticationUpdateResponse},
                         {Definitions.BearerAuthenticationReadResponse, _statusControlCommunication.BearerAuthenticationReadResponse},
+                        {Definitions.BearerPriorityConfirm, _statusControlCommunication.BearerPriorityConfirm },
                         {Definitions.LimitWarningRequest, _statusControlCommunication.LimitWarningRequest},
                         {Definitions.LimitCriticalRequest, _statusControlCommunication.LimitCriticalRequest},
                         #endregion
@@ -140,7 +140,7 @@ namespace Abiomed.Business
                         {Definitions.StreamingVideoControlIndicationEvent, _digitiserCommunication.StreamingVideoControlIndication },
                         {Definitions.ScreenCaptureIndicationEvent, _digitiserCommunication.ScreenCaptureIndication },
                         {Definitions.OpenRLMLogFileIndicationEvent, _fileTransferCommunication.OpenRLMLogFileIndication},
-                        {Definitions.CloseSessionIndicationEvent, _sessionCommunication.CloseSessionIndication },
+                        {Definitions.CloseSessionIndicationEvent, _sessionCommunication.SessionCloseIndication },
                         {Definitions.VideoStopEvent, _digitiserCommunication.VideoStop },
                         {Definitions.ImageStopEvent, _digitiserCommunication.ImageStop }
                     };
@@ -175,43 +175,45 @@ namespace Abiomed.Business
                         Enum.TryParse(options[0], out _bearer);
                         returnMessage = _sessionCommunication.BearerChangeIndication(deviceIpAddress, _bearer);
                     }
+                    else if (message.Equals(Definitions.BearerDeleteEvent))
+                    {
+                        WifiCredentials wifiCredentials = new WifiCredentials()
+                        {
+                            Slot = Convert.ToInt32(options[0])
+                        };
+                        returnMessage = _statusControlCommunication.BearerSlotDelete(deviceIpAddress, wifiCredentials);
+                    }
                     else if (message.Equals(Definitions.BearerAuthenticationUpdateIndicationEvent))
                     {
-                        // todo check
-                        if (options.Length < 2)
-                        {
-                            Authorization authorization = new Authorization();
-                            authorization.AuthorizationInfo.Slot = Convert.ToUInt16(options[0]);
-                            authorization.AuthorizationInfo.DeleteCredential = true;
-                            returnMessage = _statusControlCommunication.BearerAuthenticationUpdateIndication(deviceIpAddress, authorization);
-                        }
-                        else
-                        {
-                            Authorization authorization = new Authorization();
+                            WifiCredentials wifiCredentials = new WifiCredentials();
 
-                            //  slot, bearer, authentication type, SSID, PSK                        
-                            authorization.AuthorizationInfo.Slot = Convert.ToUInt16(options[0]);
-
-                            Definitions.Bearer bearer;
-                            Enum.TryParse(options[1], out bearer);
-                            authorization.AuthorizationInfo.BearerType = bearer;
-
+                            //  slot, authentication type, SSID, PSK                        
+                            wifiCredentials.Slot = Convert.ToUInt16(options[0]);
+                            
+                            // Fix up
                             Definitions.AuthenicationType authenicationType;
-                            Enum.TryParse(options[2], out authenicationType);
-                            authorization.AuthorizationInfo.AuthType = authenicationType;
+                            Enum.TryParse(options[1], out authenicationType);
+                            wifiCredentials.AuthType = authenicationType;
 
-                            authorization.AuthorizationInfo.SSID = options[3];
+                            wifiCredentials.SSID = options[2];
 
-                            authorization.AuthorizationInfo.PSK = options[4];
+                            wifiCredentials.PSK = options[3];
 
-                            returnMessage = _statusControlCommunication.BearerAuthenticationUpdateIndication(deviceIpAddress, authorization);
-                        }
+                            returnMessage = _statusControlCommunication.BearerAuthenticationUpdateIndication(deviceIpAddress, wifiCredentials);
+                        
+                    }
+                    else if(message.Equals(Definitions.BearerPriorityIndicationEvent))
+                    {
+                        BearerPriority bearerPriority = new BearerPriority();
+                        bearerPriority.Ethernet = Convert.ToUInt16(options[0]);
+                        bearerPriority.WiFi = Convert.ToUInt16(options[1]);
+                        bearerPriority.Cellular = Convert.ToUInt16(options[2]);
+
+                        returnMessage =_statusControlCommunication.BearerPriorityIndication(deviceIpAddress, bearerPriority);
                     }
                 }
-
-
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 //Trace.TraceInformation(@"RLM {0} already removed, during processing of message received", deviceIpAddress);                    
             }
@@ -227,7 +229,7 @@ namespace Abiomed.Business
 
         public byte[] GenerateCloseSession(string deviceIpAddress)
         {
-            return _sessionCommunication.CloseSessionIndication(deviceIpAddress);
+            return _sessionCommunication.SessionCloseIndication(deviceIpAddress);
         }
 
         public void RemoveRLMDeviceFromList(string deviceIpAddress)
@@ -359,11 +361,11 @@ namespace Abiomed.Business
                     status = false;
                     Trace.TraceInformation("RLM {0} invalid payload size, expected {1}, received {2}", deviceIpAddress, payloadBytes, (dataMessage.Length - 6));
                 }
-
             }
             #endregion
 
             #region Sequence Number and Session has started
+            /* todo maybe?????
             if (status)
             {
                 // Get sequence number and store
@@ -391,6 +393,7 @@ namespace Abiomed.Business
                     //Trace.TraceInformation("RLM {0} invalid sequence number or not session start message. expected 0, received sequence {1}, MSG", deviceIpAddress, sequence, msgId);
                 }
             }
+            */
             #endregion          
             return status;
         }

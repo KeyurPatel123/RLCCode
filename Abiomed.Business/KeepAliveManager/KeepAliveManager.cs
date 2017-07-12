@@ -11,6 +11,7 @@ using Abiomed.Models;
 using Abiomed.Repository;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Timers;
 
 namespace Abiomed.Business
@@ -53,13 +54,13 @@ namespace Abiomed.Business
         
         private void TimerExpiredCallback(object sender, ElapsedEventArgs e, string deviceIpAddress)
         {
-            //Trace.TraceInformation("Keep Alive Timer {0}", deviceIpAddress);
-
             // Destroy Timer, Remove from list, and broadcast message
             KeepAliveTimer keepAliveTimer;
             _rlmConnections.TryGetValue(deviceIpAddress, out keepAliveTimer);
 
-            if(keepAliveTimer != null)
+            Trace.TraceInformation("Keep Alive Timer Expired IP Address {1}", deviceIpAddress);
+
+            if (keepAliveTimer != null)
             {
                 keepAliveTimer.DestroyTimer();
             }

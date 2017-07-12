@@ -245,7 +245,7 @@ namespace Abiomed.Business
             throw new NotImplementedException();
         }
 
-        public byte[] CloseFileInfication(string deviceIpAddress)
+        public byte[] CloseFileIndication(string deviceIpAddress)
         {
             throw new NotImplementedException();
         }
