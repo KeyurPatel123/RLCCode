@@ -2,50 +2,49 @@
  * Remote Link - Copyright 2017 ABIOMED, Inc.
  * --------------------------------------------------------
  * Description:
- * StatusResponse.cs: 
+ * CloseSessionRequest.cs: 
  * --------------------------------------------------------
  * Author: Alessandro Agnello 
 */
-
 using System;
 
 namespace Abiomed.Models
 {
     [Serializable]
-    public class StatusResponse : BaseMessage
+    public class CloseSessionRequest : BaseMessage
     {
         #region Private        
-        private BearerInformation _ethernet;
-        private BearerInformation _wifi24;
-        private BearerInformation _wifi5;
-        private BearerInformation _lte;
+        private BearerStatistics _ethernet;
+        private BearerStatistics _wifi24;
+        private BearerStatistics _wifi5;
+        private BearerStatistics _lte;
+        
         #endregion
 
         #region Public
-        public BearerInformation Ethernet
+        public BearerStatistics Ethernet
         {
             get { return _ethernet; }
             set { _ethernet = value; }
         }
 
-        public BearerInformation Wifi24
+        public BearerStatistics Wifi24
         {
             get { return _wifi24; }
             set { _wifi24 = value; }
         }
 
-        public BearerInformation Wifi5
+        public BearerStatistics Wifi5
         {
             get { return _wifi5; }
             set { _wifi5 = value; }
         }
 
-        public BearerInformation LTE
+        public BearerStatistics LTE
         {
             get { return _lte; }
             set { _lte = value; }
         }
         #endregion
-
     }
 }

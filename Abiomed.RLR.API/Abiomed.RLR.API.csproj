@@ -163,6 +163,10 @@
       <Project>{133ECB86-A3DA-4636-9641-B10B6C8B2431}</Project>
       <Name>Abiomed.Repository</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Abiomed.Storage\Abiomed.Storage.csproj">
+      <Project>{3c003571-93b7-46a4-8219-a8ed3db97272}</Project>
+      <Name>Abiomed.Storage</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

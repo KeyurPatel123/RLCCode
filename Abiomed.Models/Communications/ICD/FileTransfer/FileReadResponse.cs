@@ -7,9 +7,11 @@
  * Author: Alessandro Agnello 
 */
 
+using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class FileReadResponse : BaseMessage
     {
         #region Private

@@ -28,6 +28,7 @@ namespace Abiomed.RLR.Communications
     {       
         private IRLMCommunication _RLMCommunication;
         private Configuration _configuration;
+        private ILogManager _logManager;
         private ConcurrentDictionary<string, TCPStateObjectInsecure> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObjectInsecure>();
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
@@ -88,8 +89,7 @@ namespace Abiomed.RLR.Communications
             {
                 var listener = new TcpListener(IPAddress.Any, _configuration.TcpPort);
                 listener.Start();
-                Trace.TraceInformation("Insecure TCP Server Started Success");
-                
+                Trace.TraceInformation("Insecure TCP Server Started Success");                
 
                 while (true)
                 {
@@ -109,7 +109,6 @@ namespace Abiomed.RLR.Communications
             {
                 Trace.TraceError("Cannot Start TCP Service Error ", e);
             }
-
         }
 
         private void AcceptCallback(IAsyncResult ar)

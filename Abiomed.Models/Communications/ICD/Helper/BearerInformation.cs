@@ -10,6 +10,7 @@ using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerInformation
     {
         private int _result;

@@ -11,6 +11,7 @@ using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class FileOpenResponse : BaseMessage
     {
         #region Private

@@ -7,12 +7,15 @@
  * Author: Alessandro Agnello 
 */
 
+using System;
+
 namespace Abiomed.Models
 {
+
     public class SessionCloseResponse : BaseMessage
     {
         #region Private                
-        private Definitions.Status _status = Definitions.Status.Unknown;        
+        private Definitions.Status _status = Definitions.Status.Unknown;
         #endregion
 
         #region Public
@@ -22,6 +25,5 @@ namespace Abiomed.Models
             set { _status = value; }
         }
         #endregion
-
     }
 }

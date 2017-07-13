@@ -18,6 +18,11 @@ using Abiomed.Models;
 
 namespace Abiomed.Repository
 {
+
+    public class MyObject : Resource
+    {
+        public string MyProperty { get; set; }
+    }
     /// <summary>
     /// A generic repository that provides basic document operations.
     /// </summary>
@@ -31,16 +36,14 @@ namespace Abiomed.Repository
         public DocumentDBRepository(Configuration configuration)
         {
             this.documentClient = new DocumentClient(new Uri(configuration.DocumentDBConnection), configuration.DocumentDBConnectionPassword);
-            this.collectionProvider = new GenericCollectionProvider<TDocument>(
-                documentClient, new BasicDatabaseProvider(documentClient, "RemoteLink"));
+            this.collectionProvider = new GenericCollectionProvider<TDocument>(documentClient, new BasicDatabaseProvider(documentClient, "RemoteLink1")); // TODO Set From Configuration Data
         }
 
         /// <summary>Creates document query using the <see cref="DocumentClient"/></summary>
         /// <returns>Document query as <see cref="IOrderedQueryable{TDocument}"/></returns>
         public virtual async Task<IOrderedQueryable<TDocument>> CreateDocumentQuery()
         {
-            return this.documentClient.CreateDocumentQuery<TDocument>(
-                await this.collectionProvider.GetCollectionDocumentsLink());
+            return this.documentClient.CreateDocumentQuery<TDocument>(await this.collectionProvider.GetCollectionDocumentsLink());
         }
 
         /// <summary>Gets all documents in the collection</summary>
@@ -90,12 +93,11 @@ namespace Abiomed.Repository
         /// The created document, the new instance contains document id and resource
         /// metadata so it is actually differnt from the given document instance.
         /// </returns>
-        public virtual async Task<TDocument> Create(TDocument document)
+        public virtual async Task<TDocument> Create(TDocument document, string collectionId = "")
         {
-            return (TDocument)(dynamic)(await this.documentClient.CreateDocumentAsync(
-                await this.collectionProvider.GetCollectionDocumentsLink(),
-                document))
-                .Resource;
+            var collectionLinks = await collectionProvider.GetCollectionDocumentsLink(collectionId);
+            var rResult = await documentClient.CreateDocumentAsync(collectionLinks, document);
+            return (TDocument)(dynamic)rResult.Resource;
         }
 
         /// <summary>

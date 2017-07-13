@@ -9,10 +9,12 @@
 
 
 using Newtonsoft.Json;
+using System;
 
 namespace Abiomed.Models
 {
     [JsonObject(MemberSerialization.OptIn)]
+    [Serializable]
     public class SessionRequest : BaseMessage
     {
         #region Private

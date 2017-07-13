@@ -10,6 +10,7 @@ using Abiomed.Business;
 using Abiomed.RLR.Communications;
 using Abiomed.Models;
 using Abiomed.Repository;
+using Abiomed.Storage;
 using Autofac;
 using Autofac.Integration.WebApi;
 using System.Reflection;
@@ -33,6 +34,9 @@ namespace Abiomed.RLR.API
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
             builder.RegisterType<RLMDeviceList>();
             builder.RegisterType<DataRetrieval>().As<IDataRetrieval>();
+            builder.RegisterType<BlobStorage>().As<IBlobStorage>();
+            builder.RegisterType<TableStorage>().As<ITableStorage>();
+            builder.RegisterType<ImageManager>().As<IImageManager>();
 
             // Get your HttpConfiguration.
             var config = GlobalConfiguration.Configuration;

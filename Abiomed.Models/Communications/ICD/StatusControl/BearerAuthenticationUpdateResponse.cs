@@ -11,6 +11,7 @@ using System;
 
 namespace Abiomed.Models
 {
+    [Serializable]
     public class BearerAuthenticationUpdateResponse : BaseMessage
     {
         #region Private        
