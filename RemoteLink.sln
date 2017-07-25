@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Console", "Abiomed.Console\Abiomed.Console.csproj", "{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Storage", "Abiomed.Storage\Abiomed.Storage.csproj", "{3C003571-93B7-46A4-8219-A8ED3DB97272}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Common", "Abiomed.Common\Abiomed.Common.csproj", "{848AB2FE-8913-4CE8-8EAF-B6E58A608AF5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.WirelessRemoteLink", "Abiomed.WirelessRemoteLink\Abiomed.WirelessRemoteLink.csproj", "{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{848AB2FE-8913-4CE8-8EAF-B6E58A608AF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{848AB2FE-8913-4CE8-8EAF-B6E58A608AF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{848AB2FE-8913-4CE8-8EAF-B6E58A608AF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{102846B6-3F10-4784-9F21-4F174F135A6A} = {E10884A0-7BE4-419F-9CA9-E74196E1C027}
 		{063F3003-01E7-446A-969A-062AEE5F4F83} = {EE3D7FCB-A9FA-4C96-A0E1-BCE5F139B4AA}
 		{EA91F5D0-2C07-48D1-B8A3-204A66BD72C4} = {E10884A0-7BE4-419F-9CA9-E74196E1C027}
+		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8} = {E10884A0-7BE4-419F-9CA9-E74196E1C027}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

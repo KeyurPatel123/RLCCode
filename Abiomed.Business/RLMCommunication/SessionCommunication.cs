@@ -217,15 +217,17 @@ namespace Abiomed.Business
 
         public byte[] KeepAliveRequest(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
+            byte[] returnMessage = new byte[0];
+
             _keepAliveManager.Ping(deviceIpAddress);
 
             RLMDevice rlmDevice;
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
 
-            // Put back with flag : Trace.TraceInformation(@"Keep Alive Request {0}", rlmDevice.SerialNo);
-
+            returnMessage = General.GenerateRequest(Definitions.KeepAliveIndication, rlmDevice);
+            
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-            return new byte[0];
+            return returnMessage;
         }
 
         public byte[] SessionCloseRequest(string deviceIpAddress, byte[] message, out RLMStatus status)

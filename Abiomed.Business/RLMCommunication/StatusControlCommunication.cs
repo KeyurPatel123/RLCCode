@@ -120,7 +120,6 @@ namespace Abiomed.Business
             return returnMessage;
         }
 
-        // Awaiting Response from CC before continuing
         public byte[] BearerAuthenticationReadResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             byte[] returnMessage = new byte[0];
