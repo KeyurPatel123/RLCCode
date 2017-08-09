@@ -413,8 +413,13 @@ namespace Abiomed.Models
 
             #region File Transfer
             FileOpenResponse = 25,
-            ClearFileResponse = 26
+            ClearFileResponse = 26,
             #endregion
+            AcceptCallback = 27,
+            ReadCallback = 28,
+            SendCallback = 29,
+            DataReadResponse = 30,
+            BearerSlotDelete = 31
         };
 
         public enum Status
@@ -440,6 +445,15 @@ namespace Abiomed.Models
             WiFi5NotAvailable = 17,
             LTENotAvailable = 18,
             Valid = 0x8000
+        };
+
+        public enum LogType
+        {
+            NoTrace = 0,
+            Information = 1,
+            Warning = 2,
+            Error = 3,
+            Exception = 4
         };
     }
 }

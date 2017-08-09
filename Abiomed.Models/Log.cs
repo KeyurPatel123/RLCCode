@@ -18,6 +18,7 @@ namespace Abiomed.Models
     {
         private T _message;
         private LogMessageType _logMessageType;
+        private LogType _logSeverityType;
         private string _deviceIpAddress;
         private string _rlmSerial;
         private string _collectionName;
@@ -35,6 +36,14 @@ namespace Abiomed.Models
         {
             get { return _logMessageType; }
             set { _logMessageType = value; }
+        }
+
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public LogType LogSeverityType
+        {
+            get { return _logSeverityType; }
+            set { _logSeverityType = value; }
         }
 
         [JsonProperty]
@@ -63,6 +72,7 @@ namespace Abiomed.Models
     public class AzureLog<T> //: TableEntity
     {
         private string _logMessageType;
+        private string _logSeverityType;
         private string _deviceIpAddress;
         private string _rlmSerial;
         private T _message;
@@ -72,6 +82,13 @@ namespace Abiomed.Models
         {
             get { return _logMessageType; }
             set { _logMessageType = value; }
+        }
+
+        [JsonProperty]
+        public string LogSeverityType
+        {
+            get { return _logSeverityType; }
+            set { _logSeverityType = value; }
         }
 
         [JsonProperty]

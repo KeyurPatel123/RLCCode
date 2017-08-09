@@ -31,6 +31,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Common", "Abiomed.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.WirelessRemoteLink", "Abiomed.WirelessRemoteLink\Abiomed.WirelessRemoteLink.csproj", "{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.FactoryData.Console", "Abiomed.FactoryData.Console\Abiomed.FactoryData.Console.csproj", "{7F8B19A6-E87C-4BA9-A9B2-94E3F6FE8CAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.FactoryData.Business", "Abiomed.FactoryData.Business\Abiomed.FactoryData.Business.csproj", "{439DED23-6393-4534-9E98-88DBC256048A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Configuration", "Configuration\Abiomed.Configuration.csproj", "{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +91,18 @@ Global
 		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC4F8210-CE79-4DEE-A3BE-54C87460F1A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F8B19A6-E87C-4BA9-A9B2-94E3F6FE8CAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F8B19A6-E87C-4BA9-A9B2-94E3F6FE8CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F8B19A6-E87C-4BA9-A9B2-94E3F6FE8CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F8B19A6-E87C-4BA9-A9B2-94E3F6FE8CAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{439DED23-6393-4534-9E98-88DBC256048A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{439DED23-6393-4534-9E98-88DBC256048A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{439DED23-6393-4534-9E98-88DBC256048A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{439DED23-6393-4534-9E98-88DBC256048A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

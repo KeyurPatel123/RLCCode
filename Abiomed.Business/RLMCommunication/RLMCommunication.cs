@@ -18,7 +18,7 @@ namespace Abiomed.Business
 {
     public class RLMCommunication : IRLMCommunication
     {
-        private Configuration _configuration;
+        private Abiomed.Models.Configuration _configuration;
         private IDigitiserCommunication _digitiserCommunication;
         private IFileTransferCommunication _fileTransferCommunication;
         private ISessionCommunication _sessionCommunication;
@@ -28,8 +28,9 @@ namespace Abiomed.Business
         private RLMDeviceList _rlmDeviceList;
         private byte[] returnMessage;
         private Dictionary<string, PartialPayload> _partialPayloadDictionary = new Dictionary<string, PartialPayload>();
+        private ILogManager _logManager;
 
-        public RLMCommunication(Configuration Configuration, IDigitiserCommunication DigitiserCommunication, IFileTransferCommunication FileTransferCommunication, ISessionCommunication SessionCommunication, IStatusControlCommunication StatusControlCommunication, IRedisDbRepository<RLMDevice> redisDbRepository, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList)
+        public RLMCommunication(Abiomed.Models.Configuration Configuration, IDigitiserCommunication DigitiserCommunication, IFileTransferCommunication FileTransferCommunication, ISessionCommunication SessionCommunication, IStatusControlCommunication StatusControlCommunication, IRedisDbRepository<RLMDevice> redisDbRepository, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList)
         {
             _configuration = Configuration;
             _digitiserCommunication = DigitiserCommunication;
@@ -39,7 +40,8 @@ namespace Abiomed.Business
             _redisDbRepository = redisDbRepository;
             _keepAliveManager = keepAliveManager;
             _rlmDeviceList = rlmDeviceList;
-        }
+            _logManager = new LogManager();
+    }
 
         #region Process Message Dictionary
         private delegate TV processMessageFunc<in V, T, TU, out TV>(V id, T input, out TU output);
@@ -114,9 +116,10 @@ namespace Abiomed.Business
                     CloseTCPSessionEvent(deviceIpAddress);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Trace.TraceInformation(@"RLM {0} already removed, during processing of message received", deviceIpAddress);                    
+                string traceMessage = string.Format(@"RLM {0} already removed, during processing of message received. {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
             }
             return returnMessage;
         }
@@ -213,9 +216,10 @@ namespace Abiomed.Business
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                //Trace.TraceInformation(@"RLM {0} already removed, during processing of message received", deviceIpAddress);                    
+                //string traceMessage = string.Format(@"RLM {0} already removed, during processing of message received. ", deviceIpAddress, e.ToString());
+                //_logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
             }
             return returnMessage;
         }
@@ -284,7 +288,7 @@ namespace Abiomed.Business
             if (difference != 0)
             {
                 multipleMessages = true;
-                Trace.TraceInformation(@"RLM sent multiple messages");
+                _logManager.TraceIt(Definitions.LogType.Information, @"RLM sent multiple messages");
             }
 
             if (multipleMessages)
@@ -304,7 +308,7 @@ namespace Abiomed.Business
                         // Determine if partial message                        
                         if (payload != (data.Length - 6))
                         {
-                            Trace.TraceInformation(@"RLM sent Partial message");
+                            _logManager.TraceIt(Definitions.LogType.Information, @"RLM sent Partial message");
 
                             // Hold onto message          
                             PartialPayload partialPayload = new PartialPayload();
@@ -347,7 +351,7 @@ namespace Abiomed.Business
             if (validMessage == false)
             {
                 status = false;
-                Trace.TraceInformation("RLM {0} invalid message type", deviceIpAddress);
+                _logManager.TraceIt(Definitions.LogType.Information, string.Format("RLM {0} invalid message type", deviceIpAddress));
             }
             #endregion
 
@@ -359,7 +363,8 @@ namespace Abiomed.Business
                 if (difference != 0)
                 {
                     status = false;
-                    Trace.TraceInformation("RLM {0} invalid payload size, expected {1}, received {2}", deviceIpAddress, payloadBytes, (dataMessage.Length - 6));
+                    string traceMessage = string.Format("RLM {0} invalid payload size, expected {1}, received {2}.", deviceIpAddress, payloadBytes, (dataMessage.Length - 6));
+                    _logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", messageToProcess, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
                 }
             }
             #endregion
@@ -381,7 +386,8 @@ namespace Abiomed.Business
                     if ((sequence - 1) != rlmDevice.ClientSequence)
                     {
                         status = false;
-                        //Trace.TraceInformation("RLM {0} invalid sequence number expected {1}, received {2}", deviceIpAddress, (rlmDevice.ClientSequence + 1), sequence);
+                        //string traceMessage = string.Format("RLM {0} invalid sequence number expected {1}, received {2}", deviceIpAddress, (rlmDevice.ClientSequence + 1), sequence);
+                        //_logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
                     }
                     rlmDevice.ClientSequence = sequence;
                 }
@@ -390,7 +396,8 @@ namespace Abiomed.Business
                 else if (sequence != 0 || msgId != Definitions.SessionRequest)
                 {
                     //status = false;
-                    //Trace.TraceInformation("RLM {0} invalid sequence number or not session start message. expected 0, received sequence {1}, MSG", deviceIpAddress, sequence, msgId);
+                    //string traceMessage = string.Format"RLM {0} invalid sequence number or not session start message. expected 0, received sequence {1}, MSG", deviceIpAddress, sequence, msgId);
+                    //_logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
                 }
             }
             */

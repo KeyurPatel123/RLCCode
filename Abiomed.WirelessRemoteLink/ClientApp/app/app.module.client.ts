@@ -7,6 +7,7 @@ import { sharedConfig } from './app.module.shared';
 import { GeneralInterceptor } from "./components/interceptor/general.interceptor";
 import { AuthenticationService } from "./components/service/authentication.service";
 
+
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
     declarations: sharedConfig.declarations,

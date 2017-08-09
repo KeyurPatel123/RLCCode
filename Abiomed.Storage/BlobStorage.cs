@@ -16,6 +16,12 @@ namespace Abiomed.Storage
     {
         #region Private Member Variables
 
+        private const string payloadToUploadCannotBeNull = @"Payload to upload cannot be null.";
+        private const string payloadToUploadCannotBeEmpty = @"Payload to upload cannot be empty.";
+        private const string blobNamecannotBeEmpty = @"BlobName cannot be null, empty, or whitespace.";
+        private const string metadataCannotBeNull = @"metaData cannot be null or empty";
+        private const string cloudBlockBlobCannotBeNull = @"CloudBlockBlob cannot be null.";
+
         private CloudStorageAccount _storageAccount = null;
         private CloudBlobClient _blobClient = null;
         private CloudBlobContainer _blobContainer = null;
@@ -62,7 +68,7 @@ namespace Abiomed.Storage
         {
             if (objectToUpload == null)
             {
-                throw new ArgumentNullException("objectToUpload cannot be null.");
+                throw new ArgumentNullException(payloadToUploadCannotBeNull);
             }
 
             SetContainerContext(containerName);
@@ -81,22 +87,22 @@ namespace Abiomed.Storage
         {
             if (payload == null)
             {
-                throw new ArgumentNullException("payload cannot be null.");
+                throw new ArgumentNullException(payloadToUploadCannotBeNull);
             }
 
             if (payload.Length == 0)
             {
-                throw new ArgumentOutOfRangeException("payload cannot be empty.");
+                throw new ArgumentOutOfRangeException(payloadToUploadCannotBeEmpty);
             }
 
             if (string.IsNullOrWhiteSpace(blobName))
             {
-                throw new ArgumentNullException("blobName cannot be null, empty, or whitespace.");
+                throw new ArgumentNullException(blobNamecannotBeEmpty);
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("metaData cannot be null.");
+                throw new ArgumentNullException(metadataCannotBeNull);
             }
 
             SetContainerContext(containerName);
@@ -121,17 +127,17 @@ namespace Abiomed.Storage
         {
             if (blockBlob == null)
             {
-                throw new ArgumentNullException("blockBlob cannot be null.");
+                throw new ArgumentNullException(cloudBlockBlobCannotBeNull);
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("metadata cannot be null.");
+                throw new ArgumentNullException(metadataCannotBeNull);
             }
 
             if (metadata.Count == 0)
             {
-                throw new ArgumentOutOfRangeException("metadata cannot empty.");
+                throw new ArgumentOutOfRangeException(metadataCannotBeNull);
             }
 
             foreach (KeyValuePair<string, string> datum in metadata)

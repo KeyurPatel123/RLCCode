@@ -9,24 +9,24 @@
 
 using Abiomed.Models;
 using Abiomed.Repository;
-using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Timers;
 
 namespace Abiomed.Business
 {
     public class KeepAliveManager : IKeepAliveManager
-    {        
-        private Configuration _configuration;
+    {
+        private Abiomed.Models.Configuration _configuration;
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmConnections = new ConcurrentDictionary<string, KeepAliveTimer>();
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmImageCountdown = new ConcurrentDictionary<string, KeepAliveTimer>();
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
+        private ILogManager _logManager;
 
-        public KeepAliveManager(Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public KeepAliveManager(Abiomed.Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
         {
             _configuration = configuration;
             _redisDbRepository = redisDbRepository;
+            _logManager = new LogManager();
         }
 
         public void Add(string deviceIpAddress)
@@ -58,7 +58,7 @@ namespace Abiomed.Business
             KeepAliveTimer keepAliveTimer;
             _rlmConnections.TryGetValue(deviceIpAddress, out keepAliveTimer);
 
-            Trace.TraceInformation("Keep Alive Timer Expired IP Address {1}", deviceIpAddress);
+            _logManager.TraceIt(Definitions.LogType.Information, string.Format("Keep Alive Timer Expired IP Address {1}", deviceIpAddress));
 
             if (keepAliveTimer != null)
             {

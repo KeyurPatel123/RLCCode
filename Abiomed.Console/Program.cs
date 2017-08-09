@@ -14,6 +14,7 @@ using Abiomed.RLR.Communications;
 using Autofac;
 using System.Diagnostics;
 using Abiomed.Models;
+using Abiomed.FactoryData;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using RestSharp;
@@ -28,7 +29,6 @@ namespace Abiomed.Console
         {           
             try
             {
-                Trace.TraceInformation(@"Remote Link Server - Started");
                 autofac = new AutofacContainer();
                 autofac.Build();
                 Configuration _configuration =  AutofacContainer.Container.Resolve<Configuration>();
