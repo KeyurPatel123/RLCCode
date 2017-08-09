@@ -1,20 +1,34 @@
-import { Component, Inject} from '@angular/core';
-import { Http } from '@angular/http';
+import { Component, OnInit} from '@angular/core';
+import { AuthenticationService } from "../service/authentication.service";
 
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css']
+    styleUrls: ['./login.component.css'],
+    providers: [AuthenticationService]
 })
+
 export class LoginComponent{
-    constructor(private http: Http, @Inject('ORIGIN_URL') private originUrl: string) {       
+    username: string;
+    password: string;    
+
+    constructor(private authenticationService: AuthenticationService) { }
+    
+    ngOnInit() {
+        // reset login status
+        this.authenticationService.logout();
     }
 
-    public LogIn() {
-
-        this.http.post(this.originUrl + '/api/Login/Login', "Alex").subscribe(result => {
-            console.log(result);
-            //this.forecasts = result.json() as WeatherForecast[];
-        });
+    public LogIn() {               
+        this.authenticationService.login(this.username, this.password)
+            .subscribe(result => {
+                // Fix up!
+                //if (result === true) {
+                //    this.router.navigate(['/']);
+                //} else {
+                //    this.error = 'Username or password is incorrect';
+                //    this.loading = false;
+                //}
+            });        
     }
 }

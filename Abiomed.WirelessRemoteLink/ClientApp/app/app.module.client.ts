@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { sharedConfig } from './app.module.shared';
+import { GeneralInterceptor } from "./components/interceptor/general.interceptor";
+import { AuthenticationService } from "./components/service/authentication.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -10,11 +13,18 @@ import { sharedConfig } from './app.module.shared';
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
+        ReactiveFormsModule,
+        HttpClientModule,
         ...sharedConfig.imports
     ],
     providers: [
-        { provide: 'ORIGIN_URL', useValue: location.origin }
+        AuthenticationService,
+        { provide: 'ORIGIN_URL', useValue: location.origin },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: GeneralInterceptor,
+            multi: true,
+        },        
     ]
 })
 export class AppModule {

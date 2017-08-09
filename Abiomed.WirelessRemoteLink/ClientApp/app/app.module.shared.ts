@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { AppComponent } from './components/app/app.component'
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
@@ -20,8 +19,8 @@ export const sharedConfig: NgModule = {
     ],
     imports: [
         RouterModule.forRoot([
-            { path: 'home', component: HomeComponent },
             { path: 'login', component: LoginComponent },
+            { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
             { path: '', redirectTo: 'login', pathMatch: 'full' },

@@ -18,10 +18,10 @@ module.exports = (env) => {
             vendor: [
                 '@angular/animations',
                 '@angular/common',
+                '@angular/common/http',
                 '@angular/compiler',
                 '@angular/core',
-                '@angular/forms',
-                '@angular/http',
+                '@angular/forms',                
                 '@angular/platform-browser',
                 '@angular/platform-browser-dynamic',
                 '@angular/router',

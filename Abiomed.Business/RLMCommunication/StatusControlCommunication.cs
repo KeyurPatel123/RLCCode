@@ -144,9 +144,8 @@ namespace Abiomed.Business
 
                 rlmDevice.BearerAuthInformationList.Add(bearerAuthenticationReadResponse);
 
-                // Determine if you need another to request another slot
-                if (rlmDevice.BearerSlotNumber >= 3)
-                //if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
+                // Determine if you need another to request another slot                
+                if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
                 {
                     // Add bearer info into REDIS, clean up RLMDevice, and PUB Message 
                     _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
