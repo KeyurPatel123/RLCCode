@@ -33,6 +33,7 @@ namespace Abiomed.RLR.Communications
         private ConcurrentDictionary<string, TCPStateObject> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObject>();
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
+        private ILogManager _logManager;
 
         private List<RedisChannel> userInteractionEvents = new List<RedisChannel>()
         {
@@ -92,13 +93,13 @@ namespace Abiomed.RLR.Communications
         public void Run()
         {
             // Bind the socket to the local endpoint and listen for incoming connections.
+            _logManager = new LogManager();
             try
             {
                 var listener = new TcpListener(IPAddress.Any, _configuration.TcpPort);
                 listener.Start();
-                Trace.TraceInformation("TCP Server Started Success");
+                _logManager.TraceIt(Definitions.LogType.Information, "TCP Server Started Success");
                 
-
                 while (true)
                 {
                     // Set the event to nonsignaled state.
@@ -115,7 +116,8 @@ namespace Abiomed.RLR.Communications
             }
             catch (Exception e)
             {
-                Trace.TraceError("Cannot Start TCP Service Error ", e);
+                string traceMessage = string.Format("Cannot Start TCP Service Error ", e);
+                _logManager.Log("TCP SERVICE ROOT", "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
             }
 
         }
@@ -147,13 +149,15 @@ namespace Abiomed.RLR.Communications
                 state.DeviceIpAddress = handler.Client.RemoteEndPoint.ToString();
                 _tcpStateObjectList.TryAdd(state.DeviceIpAddress, state);
 
-                Trace.TraceInformation("RLM connected at connection {0}", state.DeviceIpAddress);
+                _logManager.TraceIt(Definitions.LogType.Information, string.Format("RLM connected at connection {0}", state.DeviceIpAddress));
                 state.WorkStream.BeginRead(state.buffer, 0, TCPStateObject.BufferSize, new AsyncCallback(ReadCallback), state);
             }
             catch (Exception e)
             {
                 TcpListener listener = (TcpListener)ar.AsyncState;
-                Trace.TraceInformation("RLM connection failed {0} Exception {1}", listener.LocalEndpoint, e.ToString());
+
+                string traceMessage = string.Format("RLM connection failed {0} Exception {1}", listener.LocalEndpoint, e.ToString());
+                _logManager.Log(listener.LocalEndpoint.ToString(), "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
             }
         }
 
@@ -173,7 +177,8 @@ namespace Abiomed.RLR.Communications
                 {
                     var receivedBuffer = state.buffer.Take(bytesRead);
 
-                    Trace.TraceInformation("Message received from RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(receivedBuffer.ToArray()));
+                    string traceMessage = string.Format("Message received from RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(receivedBuffer.ToArray()));
+                    _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
 
                     // Process message
                     RLMStatus RLMStatus;
@@ -188,7 +193,9 @@ namespace Abiomed.RLR.Communications
                         // Send Message if there is something to send back
                         if (returnMessage.Length > 0)
                         {
-                            Trace.TraceInformation("Sending message to RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
+                            traceMessage = string.Format("Sending message to RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
+                            _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
+
                             Send(state.DeviceIpAddress, handler, returnMessage);
                         }
                     }
@@ -202,14 +209,18 @@ namespace Abiomed.RLR.Communications
                 else
                 {
                     // kill connection
-                    Trace.TraceError("ReadCallback - RLM {0} closed connection", state.DeviceIpAddress);
+                    string traceMessage = String.Format("ReadCallback - RLM {0} closed connection.", state.DeviceIpAddress);
+                    _logManager.Log(state.DeviceIpAddress, "TCP SERVICE ROOT", state, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
+
                     RemoveConnection(state.DeviceIpAddress);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 TCPStateObject state = (TCPStateObject)ar.AsyncState;
-                Trace.TraceError("ReadCallback:Catch - RLM {0} closed connection", state.DeviceIpAddress);
+                string traceMessage = String.Format("ReadCallback - RLM {0} closed connection. {1}", state.DeviceIpAddress, e.ToString());
+                _logManager.Log(state.DeviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
+
                 RemoveConnection(state.DeviceIpAddress);
             }
         }
@@ -223,7 +234,9 @@ namespace Abiomed.RLR.Communications
             }
             catch (Exception e)
             {
-                Trace.TraceError("Send Error, Closing connection ", e);
+                string traceMessage = String.Format("Send Error, Closing connection ", e);
+                _logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
+
                 RemoveConnection(deviceIpAddress);
             }
         }
@@ -276,7 +289,9 @@ namespace Abiomed.RLR.Communications
                 // Send Message if there is something to send back
                 if (returnMessage.Length > 0)
                 {
-                    Trace.TraceInformation("Sending message to RLM {0}, data {1}", tcpState.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
+                    string traceMessage = string.Format("Sending message to RLM {0}, data {1}", tcpState.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
+                    _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
+
                     Send(deviceIpAddress, tcpState.WorkStream, returnMessage);
                 }
 
@@ -337,7 +352,6 @@ namespace Abiomed.RLR.Communications
             }
         }
         #endregion
-
 
     }
 }

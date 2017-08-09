@@ -97,9 +97,6 @@
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8\Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Storage, Version=8.1.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAzure.Storage.8.1.4\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
-    </Reference>
     <Reference Include="MongoDB.Bson, Version=2.3.0.157, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Bson.2.3.0\lib\net45\MongoDB.Bson.dll</HintPath>
       <Private>True</Private>
@@ -162,9 +159,17 @@
       <Project>{28B0E1D3-612E-4EC5-803D-69ADC2D6A07E}</Project>
       <Name>Abiomed.RLR.Communications</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Abiomed.FactoryData.Business\Abiomed.FactoryData.Business.csproj">
+      <Project>{439ded23-6393-4534-9e98-88dbc256048a}</Project>
+      <Name>Abiomed.FactoryData.Business</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj">
       <Project>{D3662849-0B27-4D08-BFF6-7F1537BCF015}</Project>
       <Name>Abiomed.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Abiomed.Storage\Abiomed.Storage.csproj">
+      <Project>{3c003571-93b7-46a4-8219-a8ed3db97272}</Project>
+      <Name>Abiomed.Storage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

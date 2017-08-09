@@ -9,7 +9,6 @@
 using System;
 using Abiomed.Models;
 using System.Linq;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
 using Abiomed.Repository;
@@ -21,10 +20,10 @@ namespace Abiomed.Business
         private IKeepAliveManager _keepAliveManager;
         private ILogManager _logManager;
         private RLMDeviceList _rlmDeviceList;
-        private Configuration _configuration;
+        private Abiomed.Models.Configuration _configuration;
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
 
-        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogManager logManager, RLMDeviceList rlmDeviceList, Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogManager logManager, RLMDeviceList rlmDeviceList, Abiomed.Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
         {            
             _keepAliveManager = keepAliveManager;
             _logManager = logManager;
@@ -37,6 +36,7 @@ namespace Abiomed.Business
         public byte[] StreamingVideoControlResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             byte[] returnMessage = new byte[0];
+            string deviceSerialNumber = string.Empty;
             try
             {
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
@@ -46,23 +46,31 @@ namespace Abiomed.Business
 
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+                deviceSerialNumber = rlmDevice.SerialNo;
 
+                string traceMessage = string.Empty;
+                string failureText = string.Empty;
+                Definitions.LogType traceLogType = Definitions.LogType.NoTrace;
                 // Error checking
                 if (streamingVideoControlResponse.Status != Definitions.SuccessStats || streamingVideoControlResponse.UserRef != Definitions.UserRef)
                 {
                     status.Status = RLMStatus.StatusEnum.Failure;
-                    Trace.TraceInformation(@"Streaming Video Control Response Failure {0}", rlmDevice.SerialNo);
+                    failureText = @"Failure ";
+                    traceLogType = Definitions.LogType.Error;
                 }
                 else
                 {
-                    Trace.TraceInformation(@"Streaming Video Control Response {0}", rlmDevice.SerialNo);
+                    traceLogType = Definitions.LogType.Information;
                 }
-                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, streamingVideoControlResponse, Definitions.LogMessageType.StreamingVideoControlResponse);
 
+                traceMessage = string.Format(@"Streaming Video Control Response {0}{1}", failureText, rlmDevice.SerialNo);
+                _logManager.Log(deviceIpAddress, deviceSerialNumber, streamingVideoControlResponse, Definitions.LogMessageType.StreamingVideoControlResponse, traceLogType, traceMessage);
             }
             catch (Exception e)
             {
-                Trace.TraceInformation(@"Streaming Video Control Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                string errorMessage = string.Format(@"Streaming Video Control Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.StreamingVideoControlResponse, Definitions.LogType.Exception, errorMessage);
+
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -72,6 +80,7 @@ namespace Abiomed.Business
         public byte[] BufferStatusRequest(string deviceIpAddress, byte[] message, out RLMStatus status)
          {        
             byte[] returnMessage = new byte[0];
+            string deviceSerialNumber = string.Empty;
 
             try
             {
@@ -99,16 +108,17 @@ namespace Abiomed.Business
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 _keepAliveManager.Ping(deviceIpAddress);
+                deviceSerialNumber = rlmDevice.SerialNo;
 
                 // Put back with Config Verbose flag
-                //Trace.TraceInformation(@"Buffer Status Request {0}", deviceIpAddress);
-                //_logManager.Create(deviceIpAddress, rlmDevice.SerialNo, bufferStatusRequest, Definitions.LogMessageType.BufferStatusRequest);
+                //_logManager.Log(deviceIpAddress, rlmDevice.SerialNo, bufferStatusRequest, Definitions.LogMessageType.BufferStatusRequest, Definitions.LogType.Information, string.Format(@"Buffer Status Request {0}", deviceIpAddress));
             }
             catch (Exception e)
             {
-                Trace.TraceInformation(@"Buffer Status Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
+                string errorMessage = string.Format(@"Buffer Status Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BufferStatusRequest, Definitions.LogType.Exception, errorMessage);
 
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             return returnMessage;
         }
@@ -116,6 +126,7 @@ namespace Abiomed.Business
         public byte[] ScreenCaptureResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             byte[] returnMessage = new byte[0];
+            string deviceSerialNumber = string.Empty;
             try
             {
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
@@ -133,19 +144,21 @@ namespace Abiomed.Business
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 _keepAliveManager.Ping(deviceIpAddress);
+                deviceSerialNumber = rlmDevice.SerialNo;
 
                 // todo check for what type
                 // Create Open File Ind for screen 0
                 returnMessage = General.GenerateRequest(Definitions.OpenScreenFileIndication, rlmDevice);
 
-                Trace.TraceInformation(@"Screen Capture Response {0}", deviceIpAddress);
-                _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, screenCaptureResponse, Definitions.LogMessageType.ScreenCaptureResponse);
-
+                string traceMessage = string.Format(@"Screen Capture Response {0}", deviceIpAddress);
+                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, screenCaptureResponse, Definitions.LogMessageType.ScreenCaptureResponse, Definitions.LogType.Information, traceMessage);
             }
             catch (Exception e)
             {
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
-                Trace.TraceError(@"Screen Capture Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+
+                string traceMessage = string.Format(@"Screen Capture Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.ScreenCaptureResponse, Definitions.LogType.Exception, traceMessage);
             }
             return returnMessage;
         }
@@ -192,7 +205,7 @@ namespace Abiomed.Business
             byte[] returnMessage = General.GenerateRequest(Definitions.ScreenCaptureIndicator, rlmDevice);            
             rlmDevice.FileTransferType = Definitions.RLMFileTransfer.ScreenCapture0;
 
-            Trace.TraceInformation(@"Sending Screen Capture {0}", rlmDevice.SerialNo);
+            _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Sending Screen Capture {0}", rlmDevice.SerialNo));
 
             return returnMessage;
         }
@@ -201,13 +214,11 @@ namespace Abiomed.Business
         {
             RLMDevice rlmDevice;
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-
             rlmDevice.Streaming = false;
 
             byte[] returnMessage = General.GenerateRequest(Definitions.VideoStopIndicator, rlmDevice);
-
-            Trace.TraceInformation(@"Sending Video Stop {0}", rlmDevice.SerialNo);
-
+        
+            _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Sending Video Stop {0}", rlmDevice.SerialNo));
             return returnMessage;
         }
 
@@ -219,7 +230,7 @@ namespace Abiomed.Business
             // Shut off Request Image Timer
             _keepAliveManager.ImageTimerDelete(deviceIpAddress);
 
-            Trace.TraceInformation(@"Stop Screen Capture {0}", rlmDevice.SerialNo);
+            _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Stop Screen Capture {0}", rlmDevice.SerialNo));
             return new byte[0];
         }
 
@@ -229,7 +240,7 @@ namespace Abiomed.Business
             // convert obj to string
             string deviceIpAddress = (string)obj;
 
-            Trace.TraceInformation(@"Starting Video after 10 seconds {0}", deviceIpAddress);
+            _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Starting Video after 10 seconds {0}", deviceIpAddress));
 
             // Send message to start 
             _redisDbRepository.Publish(Definitions.StreamingVideoControlIndicationEvent, deviceIpAddress);

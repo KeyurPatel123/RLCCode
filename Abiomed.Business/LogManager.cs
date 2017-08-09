@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abiomed.Models;
-using Abiomed.Repository;
 using Abiomed.Storage;
-using Microsoft.Azure; // Namespace for CloudConfigurationManager
-using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount
-using Microsoft.WindowsAzure.Storage.Table; // Namespace for Table storage types
-using Microsoft.Azure.Documents;
-using System.Globalization;
-using System.IO;
+using Abiomed.Configuration;
+using System.Diagnostics;
 
 namespace Abiomed.Business
 {
@@ -21,50 +15,53 @@ namespace Abiomed.Business
         private ITableStorage _iTableStorage;
         private string _logName;
         private string _logMessageType;
-
-     //  // private IImageManager _iImageManager; // This was added for testing the Image - It canbe removed
+        private string _logMessageSeverity;
 
         public LogManager()
         {
             Initialize();
         }
 
-        public async Task Create<T>(string deviceIpAddress, string rlmSerial, T message, Definitions.LogMessageType logMessageType)
+        public async Task LogAsync<T>(string deviceIpAddress, string rlmSerial, T message, Definitions.LogMessageType logMessageType, Definitions.LogType logSeverityType = Definitions.LogType.NoTrace, string traceMessage = null)
         {
-            AzureLog<T> log = new AzureLog<T>
-            {
-                Message = message,
-                DeviceIpAddress = deviceIpAddress,
-                RLMSerial = rlmSerial,
-                LogMessageType = logMessageType.ToString()
-            };
-
+            TraceIt(logSeverityType, traceMessage);
+            AzureLog<T> log = GenerateLogMessage(deviceIpAddress, rlmSerial, message, logMessageType, logSeverityType);
             DateTime currentDateTime = DateTime.UtcNow;
+            List<KeyValuePair<string, string>> metadata = GenerateMetadata(logMessageType.ToString(), logSeverityType.ToString());
 
-            // Create the Metadata to associate with the blob being stored.
-            List<KeyValuePair<string, string>> metadata = new List<KeyValuePair<string, string>>();
-            metadata.Add(new KeyValuePair<string,string>(_logMessageType, log.LogMessageType)); 
             await _iBlobStorage.UploadAsync(log, CreateLogBlobName(log.RLMSerial, currentDateTime), metadata, _logName);
+        }
 
-            //      // await CreateUploadedImage("RL00001"); // THis is for testing only
+        public void Log<T>(string deviceIpAddress, string rlmSerial, T message, Definitions.LogMessageType logMessageType, Definitions.LogType logSeverityType = Definitions.LogType.NoTrace, string traceMessage = null)
+        {
+            TraceIt(logSeverityType, traceMessage);
+            AzureLog<T> log = GenerateLogMessage(deviceIpAddress, rlmSerial, message, logMessageType, logSeverityType);
+            DateTime currentDateTime = DateTime.UtcNow;
+            List<KeyValuePair<string, string>> metadata = GenerateMetadata(logMessageType.ToString(), logSeverityType.ToString());
 
-            // Try testing the TableStorage Repository
-            // - Insert
-            ApplicationConfiguration appConfig = new ApplicationConfiguration();
-            appConfig.PartitionKey = "remotelink";
-            //appConfig.RowKey = "logname";
-            //appConfig.Value = "remotelink-logs";
-            //await _iTableStorage.InsertAsync("config", appConfig);
-            appConfig.RowKey = "bloblogmetadata2";
-            appConfig.Value = "LogMessageType9";
-            //await _iTableStorage.InsertAsync("config", appConfig);
-
-            //var queryResult = await _iTableStorage.GetItemAsync<ApplicationConfiguration>(appConfig.PartitionKey, "RepositoryName", "config");
-            //var queryResult1 = await _iTableStorage.GetPartitionItemsAsync<ApplicationConfiguration>("RemoteLink", "config");
-            //var queryResult2 = await _iTableStorage.GetAllAsync<ApplicationConfiguration>("config");
-            //var queryResult3 = await _iTableStorage.InsertOrMergeAsync("config", appConfig);
-            //var queryResult4 = await _iTableStorage.UpdateAsync("config", appConfig);
-            //var queryResult5 = await _iTableStorage.DeleteAsync("config", appConfig);
+            _iBlobStorage.UploadAsync(log, CreateLogBlobName(log.RLMSerial, currentDateTime), metadata, _logName);
+        }
+    
+        public void TraceIt(Definitions.LogType logType, string message)
+        {
+            if (logType != Definitions.LogType.NoTrace && !string.IsNullOrWhiteSpace(message))
+            {
+                switch (logType)
+                {
+                    case Definitions.LogType.Information:
+                        Trace.TraceInformation(message);
+                        break;
+                    case Definitions.LogType.Warning:
+                        Trace.TraceWarning(message);
+                        break;
+                    case Definitions.LogType.Error:
+                    case Definitions.LogType.Exception:
+                        Trace.TraceError(message);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private string CreateLogBlobName(string deviceName, DateTime currentDateTime)
@@ -75,7 +72,7 @@ namespace Abiomed.Business
             blobName.Append("/" + currentDateTime.Month.ToString("00"));
             blobName.Append("/" + currentDateTime.Day.ToString("00"));
             blobName.Append("/" + currentDateTime.Hour.ToString("00"));
-            blobName.Append("/" + currentDateTime.Minute.ToString("00") + "m" + currentDateTime.Second.ToString("00") +"s" + currentDateTime.Millisecond.ToString("000") + "ms");
+            blobName.Append("/" + currentDateTime.Minute.ToString("00") + "m" + currentDateTime.Second.ToString("00") + "s" + currentDateTime.Millisecond.ToString("000") + "ms");
 
             return blobName.ToString();
         }
@@ -84,9 +81,9 @@ namespace Abiomed.Business
         {
             _iBlobStorage = new BlobStorage();
             _iTableStorage = new TableStorage();
-            _logName = "remotelink-logs"; // GetLogName();
-            _logMessageType = "LogMessageType"; // GetLogMessageType(); 
-     //       //_iImageManager = new ImageManager(); // This was added for testing the Image Storage and can be removed...
+            _logName = "remotelink-logs"; // TODO: GetLogName();
+            _logMessageType = "LogMessageType"; // TODO: GetLogMessageType(); 
+            _logMessageSeverity = "LogMessageSeverity"; // TODO: GetLogMessageSeverity();
         }
 
         private string GetLogName()
@@ -101,17 +98,40 @@ namespace Abiomed.Business
             return queryResult.Result.Value;
         }
 
-     //    /// <summary>
-     //    /// This is for testing the Image Functionality Only...
-     //   /// </summary>
-     //   /// <param name="deviceName"></param>
-     //   /// <returns></returns>
-     //  public async Task CreateUploadedImage(string deviceName)
-     //   {
-     //       List<KeyValuePair<string, string>> metadata = new List<KeyValuePair<string, string>>();
-     //       metadata.Add(new KeyValuePair<string, string>("institutionName", "Massachusets General Hospital")); // Values for test
-     //       
-     //       await _iImageManager.UploadImageFromFile(deviceName, @"C:\Temp\RL00001.png", System.Drawing.Imaging.ImageFormat.Png, metadata, "remotelink-images");
-     //   }
+        private AzureLog<T> GenerateLogMessage<T>(string deviceIpAddress, string rlmSerialNumber, T message, Definitions.LogMessageType logMessageType, Definitions.LogType logType)
+        {
+            AzureLog<T> log = new AzureLog<T>
+            {
+                Message = message,
+                DeviceIpAddress = deviceIpAddress,
+                RLMSerial = rlmSerialNumber,
+                LogMessageType = logMessageType.ToString(),
+                LogSeverityType = logType.ToString()
+            };
+
+            return log;
+        }
+
+        private List<KeyValuePair<string, string>> GenerateMetadata(string logMessageType, string logSeverityType)
+        {
+            List<KeyValuePair<string, string>> metadata = new List<KeyValuePair<string, string>>();
+            metadata.Add(new KeyValuePair<string, string>(_logMessageType, logMessageType));
+            metadata.Add(new KeyValuePair<string, string>(_logMessageSeverity, logSeverityType));
+
+            return metadata;
+        }
+
+        //    /// <summary>
+        //    /// This is for testing the Image Functionality Only...
+        //   /// </summary>
+        //   /// <param name="deviceName"></param>
+        //   /// <returns></returns>
+        //  public async Task CreateUploadedImage(string deviceName)
+        //   {
+        //       List<KeyValuePair<string, string>> metadata = new List<KeyValuePair<string, string>>();
+        //       metadata.Add(new KeyValuePair<string, string>("institutionName", "Massachusets General Hospital")); // Values for test
+        //       
+        //       await _iImageManager.UploadImageFromFile(deviceName, @"C:\Temp\RL00001.png", System.Drawing.Imaging.ImageFormat.Png, metadata, "remotelink-images");
+        //   }
     }
 }

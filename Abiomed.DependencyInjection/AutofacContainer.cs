@@ -12,6 +12,7 @@ using Abiomed.Business;
 using Autofac;
 using Abiomed.Repository;
 using Abiomed.Models;
+using Abiomed.FactoryData;
 
 namespace Abiomed.DependencyInjection 
 {
@@ -29,6 +30,7 @@ namespace Abiomed.DependencyInjection
 
             builder.RegisterType<TCPServer>().As<ITCPServer>();
             builder.RegisterType<InsecureTcpServer>();
+            builder.RegisterType<FactoryConfiguration>();
             builder.RegisterType<Configuration>().SingleInstance();            
 
             #region RLM Communications

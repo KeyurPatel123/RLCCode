@@ -15,7 +15,6 @@ namespace Abiomed.SignalRSelfHost
     public class RemoteLinkHub : Hub
     {
         private readonly ILifetimeScope _hubLifetimeScope;
-        private ILogManager _logManager;
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
 
         public RemoteLinkHub(ILifetimeScope lifetimeScope)
@@ -23,7 +22,7 @@ namespace Abiomed.SignalRSelfHost
             _hubLifetimeScope = lifetimeScope.BeginLifetimeScope();
 
             // Resolve dependencies from the hub lifetime scope.
-            _logManager = _hubLifetimeScope.Resolve<ILogManager>();
+            //_logManager = _hubLifetimeScope.Resolve<ILogManager>();
             _redisDbRepository = _hubLifetimeScope.Resolve<IRedisDbRepository<RLMDevice>>();
             RegisterEvents();
         }

@@ -10,6 +10,7 @@
 using System;
 using System.Configuration;
 using System.Text;
+using Abiomed.Configuration;
 
 namespace Abiomed.Models
 {
@@ -29,35 +30,63 @@ namespace Abiomed.Models
         private string _redisConnect = @"localhost";
         private bool _security = false;
         private string _signalRConnection = @"http://localhost:8080";
-        
+        private Abiomed.Configuration.ConfigurationManager _configurationManager;
+        private System.Collections.Generic.List<ApplicationConfiguration> _settings;
+
         #region Constructor
         public Configuration()
         {
+            _configurationManager = new Abiomed.Configuration.ConfigurationManager(@"config");
+            _settings = _configurationManager.GetAll();
+
             // Configure Sections
             connectionManager();
             optionsManager();
         }
         #endregion
 
+        private string GetConnectionSetting(string settingName)
+        {
+            return GetSetting(@"connectionmanager", settingName);
+        }
+
+        private string GetOptionSetting(string settingName)
+        {
+            return GetSetting(@"optionsmanager", settingName);
+        }
+
+        private string GetSetting(string featureName, string settingName)
+        {
+            string result = string.Empty;
+
+            var setting = _settings.Find(x => x.PartitionKey == featureName && x.RowKey == settingName);
+            if (setting != null)
+            {
+                result = setting.Value;
+            }
+
+            return result;
+        }
+
         private void connectionManager()
         {
-            var connectionManager = ConfigurationManager.GetSection("ConnectionManager") as System.Collections.Specialized.NameValueCollection;
-            _type = connectionManager["RUN"].ToString();
-            string WOWZA = connectionManager["WOWZA"].ToString();
+            string WOWZA = GetConnectionSetting("wowza");
+            _type = GetConnectionSetting("run");
+            string WEB = GetConnectionSetting("web");  
+            string RLR = GetConnectionSetting("rlr");
+            string DocDbConnectionUri = GetConnectionSetting("docdburi"); 
+            string DocDbConnectionPwd = GetConnectionSetting("docdbpwd");  
+            string RedisCon = GetConnectionSetting("redisconnect");
+            bool SecurityStatus = false;
+            bool.TryParse(GetConnectionSetting("security"), out SecurityStatus);
+            _security = SecurityStatus;
+            _deviceStatus = GetConnectionSetting("imagesend");
+
             // Configure WOWZA Url
-            //rtmp://rlv.abiomed.com
             byte WOWZALength = Convert.ToByte(WOWZA.Length);
             var WOWZABytes = Encoding.ASCII.GetBytes(WOWZA);
             Definitions.StreamVideoControlIndication.Insert(14, WOWZALength);
             Definitions.StreamVideoControlIndication.InsertRange(15, WOWZABytes);
-            
-            string WEB = connectionManager["WEB"].ToString();
-            string RLR = connectionManager["RLR"].ToString();
-            string DocDbConnectionUri = connectionManager["DocDBUri"].ToString();
-            string DocDbConnectionPwd = connectionManager["DocDBPWD"].ToString();
-            string RedisCon = connectionManager["RedisConnect"].ToString();
-            bool SecurityStatus = false;
-            bool.TryParse(connectionManager["Security"].ToString(), out SecurityStatus);
 
             _security = SecurityStatus;
 
@@ -83,12 +112,10 @@ namespace Abiomed.Models
 
         private void optionsManager()
         {
-
-            var optionsManager = ConfigurationManager.GetSection("OptionsManager") as System.Collections.Specialized.NameValueCollection;
-            _keepAliveTimer = Convert.ToInt32(optionsManager["KeepAliveTimer"].ToString());
-            _certLocation = optionsManager["CertKey"].ToString();
-            _tcpPort = Convert.ToInt32(optionsManager["TcpPort"].ToString());
-            _imageCountdownTimer = Convert.ToInt32(optionsManager["ImageCountdownTimer"].ToString());
+            _keepAliveTimer = Convert.ToInt32(GetOptionSetting("keepalivetimer"));
+            _certLocation = GetOptionSetting("certkey");
+            _tcpPort = Convert.ToInt32(GetOptionSetting("tcpport"));
+            _imageCountdownTimer = Convert.ToInt32(GetOptionSetting("imagecountdowntimer"));
         }
 
         public string DeviceStatus

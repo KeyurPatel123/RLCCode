@@ -9,7 +9,6 @@
 using System;
 using Abiomed.Models;
 using System.Linq;
-using System.Diagnostics;
 using System.Collections.Generic;
 using Abiomed.Repository;
 using System.IO;
@@ -21,12 +20,12 @@ namespace Abiomed.Business
     {
         private ILogManager _logManager;
         private RLMDeviceList _rlmDeviceList;
-        private Configuration _configuration;
+        private Abiomed.Models.Configuration _configuration;
         private IRedisDbRepository<RLMImage> _redisDbRepository;
         private IKeepAliveManager _keepAliveManager;
 
 
-        public FileTransferCommunication(ILogManager logManager, RLMDeviceList rlmDeviceList, Configuration configuration, IRedisDbRepository<RLMImage> redisDbRepository, IKeepAliveManager keepAliveManager)
+        public FileTransferCommunication(ILogManager logManager, RLMDeviceList rlmDeviceList, Abiomed.Models.Configuration configuration, IRedisDbRepository<RLMImage> redisDbRepository, IKeepAliveManager keepAliveManager)
         {
             _logManager = logManager;
             _rlmDeviceList = rlmDeviceList;
@@ -44,10 +43,10 @@ namespace Abiomed.Business
         public byte[] OpenFileResponse(string deviceIpAddress, byte[] message, out RLMStatus status)
         {
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-
             FileOpenResponse fileOpenResponse = new FileOpenResponse();
-
+            string deviceSerialNumber = string.Empty;
             byte[] returnMessage = new byte[0];
+
             try
             {
                 fileOpenResponse.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
@@ -57,22 +56,23 @@ namespace Abiomed.Business
 
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+                deviceSerialNumber = rlmDevice.SerialNo;
 
                 // Error checking
                 if (fileOpenResponse.Status != Definitions.SuccessStats || fileOpenResponse.UserRef != Definitions.UserRef)
                 {
                     status.Status = RLMStatus.StatusEnum.Failure;
-                    Trace.TraceInformation(@"Open File Response Failure {0}", rlmDevice.SerialNo);
+                    string traceMessage = string.Format(@"Open File Response Failure {0}", rlmDevice.SerialNo);
+                    _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, fileOpenResponse, Definitions.LogMessageType.FileOpenResponse, Definitions.LogType.Error, traceMessage);
                 }
                 else
                 {
-                    Trace.TraceInformation(@"Open File Response {0}", rlmDevice.SerialNo);
-
                     //Last modification time of file, in seconds, since the UNIX epoch which will be zero if an error occurs
                     var epochTime = new DateTime(1970, 1, 1);                    
                     fileOpenResponse.Time = epochTime.AddSeconds(secondTimeDifference);
 
-                    _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, fileOpenResponse, Definitions.LogMessageType.FileOpenResponse);
+                    string traceMessage = string.Format(@"Open File Response {0}", rlmDevice.SerialNo);
+                    _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, fileOpenResponse, Definitions.LogMessageType.FileOpenResponse, Definitions.LogType.Information, traceMessage);
 
                     // Calculate amount of blocks, size in bytes
                     // number_of_blocks = (int)(file_size + 999) / 1000; 
@@ -88,7 +88,8 @@ namespace Abiomed.Business
             }
             catch (Exception)
             {
-               // Trace.TraceInformation(@"File Open Response Failure {0} Exception {1}", _RLMDeviceList.RLMDevices[deviceIpAddress].SerialNo, e.ToString());
+                //string traceMessage = string.Format("File Open Response Failure {0} Exception {1}", deviceSerialNumber, e.ToString());
+                //_logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.FileOpenResponse, Definitions.LogType.Exception, traceMessage);
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             return returnMessage;
@@ -103,11 +104,13 @@ namespace Abiomed.Business
         {
             byte[] returnMessage = new byte[0];
             status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-            
+            string deviceSerialNumber = string.Empty;
+
             try
             {
                 RLMDevice rlmDevice;
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
+                deviceSerialNumber = rlmDevice.SerialNo;
 
                 // Check if full if so send messages to close file and clear
                 if (rlmDevice.Block == rlmDevice.TotalBlocks)
@@ -150,7 +153,8 @@ namespace Abiomed.Business
                     }
                     else
                     {
-                        Trace.TraceInformation(@"Data Read Response - Final - Failure {0}", deviceIpAddress);
+                        string traceMessage = string.Format(@"Data Read Response - Final - Failure {0}", deviceIpAddress);
+                        _logManager.Log(deviceIpAddress, deviceSerialNumber, rlmDevice, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Error, traceMessage);
                         status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
                     }
                 }
@@ -163,14 +167,16 @@ namespace Abiomed.Business
                     }
                     else
                     {
-                        Trace.TraceInformation(@"Data Read Response Failure {0}", deviceIpAddress);
+                        string traceMessage = string.Format(@"Data Read Response - Failure {0}", deviceIpAddress);
+                        _logManager.Log(deviceIpAddress, deviceSerialNumber, rlmDevice, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Error, traceMessage);
                         status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
                     }
                 }
             }
             catch (Exception e)
             {
-                Trace.TraceInformation(@"Data Read Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                string traceMessage = string.Format(@"Data Read Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Exception, traceMessage);
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -192,22 +198,28 @@ namespace Abiomed.Business
 
                 clearFileResponse.Status = BitConverter.ToUInt16(message.Skip(6).Take(2).Reverse().ToArray(), 0);
                 clearFileResponse.UserRef = BitConverter.ToUInt16(message.Skip(8).Take(2).Reverse().ToArray(), 0);
-               
+
+                string traceMessage = string.Empty;
+                Definitions.LogType traceLogType = Definitions.LogType.NoTrace;
                 // Error checking
                 if (clearFileResponse.Status != Definitions.SuccessStats || clearFileResponse.UserRef != Definitions.UserRef)
                 {
                     status.Status = RLMStatus.StatusEnum.Failure;
-                    Trace.TraceInformation(@"Clear File Response Failure {0}", rlmDevice.SerialNo);
+                    traceMessage = string.Format(@"Clear File Response Failure {0}", rlmDevice.SerialNo);
+                    traceLogType = Definitions.LogType.Error;
                 }
                 else
                 {
-                    Trace.TraceInformation(@"Clear File Response {0}", rlmDevice.SerialNo);
-                    _logManager.Create(deviceIpAddress, rlmDevice.SerialNo, clearFileResponse, Definitions.LogMessageType.ScreenCaptureResponse);
+                    traceMessage = string.Format(@"Clear File Response {0}", rlmDevice.SerialNo);
+                    traceLogType = Definitions.LogType.Information;
                 }
+
+                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, clearFileResponse, Definitions.LogMessageType.ClearFileResponse, traceLogType, traceMessage);
             }
             catch (Exception e)
             {
-                Trace.TraceInformation(@"Clear File Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                string traceMessage = string.Format(@"Clear File Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, e, Definitions.LogMessageType.ClearFileResponse, Definitions.LogType.Exception, traceMessage);
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             return returnMessage;
@@ -284,14 +296,16 @@ namespace Abiomed.Business
             if (dataReadResponse.Status != Definitions.SuccessStats || dataReadResponse.UserRef != Definitions.UserRefFileTransfer)
             {
                 status = false;
-                Trace.TraceInformation(@"Data Transfer Failure {0} - Status {1}", rlmDevice.SerialNo, dataReadResponse.Status);
+                string traceMessage = string.Format(@"Data Transfer Failure {0} - Status {1}", rlmDevice.SerialNo, dataReadResponse.Status);
+                _logManager.Log(rlmDevice.DeviceIpAddress, rlmDevice.SerialNo, message, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Error, traceMessage);
             }
             else
             {
-                Trace.TraceInformation(@"Successful Data Transfer {0}", rlmDevice.SerialNo);
+                string traceMessage = string.Format(@"Successful Data Transfer {0}", rlmDevice.SerialNo);
+                _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
+
                 rlmDevice.DataTransfer.AddRange(dataReadResponse.Data);
             }
-
 
             return status;
         }
@@ -301,16 +315,16 @@ namespace Abiomed.Business
             try
             {
                 RLMImage rlmImage = new RLMImage { Data = imageData, SerialNumber = serialNumber };
-
+           
                 _redisDbRepository.StringSet(serialNumber, rlmImage);
 
                 _redisDbRepository.Publish(Definitions.ImageCapture, serialNumber);                                
             }
-            catch(Exception)
+            catch(Exception e)
             {
-
+                string traceMessage = string.Format(@"Create Image Exception Exception {0}", e.ToString());
+                _logManager.Log(serialNumber, serialNumber, e, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Exception, traceMessage);
             }
-
         }
 
         private bool ByteArrayToFile(RLMDevice rlmDevice)
@@ -332,9 +346,11 @@ namespace Abiomed.Business
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine("Exception caught in process: {0}", ex);
+                string traceMessage = string.Format(@"Exception Caught in Byte Array to File {0}", e.ToString());
+                _logManager.Log(rlmDevice.DeviceIpAddress, rlmDevice.SerialNo, e, Definitions.LogMessageType.DataReadResponse, Definitions.LogType.Exception, traceMessage);
+                Console.WriteLine("Exception caught in process: {0}", e);
                 return false;
             }
         }
