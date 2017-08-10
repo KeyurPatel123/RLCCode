@@ -78,7 +78,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\RLM\Abiomed.Business\Abiomed.Business.csproj">
+    <ProjectReference Include="..\Abiomed.Business\Abiomed.Business.csproj">
       <Project>{3BA379F9-7E33-4BE6-922C-64B9BE509C12}</Project>
       <Name>Abiomed.Business</Name>
     </ProjectReference>
@@ -86,11 +86,11 @@
       <Project>{28b0e1d3-612e-4ec5-803d-69adc2d6a07e}</Project>
       <Name>Abiomed.RLR.Communications</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\RLM\Abiomed.Models\Abiomed.Models.csproj">
+    <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj">
       <Project>{D3662849-0B27-4D08-BFF6-7F1537BCF015}</Project>
       <Name>Abiomed.Models</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\RLM\Abiomed.Repository\Abiomed.Repository.csproj">
+    <ProjectReference Include="..\Abiomed.Repository\Abiomed.Repository.csproj">
       <Project>{133ECB86-A3DA-4636-9641-B10B6C8B2431}</Project>
       <Name>Abiomed.Repository</Name>
     </ProjectReference>

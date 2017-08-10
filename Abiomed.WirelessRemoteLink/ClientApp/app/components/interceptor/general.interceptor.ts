@@ -7,8 +7,8 @@ export class GeneralInterceptor implements HttpInterceptor {
     
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
+        var request = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
 
-      return next.handle(req);
+        return next.handle(request);
     }
 }
