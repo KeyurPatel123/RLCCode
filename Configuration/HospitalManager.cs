@@ -101,11 +101,6 @@ namespace Abiomed.Configuration
 
         #region Private Members
 
-        private async Task AddMetadata()
-        {
-
-        }
-
         private async Task AddHospitalAsync(Hospital hospital, string countryCode = "USA")
         {
             int retryCount = 0;
