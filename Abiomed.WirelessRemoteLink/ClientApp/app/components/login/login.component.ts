@@ -1,5 +1,6 @@
 import { Component, OnInit} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
+import { Router} from '@angular/router';
 
 @Component({
     selector: 'login',
@@ -12,7 +13,7 @@ export class LoginComponent{
     username: string;
     password: string;    
 
-    constructor(private authenticationService: AuthenticationService) { }
+    constructor(private authenticationService: AuthenticationService, private router: Router) { }
     
     ngOnInit() {
         // reset login status
@@ -30,5 +31,9 @@ export class LoginComponent{
                 //    this.loading = false;
                 //}
             });        
+    }
+
+    public Enroll() {
+        this.router.navigate(['/enrollment']);
     }
 }
