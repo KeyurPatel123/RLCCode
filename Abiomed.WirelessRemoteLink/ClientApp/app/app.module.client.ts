@@ -6,6 +6,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { sharedConfig } from './app.module.shared';
 import { GeneralInterceptor } from "./components/interceptor/general.interceptor";
 import { AuthenticationService } from "./components/service/authentication.service";
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { AuthenticationService } from "./components/service/authentication.servi
         FormsModule,
         ReactiveFormsModule,
         HttpClientModule,
+        NgbModule.forRoot(),
         ...sharedConfig.imports
     ],
     providers: [
