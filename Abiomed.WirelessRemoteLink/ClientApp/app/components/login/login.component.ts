@@ -5,7 +5,7 @@ import { Router} from '@angular/router';
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
+    styleUrls: ['./login.component.css', '../../assets/css/AbiomedBase.css'],
     providers: [AuthenticationService]
 })
 
