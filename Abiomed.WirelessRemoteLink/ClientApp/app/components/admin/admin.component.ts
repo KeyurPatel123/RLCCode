@@ -8,7 +8,6 @@ import { Router} from '@angular/router';
     styleUrls: ['./admin.component.css', '../../assets/css/AbiomedBase.css'],    
     providers: [AuthenticationService]
 })
-
 export class AdminComponent{
     username: string;
     password: string;    
@@ -16,3 +15,4 @@ export class AdminComponent{
     constructor(private authenticationService: AuthenticationService, private router: Router) { }
     
 }
+

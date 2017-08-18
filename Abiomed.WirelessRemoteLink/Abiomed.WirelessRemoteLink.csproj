@@ -4,6 +4,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <IsPackable>false</IsPackable>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ElCamino.AspNetCore.Identity.AzureTable" Version="1.6.7" />
