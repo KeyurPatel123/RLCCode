@@ -5,7 +5,7 @@ import { Router} from '@angular/router';
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css', '../../assets/css/AbiomedBase.css'],
+    styleUrls: ['./login.component.css', '../../assets/css/AbiomedBase.css'],    
     providers: [AuthenticationService]
 })
 
@@ -20,8 +20,9 @@ export class LoginComponent{
         this.authenticationService.logout();
     }
 
-    public LogIn() {               
-        this.authenticationService.login(this.username, this.password)
+    public LogIn() {      
+      this.router.navigate(['/admin']);         
+        /*this.authenticationService.login(this.username, this.password)
             .subscribe(result => {
                 // Fix up!
                 //if (result === true) {
@@ -31,6 +32,7 @@ export class LoginComponent{
                 //    this.loading = false;
                 //}
             });        
+        */
     }
 
     public Enroll() {

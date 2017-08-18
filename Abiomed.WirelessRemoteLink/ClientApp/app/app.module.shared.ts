@@ -8,6 +8,7 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { ForgotPasswordComponent } from "./components/forgotPassword/forgotPassword.component";
+import { AdminComponent } from "./components/admin/admin.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [ AppComponent ],    
@@ -19,13 +20,15 @@ export const sharedConfig: NgModule = {
         HomeComponent,
         LoginComponent,
         EnrollmentComponent,
-        ForgotPasswordComponent
+        ForgotPasswordComponent,
+        AdminComponent
     ],
     imports: [
         RouterModule.forRoot([
             { path: 'login', component: LoginComponent },
             { path: 'enrollment', component: EnrollmentComponent },
             { path: 'forgot-password', component: ForgotPasswordComponent },
+            { path: 'admin', component: AdminComponent },
             { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
