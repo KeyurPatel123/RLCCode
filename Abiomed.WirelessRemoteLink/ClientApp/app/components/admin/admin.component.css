@@ -10,6 +10,11 @@ h2 {
     color: #69a1cc;
     font-size: 1.2em;
 }
+label {
+    font-size:.8em;
+    color:#555;
+    font-weight:500;
+}
 
 p {
     color: #555;
@@ -18,3 +23,26 @@ p {
 .MainContent {
     margin-top: 50px;
 }
+.NewUserWell {
+    border: .5px solid #ccc;
+    margin: 10px 40px 20px 40px;
+    border-radius: 10px;
+}
+
+.AddAbioUserForm {
+    background-color: #efefef;
+    border-radius: 0 10px 10px 0;
+    padding:20px 20px 10px 20px;
+}
+.NewUserIntro {
+    padding: 20px 20px 10px 20px;
+}
+
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+
+    .AddAbioUserForm {
+        border-radius: 0 0 10px 10px;
+    }
+}
+

@@ -1,6 +1,10 @@
-﻿.AbiomedLogoColor {
+﻿body {
+    background-color:#efefef;
+}
+.AbiomedLogoColor {
     height: 50px;
     width: 300px;
     background: url(../images/AbiomedLogo.svg) no-repeat;
     padding-bottom: 20px;
+
 }
