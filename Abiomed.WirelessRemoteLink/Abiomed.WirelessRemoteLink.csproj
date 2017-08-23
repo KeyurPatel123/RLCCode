@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="1.1.1" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.3.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.4.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Files not to show in IDE -->
@@ -26,8 +26,11 @@
     <Content Remove="ClientApp\**" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.Business\Abiomed.Business.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
+    <ProjectReference Include="..\Abiomed.Storage\Abiomed.Storage.csproj" />
   </ItemGroup>
   <Target Name="RunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->

@@ -195,6 +195,7 @@
     <Compile Include="Communications\ICD\Digitiser\BufferStatusRequest.cs" />
     <Compile Include="Communications\CommunicationsEvent.cs" />
     <Compile Include="Communications\PartialPayload.cs" />
+    <Compile Include="Entities\AuditLog.cs" />
     <Compile Include="Entities\RemoteLinkUser.cs" />
     <Compile Include="Web\BearerPriorityUpdate.cs" />
     <Compile Include="Web\UserRegistration.cs" />
