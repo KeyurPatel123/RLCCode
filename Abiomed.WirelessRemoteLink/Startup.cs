@@ -12,6 +12,7 @@ using ElCamino.AspNetCore.Identity.AzureTable;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 using Abiomed.Storage;
 using Abiomed.Models;
+using Abiomed.DotNetCore.Business;
 
 namespace Abiomed_WirelessRemoteLink
 {
@@ -32,6 +33,10 @@ namespace Abiomed_WirelessRemoteLink
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string storageConnection = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value;
+            string tablePrefix = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value;
+            string auditTableName = Configuration.GetSection("Auditing:TableName").Value;
+
             // Add Elcamino Azure Table Identity services.
             services.AddIdentity<RemoteLinkUser, IdentityRole>((options) =>
             {
@@ -54,20 +59,22 @@ namespace Abiomed_WirelessRemoteLink
                 .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
                 {
                     IdentityConfiguration idconfig = new IdentityConfiguration();
-                    idconfig.TablePrefix = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value;
-                    idconfig.StorageConnectionString = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value;
+                    idconfig.TablePrefix = tablePrefix;
+                    idconfig.StorageConnectionString = storageConnection;
                     idconfig.LocationMode = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:LocationMode").Value;
                     return idconfig;
                 }))
                 .AddDefaultTokenProviders()
-                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); //can remove after first run;
+                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
 
-            // Add framework services.
             services.AddMvc();
+
+            string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
+            services.AddSingleton<IAuditLogManager>(new AuditLogManager(auditLogTableName, storageConnection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IAuditLogManager auditLogManager)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();

@@ -1,4 +1,5 @@
 using Abiomed.Models;
+using Abiomed.DotNetCore.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -14,11 +15,13 @@ namespace Abiomed_WirelessRemoteLink.Controllers
     {
         private readonly UserManager<RemoteLinkUser> _userManager;
         private readonly SignInManager<RemoteLinkUser> _signInManager;
+        private readonly IAuditLogManager _iauditLogManager;
 
-        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager)
+        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager iauditLogManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _iauditLogManager = iauditLogManager;
         }
 
         [HttpPost]
@@ -33,19 +36,24 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 var result = await _signInManager.PasswordSignInAsync(credentials.Username, credentials.Password, false, lockoutOnFailure: false);
                 var remoteLinkUser = await _userManager.FindByNameAsync(credentials.Username);
 
-                // ToDo Add Auditing
-
-                if (remoteLinkUser != null)
+                if (remoteLinkUser == null)
                 {
-
+                    await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Failed: User Does not exist.");
+                }
+                else
+                {
                     if (result.Succeeded == true)
                     {
                         await ResetUserAccountAsync(remoteLinkUser);
+                        await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Successful");
                         status = true;
                     }
                     else
                     {
                         await AccessFailedAsync(remoteLinkUser);
+                        //TODO (Descriptive error message logged).
+                        await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Failed... Place Holder");
+
                     }
                 }
             }
@@ -99,7 +107,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                 // ToDo Add Auditing
             }
-            catch (Exception e)
+            catch 
             {
                 // ToDo Handle/Log Error
             }

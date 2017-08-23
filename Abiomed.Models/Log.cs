@@ -69,7 +69,7 @@ namespace Abiomed.Models
 
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class AzureLog<T> //: TableEntity
+    public class AzureLog<T>  
     {
         private string _logMessageType;
         private string _logSeverityType;

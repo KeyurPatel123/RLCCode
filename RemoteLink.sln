@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Console", "Abiomed.Console\Abiomed.Console.csproj", "{D423B70D-EFFE-4663-8C51-E5FD5A1FF5F9}"
 EndProject
@@ -36,6 +36,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.FactoryData.Business", "Abiomed.FactoryData.Business\Abiomed.FactoryData.Business.csproj", "{439DED23-6393-4534-9E98-88DBC256048A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Configuration", "Configuration\Abiomed.Configuration.csproj", "{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Storage", "Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj", "{8A271B05-D318-485C-A148-EEF85369C6E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Business", "Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj", "{39E2F873-B4EE-4914-9560-3557AD539385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +107,14 @@ Global
 		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A271B05-D318-485C-A148-EEF85369C6E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A271B05-D318-485C-A148-EEF85369C6E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A271B05-D318-485C-A148-EEF85369C6E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A271B05-D318-485C-A148-EEF85369C6E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39E2F873-B4EE-4914-9560-3557AD539385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39E2F873-B4EE-4914-9560-3557AD539385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39E2F873-B4EE-4914-9560-3557AD539385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39E2F873-B4EE-4914-9560-3557AD539385}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
