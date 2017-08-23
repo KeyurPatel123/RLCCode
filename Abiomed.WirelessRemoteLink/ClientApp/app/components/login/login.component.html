@@ -1,35 +1,72 @@
-<div class="row AbiomedLogoPadding">
-    <div class="col-12 AbiomedLogo">  </div>
-</div>
-<!--<div class="row NavBarLogin"></div>-->
-<div class="row justify-content-md-center FillBackground">
-    <div class="col-3">        
-            <div class="input-group-lg Input">
-                <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" id="username"
-                       required minlength="4" maxlength="24" [(ngModel)]="username">                
-            </div>
-            <div class="input-group-lg Input">
-                <input type="password" class="form-control" placeholder="Password" aria-describedby="sizing-addon1"
-                   required [(ngModel)]="password">
-            </div>
-            <div>
-                <button (click)="LogIn()" class="btn btn-primary btn-block LoginButton">Log In</button>
-            </div>
+<div>
+    <div class="row AbiomedLogoPadding">
+        <div class="col-12 AbiomedLogo">  </div>
+    </div>
+    <div class="row justify-content-md-center FillBackground">        
+        <div class="col-3">
+            <form novalidate (ngSubmit)="LogIn(modal)" [formGroup]="loginForm">
+                <!-- Username -->
+                <div class="input-group-lg Input">
+                    <input type="text" class="form-control" placeholder="Username"
+                           aria-describedby="sizing-addon1" id="username"
+                           [(ngModel)]="username" formControlName="username">
+                </div>
+               
+                <!-- Username Errors -->
+                <div class="error" *ngIf="loginForm.get('username').hasError('required') && loginForm.get('username').touched">
+                    <p>Username is required</p>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group-lg Input">
+                    <input type="password" class="form-control" placeholder="Password" aria-describedby="sizing-addon1"
+                           required [(ngModel)]="password" formControlName="password">
+                </div>
+                <!-- Password Errors -->
+                <div class="error" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">
+                    <p>Password is required</p>
+                </div>
+
+                <div>
+                    <input type="submit" class="btn btn-primary btn-block LoginButton" value="Log In" [disabled]="!loginForm.valid">
+                </div>
+            </form>
             <div class="ForgotPassword">
-                <a [routerLink]="['/forgot-password']" >Forgot Password?</a>
-            </div>        
-    </div>
-    <div class="col-4">
-        <h1>
-            Welcome to Wireless Remote Link
-        </h1>
-        <p>
-            Mea essent gubergren cu. Per cu ponderum assueverit reprehendunt, ea aeterno lucilius reprimique eos. Inani simul torquatos id duo, has summo lobortis quaerendum ex, ex oratio dolorem reformidans duo. Cu has platonem expetenda qualisque. Homero integre deseruisse nec eu.
-        </p>
-        <p><button (click)="Enroll()" class="btn btn-outline-secondary">ENROLL</button>&nbsp;&nbsp;<button class="btn btn-outline-secondary">DEMO</button> </p>
-    </div>
+                <a [routerLink]="['/forgot-password']">Forgot Password?</a>
+            </div>
+        </div>
 
+        <div class="col-4">
+            <h1>
+                Welcome to Wireless Remote Link
+            </h1>
+            <p>
+                Mea essent gubergren cu. Per cu ponderum assueverit reprehendunt, ea aeterno lucilius reprimique eos. Inani simul torquatos id duo, has summo lobortis quaerendum ex, ex oratio dolorem reformidans duo. Cu has platonem expetenda qualisque. Homero integre deseruisse nec eu.
+            </p>
+            <p><button (click)="Enroll()" class="btn btn-outline-secondary">ENROLL</button>&nbsp;&nbsp;<button class="btn btn-outline-secondary">DEMO</button> </p>
+        </div>
+
+    </div>
+    <footer class="fixed-bottom LoginFooter">
+        Copyright 2017 &copy; Abiomed | www.abiomed.com | Terms and Conditions
+    </footer>
 </div>
 
-
-    <footer class="fixed-bottom LoginFooter"><div class="container col-6">footer</div></footer>
+<!-- Modal for Terms and Conditions-->
+<ng-template #modal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Terms and Conditions</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p class="LoginModalText">"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p>
+        <p class="LoginModalText">"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p>
+        <p class="LoginModalText">"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p>
+        <p class="LoginModalText">"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>

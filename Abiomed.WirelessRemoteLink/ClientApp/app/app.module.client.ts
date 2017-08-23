@@ -7,7 +7,7 @@ import { sharedConfig } from './app.module.shared';
 import { GeneralInterceptor } from "./components/interceptor/general.interceptor";
 import { AuthenticationService } from "./components/service/authentication.service";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
+import "./assets/css/AbiomedBase.css";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
