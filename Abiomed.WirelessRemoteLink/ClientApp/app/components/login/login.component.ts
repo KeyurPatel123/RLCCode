@@ -35,6 +35,7 @@ export class LoginComponent {
 
     public LogIn(modal) {      
         this.OpenTermsAndConditionsModal(modal);
+        // Fix up
         //this.router.navigate(['/admin']);
         /*this.authenticationService.login(this.username, this.password)
             .subscribe(result => {
