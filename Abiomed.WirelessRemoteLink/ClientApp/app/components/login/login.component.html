@@ -1,9 +1,16 @@
 <div>
-    <div class="row AbiomedLogoPadding">
-        <div class="col-12 AbiomedLogo">  </div>
+    <div class="row justify-content-md-center AbiomedLogoPadding">
+        <div class="col-md-3">
+            <div class="AbiomedLogo">
+                <p class="Tagline">Wireless Remote Link</p>
+            </div>
+        </div>
+       <div class="col-md-4">  </div>
     </div>
+
+
     <div class="row justify-content-md-center FillBackground">        
-        <div class="col-3">
+        <div class="col-md-3">
             <form novalidate (ngSubmit)="LogIn(modal)" [formGroup]="loginForm">
                 <!-- Username -->
                 <div class="input-group-lg Input">
@@ -13,8 +20,8 @@
                 </div>
                
                 <!-- Username Errors -->
-                <div class="error" *ngIf="loginForm.get('username').hasError('required') && loginForm.get('username').touched">
-                    <p>Username is required</p>
+                <div class="error arrow_box" *ngIf="loginForm.get('username').hasError('required') && loginForm.get('username').touched">
+                    Username is required
                 </div>
 
                 <!-- Password -->
@@ -23,8 +30,8 @@
                            required [(ngModel)]="password" formControlName="password">
                 </div>
                 <!-- Password Errors -->
-                <div class="error" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">
-                    <p>Password is required</p>
+                <div class="error arrow_box" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">
+                    Password is required
                 </div>
 
                 <div>
@@ -36,7 +43,7 @@
             </div>
         </div>
 
-        <div class="col-4">
+        <div class="col-md-4">
             <h1>
                 Welcome to Wireless Remote Link
             </h1>

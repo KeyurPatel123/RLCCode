@@ -1,4 +1,7 @@
 ﻿/* Base Overload - HTML Elements */
+body {
+    background-color:#ff0000;
+}
 h1 {
     color: white;
     font-size: 1.3em;
@@ -22,7 +25,8 @@ btn-info {
 /* Custom CSS */
 
 .AbiomedLogoPadding {
-    padding: 15vh 0 10vh 25vw;
+    margin:20px auto;
+    padding: 50px 0 50px 0;
     background-color: white;
 }
 
@@ -63,11 +67,57 @@ btn-info {
 
 .LoginFooter {
     background-color: #0E355A;
-    color: white;
-    font-size: .8em;
+    color: #efefef;
+    font-size: .7em;
     text-align:center;
 }
 
 .LoginModalText {
     color:black;
 }
+
+.Tagline {
+    text-align: right;
+    font-size: 1em;
+    color: #910202;
+    padding: 52px 70px 0 0;
+}
+
+/* Error validation Styles */
+.arrow_box {
+    position: relative;
+    background: #d81e1e;
+    border: 1px solid #d81e1e;
+    border-radius: 5px;
+    padding: 3px 3px 3px 3px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-size: .8em;
+    font-weight: 600;
+    text-align: center;
+}
+
+    .arrow_box:after, .arrow_box:before {
+        bottom: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .arrow_box:after {
+        border-color: rgba(255, 255, 255, 0);
+        border-bottom-color: #d81e1e;
+        border-width: 8px;
+        margin-left: -8px;
+    }
+
+    .arrow_box:before {
+        border-color: rgba(239, 239, 239, 0);
+        border-bottom-color: #d81e1e;
+        border-width: 9px;
+        margin-left: -9px;
+    }
