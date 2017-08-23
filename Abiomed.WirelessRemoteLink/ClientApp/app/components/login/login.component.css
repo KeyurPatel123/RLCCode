@@ -17,7 +17,7 @@ p {
 .AbiomedLogo {
     height: 50px;
     width:300px;
-    background: url(/dist/AbiomedLogo.svg) no-repeat; 
+    background: url(../../assets/images/AbiomedLogo.svg) no-repeat; 
     padding-bottom:20px;
 }
 
