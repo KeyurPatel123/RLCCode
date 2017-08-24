@@ -1,6 +1,8 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgbModal, ModalDismissReasons, NgbTooltip} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
     selector: 'login',
@@ -9,19 +11,32 @@ import { Router} from '@angular/router';
     providers: [AuthenticationService]
 })
 
-export class LoginComponent{
+export class LoginComponent {
     username: string;
     password: string;    
+    closeResult: string;
+    loginForm: FormGroup;
 
-    constructor(private authenticationService: AuthenticationService, private router: Router) { }
-    
+    constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal) { }
+
+
     ngOnInit() {
         // reset login status
         this.authenticationService.logout();
+        this.createForm();
+    }
+   
+    private createForm() {
+        this.loginForm = new FormGroup({
+            username: new FormControl('', [Validators.required]),           
+            password: new FormControl('', [Validators.required]),           
+        });
     }
 
-    public LogIn() {      
-      this.router.navigate(['/admin']);         
+    public LogIn(modal) {      
+        this.OpenTermsAndConditionsModal(modal);
+        // Fix up
+        //this.router.navigate(['/admin']);
         /*this.authenticationService.login(this.username, this.password)
             .subscribe(result => {
                 // Fix up!
@@ -37,5 +52,23 @@ export class LoginComponent{
 
     public Enroll() {
         this.router.navigate(['/enrollment']);
+    }
+
+    public OpenTermsAndConditionsModal(modal) {
+        this.modalService.open(modal).result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+    }
+
+    private getDismissReason(reason: any): string {
+        if (reason === ModalDismissReasons.ESC) {
+            return 'by pressing ESC';
+        } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+            return 'by clicking on a backdrop';
+        } else {
+            return `with: ${reason}`;
+        }
     }
 }
