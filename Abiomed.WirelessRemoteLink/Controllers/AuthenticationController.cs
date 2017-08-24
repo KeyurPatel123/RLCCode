@@ -27,43 +27,61 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<bool> Post([FromBody]Credentials credentials)
+        public async Task<string> Post([FromBody]Credentials credentials)
         {
-            var status = false;
+            string resultMessage = "Invalid Username/password combination";
 
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(credentials.Username, credentials.Password, false, lockoutOnFailure: false);
-                var remoteLinkUser = await _userManager.FindByNameAsync(credentials.Username);
+                var remoteLinkUser = new RemoteLinkUser();
+                var isUserActivated = false;
+  
 
-                if (remoteLinkUser == null)
+                remoteLinkUser = await _userManager.FindByNameAsync(credentials.Username);
+
+                if (remoteLinkUser != null)
                 {
-                    await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Failed: User Does not exist.");
+                    isUserActivated = remoteLinkUser.Activated;
                 }
-                else
+
+                switch(DetermineLoginResult(result,isUserActivated))
                 {
-                    if (result.Succeeded == true)
-                    {
+                    case LoginResult.Succeeded:
+                        resultMessage = "Success";
                         await ResetUserAccountAsync(remoteLinkUser);
-                        await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Successful");
-                        status = true;
-                    }
-                    else
-                    {
-                        await AccessFailedAsync(remoteLinkUser);
-                        //TODO (Descriptive error message logged).
-                        await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", "Login Failed... Place Holder");
-
-                    }
+                        break;
+                    case LoginResult.EmailNotValidated:
+                        resultMessage = "Email Address not verified";
+                        break;
+                    case LoginResult.IsLockedOut:
+                        resultMessage = "Account locked";
+                        break;
+                    case LoginResult.NotActivated:
+                        resultMessage = "Account not activated by Abiomed";
+                        break;
+                    case LoginResult.RequiresTwoFactorAuthentication:
+                        resultMessage = "Not authorized: Multi factor authentication";
+                        break;
+                    case LoginResult.BadUsernamePasswordCombination:
+                    case LoginResult.Unknown:
+                    default:
+                        resultMessage = "Invalid Username/password combination";
+                        if (remoteLinkUser != null)
+                        {
+                            await AccessFailedAsync(remoteLinkUser);
+                        }
+                        break;
                 }
             }
-            catch (Exception EX)
+            catch
             {
-
-                var xx = EX.Message; // ToDo: Log Error/Audit
+                // ToDo: Log Error
+                // Determine UI Error Handling
             }
 
-            return status;
+            await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", resultMessage);
+            return resultMessage;
         }
 
         [HttpPost]
@@ -83,7 +101,9 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     InstitutionName = userRegistration.InstitutionName,
                     InstitutionLocationProvince = userRegistration.InstitutionLocationProvince,
                     UserName = userRegistration.UserName,
-                    Email = userRegistration.Email                  
+                    Email = userRegistration.Email,
+                    EmailConfirmed = bool.Parse(userRegistration.EmailConfirmed),
+                    Activated = bool.Parse(userRegistration.Activated)
                 };
 
                 var result = await _userManager.CreateAsync(remoteLinkUser, userRegistration.Password);
@@ -116,6 +136,38 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         }
 
         #region Private Helper Methods
+
+        private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated)
+        {
+            if (signInResult.Succeeded)
+            {
+                if (isUserActivated)
+                {
+                    return LoginResult.Succeeded;
+                }
+                else
+                {
+                    return LoginResult.NotActivated;
+                }
+            }
+
+            if (signInResult.IsLockedOut)
+            {
+                return LoginResult.IsLockedOut;
+            }
+
+            if (signInResult.IsNotAllowed)
+            {
+                return LoginResult.EmailNotValidated;
+            }
+
+            if (signInResult.RequiresTwoFactor)
+            {
+                return LoginResult.RequiresTwoFactorAuthentication;
+            }
+
+            return LoginResult.BadUsernamePasswordCombination;
+        }
 
         private async Task ResetUserAccountAsync(RemoteLinkUser remoteLinkUser)
         {

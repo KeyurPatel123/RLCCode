@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace Abiomed.Models
 {
+    public enum LoginResult
+    {
+        Unknown = -1,       
+        BadUsernamePasswordCombination = 0,         
+        Succeeded = 1,
+        IsLockedOut = 2,
+        EmailNotValidated = 3,
+        NotActivated = 4,
+        RequiresTwoFactorAuthentication = 5
+    }
+
     public class UserRegistration
     {
         public string FirstName { get; set; } = string.Empty;
@@ -18,5 +29,7 @@ namespace Abiomed.Models
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string EmailConfirmed { get; set; } = string.Empty;
+        public string Activated { get; set; } = string.Empty;
     }
 }
