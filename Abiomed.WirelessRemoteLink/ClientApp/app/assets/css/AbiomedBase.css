@@ -1,3 +1,14 @@
 ﻿button {
     cursor:pointer;
 }
+.AbiomedLogoModal {
+    height: 25px;
+    width: 150px;
+    background: url(../../assets/images/AbiomedLogo.svg) no-repeat;
+    margin-left:10px;
+}
+.ModalBody {
+    max-height: 450px;
+    // max-height: calc(100vh - 300px);
+    overflow-y: auto;
+}

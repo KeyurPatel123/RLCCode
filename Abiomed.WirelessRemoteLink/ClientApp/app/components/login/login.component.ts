@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -11,7 +11,7 @@ import { NgbModal, ModalDismissReasons, NgbTooltip} from "@ng-bootstrap/ng-boots
     providers: [AuthenticationService]
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy  {
     username: string;
     password: string;    
     closeResult: string;
@@ -19,14 +19,17 @@ export class LoginComponent {
 
     constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal) { }
 
-
     ngOnInit() {
-        // reset login status
+        document.querySelector('body').style.backgroundColor = '#0E355A';
         this.authenticationService.logout();
-        this.createForm();
+        this.validateForm();        
+    }
+    
+    ngOnDestroy() {
+        document.querySelector('body').style.backgroundColor = '';
     }
    
-    private createForm() {
+    private validateForm() {
         this.loginForm = new FormGroup({
             username: new FormControl('', [Validators.required]),           
             password: new FormControl('', [Validators.required]),           
@@ -40,18 +43,18 @@ export class LoginComponent {
         /*this.authenticationService.login(this.username, this.password)
             .subscribe(result => {
                 // Fix up!
-                //if (result === true) {
-                //    this.router.navigate(['/']);
-                //} else {
-                //    this.error = 'Username or password is incorrect';
-                //    this.loading = false;
-                //}
+                if (result === true) {
+                    this.router.navigate(['/']);
+                } else {
+                    //this.error = 'Username or password is incorrect';
+                    //this.loading = false;
+                }
             });        
         */
     }
 
     public Enroll() {
-        this.router.navigate(['/enrollment']);
+        this.router.navigate(['/admin']);
     }
 
     public OpenTermsAndConditionsModal(modal) {

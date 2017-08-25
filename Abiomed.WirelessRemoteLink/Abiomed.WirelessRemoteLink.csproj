@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Files not to show in IDE -->
+    <None Remove="Properties\PublishProfiles\RLW - Web Deploy.pubxml" />
     <None Remove="yarn.lock" />
 
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
@@ -31,6 +32,9 @@
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
     <ProjectReference Include="..\Abiomed.Storage\Abiomed.Storage.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <Target Name="RunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->

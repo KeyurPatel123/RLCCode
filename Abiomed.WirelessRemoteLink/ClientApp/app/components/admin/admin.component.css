@@ -20,6 +20,12 @@ p {
     color: #555;
     font-size: .8em;
 }
+
+.FormContainer 
+{
+    padding:10px;
+}
+
 .MainContent {
     margin-top: 50px;
 }
@@ -46,3 +52,41 @@ p {
     }
 }
 
+/* Error validation Styles */
+.ErrorArrowBox {
+    position: relative;
+    background: #d81e1e;
+    border: 1px solid #d81e1e;
+    border-radius: 5px;
+    padding: 3px 3px 3px 3px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-size: .8em;
+    font-weight: 600;
+    text-align: center;
+}
+
+    .ErrorArrowBox:after, .ErrorArrowBox:before {
+        bottom: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .ErrorArrowBox:after {
+        border-color: rgba(255, 255, 255, 0);
+        border-bottom-color: #d81e1e;
+        border-width: 8px;
+        margin-left: -8px;
+    }
+
+    .ErrorArrowBox:before {
+        border-color: rgba(239, 239, 239, 0);
+        border-bottom-color: #d81e1e;
+        border-width: 9px;
+        margin-left: -9px;
+    }

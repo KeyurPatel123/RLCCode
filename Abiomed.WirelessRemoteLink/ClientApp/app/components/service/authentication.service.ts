@@ -36,6 +36,7 @@ export class AuthenticationService {
                     // return false to indicate failed login
                     return false;
                 }*/
+                console.log(response);
                 return true;
             });
     }
