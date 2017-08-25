@@ -6,12 +6,14 @@ import { LoginComponent } from './components/login/login.component';
 import { EnrollmentComponent } from './components/enrollment/enrollment.component';
 import { ForgotPasswordComponent } from "./components/forgotPassword/forgotPassword.component";
 import { AdminComponent } from "./components/admin/admin.component";
+import { FooterMenuComponent } from "./components/footermenu/footermenu.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [ AppComponent ],    
     declarations: [
         AppComponent,
         NavMenuComponent,
+        FooterMenuComponent,
         LoginComponent,
         EnrollmentComponent,
         ForgotPasswordComponent,

@@ -1,131 +1,133 @@
 <nav-menu></nav-menu>
 <div class="container">
-    
-     <div class="col-sm-12 MainContent">
+    <div class="col-sm-12 MainContent">
         <h1>Remote Link Admin</h1>
-         <!--Intro -->   
-         <div class="row">
-                <div class="col-md-6">
-                </div>
-               
+        <!--Intro -->
+        <div class="row">
+            <div class="col-md-6">
             </div>
-         <!--Add New User Panel-->
-         <div class="row">
-             <div class="col-md-12">
-                 <!--Add User-->
+        </div>
+        <!--Add New User Panel-->
+        <div class="row">
+            <div class="col-md-12">
+                <!--Add User-->
+                <div class="row NewUserWell">
+                    <div class="col-md-4 NewUserIntro">
+                        <h2>Add a new Abiomed User</h2>
+                        <p>Proin laoreet sagittis nibh, quis faucibus elit congue at. Pellentesque vulputate felis et est gravida, sed consequat sem ultricies. Quisque tempor ipsum ut felis imperdiet, elementum mollis ex tristique. All fields are required.</p>
+                    </div>
+                    <div class="col-md-8 AddAbioUserForm">
+                        <form novalidate class="FormContainer form-group" (ngSubmit)="Register()" [formGroup]="createForm">                            
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-3 col-form-label">First Name:</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" value="" [(ngModel)]="firstname" formControlName="firstname">
+                                    </div>
+                                    <!-- FirstName Errors-->
+                                    <div class="ErrorArrowBox" *ngIf="createForm.get('firstname').hasError('required') && createForm.get('firstname').touched">
+                                        First Name is required
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-3 col-form-label">Last Name:</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" value="" [(ngModel)]="lastname" formControlName="lastname">
+                                    </div>
+                                </div>
+                                <!-- LastName Errors-->
+                                <div class="ErrorArrowBox" *ngIf="createForm.get('lastname').hasError('required') && createForm.get('lastname').touched">
+                                    Last Name is required
+                                </div>
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-3 col-form-label">Phone:</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" value="" [(ngModel)]="phone" formControlName="phone">
+                                    </div>
+                                </div>                                
+                                <div class="form-group row">
+                                    <label for="example-email-input" class="col-3 col-form-label">Email:</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="email" value="@abiomed.com" [(ngModel)]="email" formControlName="email">
+                                    </div>
+                                </div>
+                                <!-- Email Errors-->
+                                <div class="ErrorArrowBox" *ngIf="createForm.get('email').hasError('required') && createForm.get('email').touched">
+                                    Email is required
+                                </div>
+                                <div class="form-group row">
+                                    <label for="example-tel-input" class="col-3 col-form-label">Role:</label>
+                                    <div class="col-9">
+                                        <label class="custom-control custom-radio">
+                                            <input id="admin" name="radio" type="radio" class="custom-control-input">
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">Admin</span>
+                                        </label>
+                                        <label class="custom-control custom-radio">
+                                            <input id="staff" name="radio" type="radio" class="custom-control-input">
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">Staff</span>
+                                        </label>
+                                    </div>
+                                </div>                           
+                                <div class="row">
+                                    <div class="col-md-12 d-flex flex-row-reverse">
+                                        <button type="button" class="btn btn-primary btn-sm align-self-end">Create User</button>
+                                    </div>
+                                </div>
 
-                     
-                             <div class="row NewUserWell">
-                                 <div class="col-md-4 NewUserIntro" ><h2>Add a new Abiomed User</h2>
-<p>Proin laoreet sagittis nibh, quis faucibus elit congue at. Pellentesque vulputate felis et est gravida, sed consequat sem ultricies. Quisque tempor ipsum ut felis imperdiet, elementum mollis ex tristique. All fields are required.</p>
+
+
+
+                            </form>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        
+        <!--User Table-
+        <div class="row">
+            <div class="col-md-12">
+
+                <table class="table table-striped table-bordered table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Last Name</th>
+                            <th>First Name</th>
+                            <th>Email Address</th>
+                            <th>Role</th>
+                            <th>Territory</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Agnello</th>
+                            <td>Alex</td>
+                            <td><a href="mailto:aagello@abiomed.com">aagnello@abiomed.com</a></td>
+                            <td>User</td>
+                            <td>Danvers</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Agnello</th>
+                            <td>Alex</td>
+                            <td><a href="mailto:aagnello@abiomed.com">aagnello@abiomed.com</a></td>
+                            <td>User</td>
+                            <td>Danvers</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Agnello</th>
+                            <td>Alex</td>
+                            <td><a href="mailto:aagnello@abiomed.com">aagnello@abiomed.com</a></td>
+                            <td>User</td>
+                            <td>Danvers</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>-->
+    </div>
 </div>
-                                 <div class="col-md-8 AddAbioUserForm">
-                                 <form class="FormContainer form-group" style="padding:10px;" >
-    <div class="form-group row">
-        <label for="example-text-input" class="col-2 col-form-label">First Name:</label>
-        <div class="col-10">
-            <input class="form-control" type="text" value="" id="example-text-input">
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="example-text-input" class="col-2 col-form-label">Last Name:</label>
-        <div class="col-10">
-            <input class="form-control" type="text" value="" id="example-text-input">
-        </div>
-    </div>
-     <div class="form-group row">
-     <label for="example-text-input" class="col-2 col-form-label">Phone:</label>
-      <div class="col-10">
-       <input class="form-control" type="text" value="" id="example-text-input">
-       </div>
-       </div>
-    <div class="form-group row">
-        <label for="example-email-input" class="col-2 col-form-label">Email:</label>
-        <div class="col-10">
-            <input class="form-control" type="email" value="@abiomed.com" id="example-email-input">
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <label for="example-tel-input" class="col-2 col-form-label">Role</label>
-        <div class="col-10">
-            <label class="custom-control custom-radio">
-                <input id="radio1" name="radio" type="radio" class="custom-control-input">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Admin</span>
-            </label>
-            <label class="custom-control custom-radio">
-                <input id="radio2" name="radio" type="radio" class="custom-control-input">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">CSC User</span>
-            </label>
-        </div>
-    </div>
-                                     <div class="row">
-                                         <div class="col-md-12 d-flex flex-row-reverse">
-                                         <button type="button" class="btn btn-primary btn-sm align-self-end">Submit User</button>
-                                          </div>
-                                     </div>
-                                     
-   
-
-
-</form>
-                                     </div>
-                                 
-                             
-                     </div>
-                 </div>
-
-
-         </div>
-         <p></p>
-         <!--User Table-->
-         <div class="row">
-             <div class="col-md-12">
-
-                 <table class="table table-striped table-bordered table-hover table-sm">
-                     <thead>
-                         <tr>
-                             <th>Last Name</th>
-                             <th>First Name</th>
-                             <th>Email Address</th>
-                             <th>Role</th>
-                             <th>Territory</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <th scope="row">Agnello</th>
-                             <td>Alex</td>
-                             <td><a href="mailto:aagello@abiomed.com">aagnello@abiomed.com</a></td>
-                             <td>User</td>
-                             <td>Danvers</td>
-                         </tr>
-                         <tr>
-                             <th scope="row">Agnello</th>
-                             <td>Alex</td>
-                             <td><a href="mailto:aagnello@abiomed.com">aagnello@abiomed.com</a></td>
-                             <td>User</td>
-                             <td>Danvers</td>
-                         </tr>
-                         <tr>
-                             <th scope="row">Agnello</th>
-                             <td>Alex</td>
-                             <td><a href="mailto:aagnello@abiomed.com">aagnello@abiomed.com</a></td>
-                             <td>User</td>
-                             <td>Danvers</td>
-                         </tr>
-                     </tbody>
-                 </table>
-
-             </div>
-
-         </div>
-    </div>
-</div>
-<footer class="fixed-bottom">Footer</footer>
-
-
-
-
+<footer-menu></footer-menu>

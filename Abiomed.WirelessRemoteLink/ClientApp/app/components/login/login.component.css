@@ -1,7 +1,4 @@
 ﻿/* Base Overload - HTML Elements */
-body {
-    background-color:#ff0000;
-}
 h1 {
     color: white;
     font-size: 1.3em;
@@ -23,9 +20,7 @@ btn-info {
 }
 
 /* Custom CSS */
-
-.AbiomedLogoPadding {
-    margin:20px auto;
+.AbiomedLogoPadding {    
     padding: 50px 0 50px 0;
     background-color: white;
 }
@@ -44,10 +39,9 @@ btn-info {
 
 .FillBackground {
     background-color: #0E355A;
-    height: calc(80vh - 90px);
+    /*height: calc(80vh - 70px);*/
     padding-top: 20px;
 }
-
 
 .Input {
     margin-bottom: 10px;
@@ -56,7 +50,7 @@ btn-info {
 .LoginButton {
     text-transform: uppercase;
     padding-top: 15px;
-    padding-bottom: 15px;
+    padding-bottom: 15px;    
 }
 
 .ForgotPassword {
@@ -84,7 +78,7 @@ btn-info {
 }
 
 /* Error validation Styles */
-.arrow_box {
+.ErrorArrowBox {
     position: relative;
     background: #d81e1e;
     border: 1px solid #d81e1e;
@@ -97,7 +91,7 @@ btn-info {
     text-align: center;
 }
 
-    .arrow_box:after, .arrow_box:before {
+    .ErrorArrowBox:after, .ErrorArrowBox:before {
         bottom: 100%;
         left: 50%;
         border: solid transparent;
@@ -108,14 +102,14 @@ btn-info {
         pointer-events: none;
     }
 
-    .arrow_box:after {
+    .ErrorArrowBox:after {
         border-color: rgba(255, 255, 255, 0);
         border-bottom-color: #d81e1e;
         border-width: 8px;
         margin-left: -8px;
     }
 
-    .arrow_box:before {
+    .ErrorArrowBox:before {
         border-color: rgba(239, 239, 239, 0);
         border-bottom-color: #d81e1e;
         border-width: 9px;

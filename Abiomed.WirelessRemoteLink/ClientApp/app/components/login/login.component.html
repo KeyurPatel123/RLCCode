@@ -5,9 +5,12 @@
                 <p class="Tagline">Wireless Remote Link</p>
             </div>
         </div>
-       <div class="col-md-4">  </div>
+       <div class="col-md-4"></div>
     </div>
 
+    <div class="row">
+        Error here
+    </div>
 
     <div class="row justify-content-md-center FillBackground">        
         <div class="col-md-3">
@@ -17,10 +20,9 @@
                     <input type="text" class="form-control" placeholder="Username"
                            aria-describedby="sizing-addon1" id="username"
                            [(ngModel)]="username" formControlName="username">
-                </div>
-               
+                </div>               
                 <!-- Username Errors -->
-                <div class="error arrow_box" *ngIf="loginForm.get('username').hasError('required') && loginForm.get('username').touched">
+                <div class="ErrorArrowBox" *ngIf="loginForm.get('username').hasError('required') && loginForm.get('username').touched">
                     Username is required
                 </div>
 
@@ -30,7 +32,7 @@
                            required [(ngModel)]="password" formControlName="password">
                 </div>
                 <!-- Password Errors -->
-                <div class="error arrow_box" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">
+                <div class="ErrorArrowBox" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">
                     Password is required
                 </div>
 
