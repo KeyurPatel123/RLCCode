@@ -13,7 +13,6 @@ namespace Abiomed.Models
     public class RemoteLinkUser : IdentityUser
     {
         public string FirstName { get; set; } = string.Empty;
-        public string MiddleInitial { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string InstitutionName { get; set; } = string.Empty;
         public string InstitutionLocationProvince { get; set; } = string.Empty;
@@ -21,5 +20,7 @@ namespace Abiomed.Models
         public string ActivationDate { get; set; } = string.Empty;
         public string ActivatedBy { get; set; } = string.Empty;
         public string Territory { get; set; } = string.Empty;
+        public bool AcceptedTermsAndConditions { get; set; } = false;
+        public string AcceptedTermsAndConditionsDate { get; set; } = string.Empty;
     }
 }

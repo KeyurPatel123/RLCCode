@@ -198,7 +198,9 @@
     <Compile Include="Entities\AuditLog.cs" />
     <Compile Include="Entities\RemoteLinkUser.cs" />
     <Compile Include="Web\BearerPriorityUpdate.cs" />
+    <Compile Include="Web\LoginResult.cs" />
     <Compile Include="Web\UserRegistration.cs" />
+    <Compile Include="Web\UserResponse.cs" />
     <Compile Include="Web\WifiCredentials.cs" />
     <Compile Include="Web\DeviceStatus.cs" />
     <Compile Include="Communications\RLMDeviceList.cs" />
