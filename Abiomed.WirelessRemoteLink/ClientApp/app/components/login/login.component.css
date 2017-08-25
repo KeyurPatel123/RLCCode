@@ -18,9 +18,12 @@ input-group-lg {
 btn-info {
     background-color: #8f9aa8;
 }
+.modal-footer {
+    background-color:#efefef;
+}
 
 /* Custom CSS */
-.AbiomedLogoPadding {    
+.AbiomedLogoPadding {
     padding: 50px 0 70px 0;
     background-color: white;
 }
