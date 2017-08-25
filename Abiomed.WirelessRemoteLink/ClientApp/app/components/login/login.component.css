@@ -21,7 +21,7 @@ btn-info {
 
 /* Custom CSS */
 .AbiomedLogoPadding {    
-    padding: 50px 0 50px 0;
+    padding: 50px 0 70px 0;
     background-color: white;
 }
 
@@ -73,7 +73,7 @@ btn-info {
 .Tagline {
     text-align: right;
     font-size: 1em;
-    color: #910202;
+    color: #a40046;
     padding: 52px 70px 0 0;
 }
 
@@ -115,3 +115,12 @@ btn-info {
         border-width: 9px;
         margin-left: -9px;
     }
+.ServerError {
+    background-color: #ffd6d6;
+    opacity: 1.0;
+    text-align: center;
+    color: #d81e1e;
+    font-weight: 700;
+    padding: 10px;
+    font-size: .9em;
+}
