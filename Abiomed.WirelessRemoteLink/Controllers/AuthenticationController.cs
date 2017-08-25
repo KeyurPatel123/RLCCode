@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System;
+using System.Security.Claims;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
@@ -111,6 +112,33 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         }
 
         [HttpPost]
+        [Route("AcceptTAC")]
+        [AllowAnonymous]
+        public async Task<bool> Post()
+        {
+            bool result = false;
+            string auditMessage = "Accepted Terms and Conditions";
+
+            ClaimsPrincipal currentUser = User;
+
+            if (currentUser.Identity.IsAuthenticated)
+            {
+                result = await SetTermsAndConditionsAsync(true);
+                if (!result)
+                {
+                    auditMessage = "Error attempting to set Terms and Conditions";
+                }
+            }
+            else
+            {
+                auditMessage = "Error attmepting to set Terms and Conditions.  User is not authenticated.";
+            }
+
+            await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "TermsAndConditions", auditMessage);
+            return result;
+        }
+
+        [HttpPost]
         [Route("Register")]
         [AllowAnonymous]
         public async Task<bool> Post([FromBody] UserRegistration userRegistration)
@@ -152,7 +180,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     }
                 }
 
-                // ToDo Add Auditing
+                await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Registration", "New User Registration");
             }
             catch 
             {
@@ -164,6 +192,35 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
         #region Private Helper Methods
 
+        private async Task<bool> SetTermsAndConditionsAsync(bool termsAndConditions)
+        {
+            bool result = false;
+            try
+            {
+                var remoteLinkUser = await _userManager.GetUserAsync(User);
+                remoteLinkUser.AcceptedTermsAndConditions = termsAndConditions;
+                if (termsAndConditions)
+                {
+                    remoteLinkUser.AcceptedTermsAndConditionsDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                }
+                else
+                {
+                    remoteLinkUser.AcceptedTermsAndConditionsDate = string.Empty;
+                }
+
+                var identityResult = await _userManager.UpdateAsync(remoteLinkUser);
+                if (identityResult.Succeeded)
+                {
+                    result = true;
+                }
+            } catch (Exception EX)
+            {
+                // TODO Handle Exception
+                string message = EX.Message;
+            }
+
+            return result;
+        }
         private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated, bool hasUserAcceptedTermsAndConditions)
         {
             if (signInResult.Succeeded)
