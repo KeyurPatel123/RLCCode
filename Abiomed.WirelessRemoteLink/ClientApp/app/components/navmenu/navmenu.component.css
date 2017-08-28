@@ -14,3 +14,18 @@
     padding: 0 200px 0 40px;
     background: url(../../assets/images/AbiomedLogo.svg) no-repeat;
 }
+
+
+
+/*Boostrap Override*/
+.container-fluid {
+    padding-right: 0;
+    padding-left: 0;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.navbar {
+    margin-top:0;
+    padding-top:0;
+}
