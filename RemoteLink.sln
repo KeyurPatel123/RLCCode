@@ -37,9 +37,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.FactoryData.Busines
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.Configuration", "Configuration\Abiomed.Configuration.csproj", "{E28F5858-E58D-47DC-B3DF-8FD6D6D69FE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Storage", "Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj", "{8A271B05-D318-485C-A148-EEF85369C6E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.Storage", "Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj", "{8A271B05-D318-485C-A148-EEF85369C6E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Business", "Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj", "{39E2F873-B4EE-4914-9560-3557AD539385}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.Business", "Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj", "{39E2F873-B4EE-4914-9560-3557AD539385}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Mail", "Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj", "{BC98BAC8-16DC-4FF7-9452-184A52321521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.MailConsole", "Abiomed.DotNetCore.MailConsole\Abiomed.DotNetCore.MailConsole.csproj", "{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,6 +119,14 @@ Global
 		{39E2F873-B4EE-4914-9560-3557AD539385}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39E2F873-B4EE-4914-9560-3557AD539385}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39E2F873-B4EE-4914-9560-3557AD539385}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
