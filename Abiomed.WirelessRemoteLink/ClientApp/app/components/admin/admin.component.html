@@ -24,7 +24,7 @@
                                         <input class="form-control" type="text" value="" [(ngModel)]="firstname" formControlName="firstname">
                                     </div>
                                     <!-- FirstName Errors-->
-                                    <div class="ErrorArrowBox" *ngIf="createForm.get('firstname').hasError('required') && createForm.get('firstname').touched">
+                                    <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('firstname').hasError('required') && createForm.get('firstname').touched">
                                         First Name is required
                                     </div>
                                 </div>
@@ -35,7 +35,7 @@
                                     </div>
                                 </div>
                                 <!-- LastName Errors-->
-                                <div class="ErrorArrowBox" *ngIf="createForm.get('lastname').hasError('required') && createForm.get('lastname').touched">
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('lastname').hasError('required') && createForm.get('lastname').touched">
                                     Last Name is required
                                 </div>
                                 <div class="form-group row">
@@ -51,37 +51,35 @@
                                     </div>
                                 </div>
                                 <!-- Email Errors-->
-                                <div class="ErrorArrowBox" *ngIf="createForm.get('email').hasError('required') && createForm.get('email').touched">
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('email').hasError('required') && createForm.get('email').touched">
                                     Email is required
                                 </div>
                                 <div class="form-group row">
                                     <label for="example-tel-input" class="col-3 col-form-label">Role:</label>
                                     <div class="col-9">
                                         <label class="custom-control custom-radio">
-                                            <input id="admin" name="radio" type="radio" class="custom-control-input">
+                                            <input id="admin" name="role" type="radio" value="admin" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Admin</span>
                                         </label>
                                         <label class="custom-control custom-radio">
-                                            <input id="staff" name="radio" type="radio" class="custom-control-input">
+                                            <input id="staff" name="role" value="staff" type="radio" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Staff</span>
                                         </label>
                                     </div>
-                                </div>                           
+                                </div>
+                                <!-- Role Errors-->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('role').hasError('required') && createForm.get('role').touched">
+                                    Role is required
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 d-flex flex-row-reverse">
-                                        <button type="button" class="btn btn-primary btn-sm align-self-end">Create User</button>
+                                        <input type="submit" class="btn btn-primary btn-sm align-self-end" value="Create User" [disabled]="!createForm.valid">
                                     </div>
                                 </div>
-
-
-
-
                             </form>
                     </div>
-
-
                 </div>
             </div>
         </div>

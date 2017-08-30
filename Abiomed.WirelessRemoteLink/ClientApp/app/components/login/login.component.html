@@ -8,8 +8,8 @@
        <div class="col-md-4"></div>
     </div>
 
-    <div class="row justify-content-md-center">
-        <div class="col-md-12 ServerError">Sorry. There is something seriously wrong with you. </div>
+    <div *ngIf="loginError" class="row justify-content-md-center">
+        <div class="col-md-12 ServerError">{{errorMessage}}</div>
     </div>
 
     <div class="row justify-content-md-center FillBackground">        
@@ -83,7 +83,7 @@
                     <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1"> 1
                 </label>
             </div>-->
-            <p class="LoginModalText"><em>By clicking Accept, you are agreeing to Abiomed&nbsp;Wireless&nbsp;Remote&nbsp;Link Tems and Conditions.</em></p><button type="button" class="btn btn-sm btn-primary" (click)="c('Close click')">I accept</button>
+            <p class="LoginModalText"><em>By clicking Accept, you are agreeing to Abiomed&nbsp;Wireless&nbsp;Remote&nbsp;Link Tems and Conditions.</em></p><button type="button" class="btn btn-sm btn-primary" (click)="AcceptTAC()">I accept</button>
         </div>
     </div>
 </ng-template>
