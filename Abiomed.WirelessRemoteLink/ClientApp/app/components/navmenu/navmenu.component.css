@@ -2,7 +2,6 @@
     height: 36px;
     background-color: #ffffff;
     border-bottom: .5px solid #cccccc;
-    padding: 5px 0 20px 20px;
     webkit-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
     -moz-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
     box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
@@ -15,17 +14,43 @@
     background: url(../../assets/images/AbiomedLogo.svg) no-repeat;
 }
 
+.CogDropdown {
+    padding:5px 10px 0 10px;
+    width:36px;
+    height:36px;
+    border-left:.5px solid #ccc;
+}
 
+.CogDropdown:hover {
+    color:#005fa6;
+}
 
 /*Boostrap Override*/
 .container-fluid {
     padding-right: 0;
     padding-left: 0;
     margin-right: auto;
-    margin-left: auto
+    margin-left: auto;
 }
 
 .navbar {
     margin-top:0;
     padding-top:0;
+}
+
+.dropdown-toggle::after {
+    display: none
+}
+.dropdown-item {
+    font-size: .8em;
+}
+.dropdown-item:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: #005fa6;
+}
+.dropdown-menu {
+    webkit-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
+    -moz-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
+    box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
 }
