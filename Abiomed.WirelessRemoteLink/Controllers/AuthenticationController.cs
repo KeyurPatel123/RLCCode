@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System;
+using System.Security.Claims;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
@@ -27,29 +28,49 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<string> Post([FromBody]Credentials credentials)
+        public async Task<UserResponse> Post([FromBody]Credentials credentials)
         {
             string resultMessage = "Invalid Username/password combination";
+            bool isLoginSuccess = false;
+            UserResponse userResponse = new UserResponse();
 
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(credentials.Username, credentials.Password, false, lockoutOnFailure: false);
                 var remoteLinkUser = new RemoteLinkUser();
-                var isUserActivated = false;
-  
+                bool isUserActivated = false;
+                bool hasUserAcceptedTermsAndConditions = false;
+                long accessFailedCount = 0;
+
 
                 remoteLinkUser = await _userManager.FindByNameAsync(credentials.Username);
 
                 if (remoteLinkUser != null)
                 {
                     isUserActivated = remoteLinkUser.Activated;
+                    hasUserAcceptedTermsAndConditions = remoteLinkUser.AcceptedTermsAndConditions;
+                    userResponse.FirstName = remoteLinkUser.FirstName;
+                    userResponse.LastName = remoteLinkUser.LastName;
+                    userResponse.ViewedTermsAndConditions = remoteLinkUser.AcceptedTermsAndConditions;
+                    accessFailedCount = remoteLinkUser.AccessFailedCount;
+                    userResponse.FullName = userResponse.LastName + ", " + userResponse.FirstName;
+
+                    foreach(var role in remoteLinkUser.Roles)
+                    {
+                        userResponse.Role = role.RoleName;
+                        break;
+                    }
                 }
 
-                switch(DetermineLoginResult(result,isUserActivated))
+                switch(DetermineLoginResult(result, isUserActivated, hasUserAcceptedTermsAndConditions))
                 {
                     case LoginResult.Succeeded:
                         resultMessage = "Success";
-                        await ResetUserAccountAsync(remoteLinkUser);
+                        isLoginSuccess = true;
+                        if (accessFailedCount > 0)
+                        {
+                            await ResetUserAccountAsync(remoteLinkUser);
+                        }
                         break;
                     case LoginResult.EmailNotValidated:
                         resultMessage = "Email Address not verified";
@@ -63,10 +84,13 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     case LoginResult.RequiresTwoFactorAuthentication:
                         resultMessage = "Not authorized: Multi factor authentication";
                         break;
+                    case LoginResult.UserNotAcceptedTermsAndConditions:
+                        isLoginSuccess = true;
+                        resultMessage = "User has not accepted Terms and Conditions";
+                        break;
                     case LoginResult.BadUsernamePasswordCombination:
                     case LoginResult.Unknown:
                     default:
-                        resultMessage = "Invalid Username/password combination";
                         if (remoteLinkUser != null)
                         {
                             await AccessFailedAsync(remoteLinkUser);
@@ -80,8 +104,38 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 // Determine UI Error Handling
             }
 
+            userResponse.IsSuccess = isLoginSuccess;
+            userResponse.Response = resultMessage;
             await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", resultMessage);
-            return resultMessage;
+
+            return userResponse;
+        }
+
+        [HttpPost]
+        [Route("AcceptTAC")]
+        [AllowAnonymous]
+        public async Task<bool> Post()
+        {
+            bool result = false;
+            string auditMessage = "Accepted Terms and Conditions";
+
+            ClaimsPrincipal currentUser = User;
+
+            if (currentUser.Identity.IsAuthenticated)
+            {
+                result = await SetTermsAndConditionsAsync(true);
+                if (!result)
+                {
+                    auditMessage = "Error attempting to set Terms and Conditions";
+                }
+            }
+            else
+            {
+                auditMessage = "Error attmepting to set Terms and Conditions.  User is not authenticated.";
+            }
+
+            await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "TermsAndConditions", auditMessage);
+            return result;
         }
 
         [HttpPost]
@@ -97,13 +151,14 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 {
                     FirstName = userRegistration.FirstName,
                     LastName = userRegistration.LastName,
-                    MiddleInitial = userRegistration.MiddleInitial,
                     InstitutionName = userRegistration.InstitutionName,
                     InstitutionLocationProvince = userRegistration.InstitutionLocationProvince,
                     UserName = userRegistration.UserName,
                     Email = userRegistration.Email,
                     EmailConfirmed = bool.Parse(userRegistration.EmailConfirmed),
-                    Activated = bool.Parse(userRegistration.Activated)
+                    Activated = bool.Parse(userRegistration.Activated),
+                    AcceptedTermsAndConditions = bool.Parse(userRegistration.AcceptedTermsAndConditions),
+                    AcceptedTermsAndConditionsDate = userRegistration.AcceptedTermsAndConditionsDate
                 };
 
                 var result = await _userManager.CreateAsync(remoteLinkUser, userRegistration.Password);
@@ -125,7 +180,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     }
                 }
 
-                // ToDo Add Auditing
+                await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Registration", "New User Registration");
             }
             catch 
             {
@@ -137,13 +192,49 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
         #region Private Helper Methods
 
-        private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated)
+        private async Task<bool> SetTermsAndConditionsAsync(bool termsAndConditions)
+        {
+            bool result = false;
+            try
+            {
+                var remoteLinkUser = await _userManager.GetUserAsync(User);
+                remoteLinkUser.AcceptedTermsAndConditions = termsAndConditions;
+                if (termsAndConditions)
+                {
+                    remoteLinkUser.AcceptedTermsAndConditionsDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                }
+                else
+                {
+                    remoteLinkUser.AcceptedTermsAndConditionsDate = string.Empty;
+                }
+
+                var identityResult = await _userManager.UpdateAsync(remoteLinkUser);
+                if (identityResult.Succeeded)
+                {
+                    result = true;
+                }
+            } catch (Exception EX)
+            {
+                // TODO Handle Exception
+                string message = EX.Message;
+            }
+
+            return result;
+        }
+        private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated, bool hasUserAcceptedTermsAndConditions)
         {
             if (signInResult.Succeeded)
             {
                 if (isUserActivated)
                 {
-                    return LoginResult.Succeeded;
+                    if (hasUserAcceptedTermsAndConditions)
+                    {
+                        return LoginResult.Succeeded;
+                    }
+                    else
+                    {
+                        return LoginResult.UserNotAcceptedTermsAndConditions;
+                    }
                 }
                 else
                 {

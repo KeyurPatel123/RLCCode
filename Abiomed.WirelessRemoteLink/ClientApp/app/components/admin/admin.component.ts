@@ -34,7 +34,7 @@ export class AdminComponent implements OnInit {
     }   
 
     private Register() {
-
+        //this.authenticationService.            
     }
 }
 

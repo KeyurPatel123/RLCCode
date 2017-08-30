@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { NgbModal, ModalDismissReasons, NgbTooltip} from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, ModalDismissReasons, NgbTooltip, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
     selector: 'login',
@@ -13,14 +13,18 @@ import { NgbModal, ModalDismissReasons, NgbTooltip} from "@ng-bootstrap/ng-boots
 
 export class LoginComponent implements OnInit, OnDestroy  {
     username: string;
-    password: string;    
+    password: string;   
+    errorMessage: string;
     closeResult: string;
     loginForm: FormGroup;
+    loginError: boolean;
+    modalRef: NgbModalRef;
 
     constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal) { }
 
     ngOnInit() {
         document.querySelector('body').style.backgroundColor = '#0E355A';
+        this.loginError = false;
         this.authenticationService.logout();
         this.validateForm();        
     }
@@ -36,21 +40,27 @@ export class LoginComponent implements OnInit, OnDestroy  {
         });
     }
 
-    public LogIn(modal) {      
-        this.OpenTermsAndConditionsModal(modal);
-        // Fix up
-        //this.router.navigate(['/admin']);
-        /*this.authenticationService.login(this.username, this.password)
-            .subscribe(result => {
-                // Fix up!
-                if (result === true) {
-                    this.router.navigate(['/']);
-                } else {
-                    //this.error = 'Username or password is incorrect';
-                    //this.loading = false;
+    public LogIn(modal) {       
+        // Reset Error flag and try to login
+        this.loginError = false;
+        this.authenticationService.login(this.username, this.password)
+            .subscribe(result => {                
+                if (result.isSuccess) {                    
+                    if (result.viewedTermsAndConditions !== true)
+                    {
+                        this.OpenTermsAndConditionsModal(modal);
+                    }
+                    else
+                    {
+                        this.routeUser();
+                    }                    
                 }
-            });        
-        */
+                else 
+                {
+                    this.loginError = true;
+                    this.errorMessage = result.response;
+                }
+            });                
     }
 
     public Enroll() {
@@ -58,11 +68,20 @@ export class LoginComponent implements OnInit, OnDestroy  {
     }
 
     public OpenTermsAndConditionsModal(modal) {
-        this.modalService.open(modal).result.then((result) => {
-            this.closeResult = `Closed with: ${result}`;
-        }, (reason) => {
-            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        });
+        this.modalRef = this.modalService.open(modal);        
+    }
+
+    public AcceptTAC() {
+        this.authenticationService.acceptTAC()
+            .subscribe(result => {
+                this.modalRef.close();
+                this.routeUser();
+            });                
+    }
+
+    private routeUser()
+    {
+        this.router.navigate(['/admin']);
     }
 
     private getDismissReason(reason: any): string {

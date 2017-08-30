@@ -120,6 +120,12 @@ namespace Abiomed.Configuration
             await AddConfigurationItem(@"optionsmanager", @"certkey", @"C:\Certs\RLR.abiomed.com\rlr.abiomed.com.pfx");
             await AddConfigurationItem(@"optionsmanager", @"tcpport", @"443");
             await AddConfigurationItem(@"optionsmanager", @"imagecountdowntimer", @"60000000");
+            await AddConfigurationItem(@"smtpmanager", @"fromfriendlyname", @"Abiomed RLC Admin");
+            await AddConfigurationItem(@"smtpmanager", @"fromemail", @"admin_abiomed@outlook.com");
+            await AddConfigurationItem(@"smtpmanager", @"bodytexttype", @"plain");
+            await AddConfigurationItem(@"smtpmanager", @"localdomain", @"www.abiomed.com");
+            await AddConfigurationItem(@"smtpmanager", @"host", @"USDVREX01.abiomed.com");
+            await AddConfigurationItem(@"smtpmanager", @"port", @"25");
         }
 
         private async Task AddConfigurationItem(string partitionKey, string rowKey, string value)
