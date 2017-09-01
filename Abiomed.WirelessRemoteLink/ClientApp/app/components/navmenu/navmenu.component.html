@@ -1,14 +1,20 @@
-<div class="row RemoteLinkNav">
-    <div class="col AbiomedLogoNav">
+<div class="container-fluid">
+    <div class="row RemoteLinkNav">
+
+    <div class="col" style="padding:5px 0 0 30px; ">
+        <div class="AbiomedLogoNav"></div>
     </div>
-    <div class="col">
-        <div ngbDropdown class="d-inline-block" style="float:right">
-            <button class="btn btn-secondary btn-sm" id="dropdownBasic1" ngbDropdownToggle><span class="fa fa-cog"></span></button>
-            <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
-                <button class="dropdown-item DropdownCog">Action - 1</button>
-                <button class="dropdown-item DropdownCog">Another Action</button>
-                <button class="dropdown-item DropdownCog">Something else is here</button>
+    <div class="col-1">
+        
+            <div ngbDropdown class="d-inline-block">
+                <div class="CogDropdown" id="dropdownBasic1" ngbDropdownToggle><span class="fa fa-cog"></span></div>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
+                    <div class="dropdown-item DropdownCog">Action - 1</div>
+                    <div class="dropdown-item DropdownCog">Another Action</div>
+                    <div class="dropdown-item DropdownCog">Something else is here</div>
+                </div>
             </div>
-        </div>
+        
+    </div>
     </div>
 </div>

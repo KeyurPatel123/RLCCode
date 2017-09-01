@@ -9,7 +9,7 @@
         </div>
         <!--Add New User Panel-->
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-10">
                 <!--Add User-->
                 <div class="row NewUserWell">
                     <div class="col-md-4 NewUserIntro">
@@ -17,71 +17,64 @@
                         <p>Proin laoreet sagittis nibh, quis faucibus elit congue at. Pellentesque vulputate felis et est gravida, sed consequat sem ultricies. Quisque tempor ipsum ut felis imperdiet, elementum mollis ex tristique. All fields are required.</p>
                     </div>
                     <div class="col-md-8 AddAbioUserForm">
-                        <form novalidate class="FormContainer form-group" (ngSubmit)="Register()" [formGroup]="createForm">                            
+                        <form novalidate class="FormContainer form-group" (ngSubmit)="Register()" [formGroup]="createForm">  
+                            
+                            
                                 <div class="form-group row">
                                     <label for="example-text-input" class="col-3 col-form-label">First Name:</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" value="" [(ngModel)]="firstname" formControlName="firstname">
-                                    </div>
-                                    <!-- FirstName Errors-->
-                                    <div class="ErrorArrowBox" *ngIf="createForm.get('firstname').hasError('required') && createForm.get('firstname').touched">
-                                        First Name is required
-                                    </div>
+                                    <input class="form-control col-9" type="text" value="" [(ngModel)]="firstname" formControlName="firstname">
                                 </div>
+                            <!-- FirstName Errors-->
+                            <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('firstname').hasError('required') && createForm.get('firstname').touched">
+                                First Name is required
+                            </div>
                                 <div class="form-group row">
-                                    <label for="example-text-input" class="col-3 col-form-label">Last Name:</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" value="" [(ngModel)]="lastname" formControlName="lastname">
-                                    </div>
+                                   <label for="example-text-input" class="col-3 col-form-label">Last Name:</label>
+                                   <input class="form-control col-9" type="text" value="" [(ngModel)]="lastname" formControlName="lastname">
                                 </div>
                                 <!-- LastName Errors-->
-                                <div class="ErrorArrowBox" *ngIf="createForm.get('lastname').hasError('required') && createForm.get('lastname').touched">
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('lastname').hasError('required') && createForm.get('lastname').touched">
                                     Last Name is required
                                 </div>
                                 <div class="form-group row">
                                     <label for="example-text-input" class="col-3 col-form-label">Phone:</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" value="" [(ngModel)]="phone" formControlName="phone">
-                                    </div>
+                                    <input class="form-control col-9" type="text" value="" [(ngModel)]="phone" formControlName="phone">
                                 </div>                                
                                 <div class="form-group row">
                                     <label for="example-email-input" class="col-3 col-form-label">Email:</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="email" value="@abiomed.com" [(ngModel)]="email" formControlName="email">
-                                    </div>
+                                    <input class="form-control col-9" type="email" value="@abiomed.com" [(ngModel)]="email" formControlName="email">
                                 </div>
                                 <!-- Email Errors-->
-                                <div class="ErrorArrowBox" *ngIf="createForm.get('email').hasError('required') && createForm.get('email').touched">
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('email').hasError('required') && createForm.get('email').touched">
                                     Email is required
                                 </div>
                                 <div class="form-group row">
                                     <label for="example-tel-input" class="col-3 col-form-label">Role:</label>
-                                    <div class="col-9">
+                                    
                                         <label class="custom-control custom-radio">
-                                            <input id="admin" name="radio" type="radio" class="custom-control-input">
+                                            <input id="admin" name="role" type="radio" value="admin" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Admin</span>
                                         </label>
                                         <label class="custom-control custom-radio">
-                                            <input id="staff" name="radio" type="radio" class="custom-control-input">
+                                            <input id="staff" name="role" value="staff" type="radio" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Staff</span>
                                         </label>
-                                    </div>
-                                </div>                           
+                                   
+                                </div>
+                                <!-- Role Errors-->
+                                <div class="ErrorArrowBox offset-3 col-3" *ngIf="createForm.get('role').hasError('required') && createForm.get('role').touched">
+                                    Role is required
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 d-flex flex-row-reverse">
-                                        <button type="button" class="btn btn-primary btn-sm align-self-end">Create User</button>
+                                        <input type="submit" class="btn btn-primary btn-sm align-self-end" value="Create User" [disabled]="!createForm.valid">
                                     </div>
                                 </div>
 
-
-
-
                             </form>
                     </div>
-
-
                 </div>
             </div>
         </div>
