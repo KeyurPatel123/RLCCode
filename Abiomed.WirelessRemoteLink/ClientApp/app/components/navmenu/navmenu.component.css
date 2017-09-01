@@ -24,10 +24,13 @@
 .CogDropdown:hover {
     color:#005fa6;
 }
-
+.CogPadding {
+    padding-left:0;
+}
 /*Boostrap Override*/
+
 .container-fluid {
-    padding-right: 0;
+    padding-right: 0px;
     padding-left: 0;
     margin-right: auto;
     margin-left: auto;
@@ -53,4 +56,76 @@
     webkit-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
     -moz-box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
     box-shadow: 0px 2px 22px -6px rgba(0,0,0,0.34);
+}
+
+/*Search Box Styles*/
+.add-on .input-group-btn > .btn {
+    border-left-width: 0;
+    left: -2px;
+    /* -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);*/
+}
+/* stop the glowing blue shadow */
+.add-on .form-control:focus {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-color: #cccccc;
+}
+
+.form-control {
+    width: 20%;
+    border: none;
+    height: 99%;
+}
+
+.navbar-nav > li > a {
+    border-right: 1px solid #ddd;
+    padding-bottom: 15px;
+    padding-top: 15px;
+}
+
+.navbar-nav:last-child {
+    border-right: 0
+}
+.input-group {
+    border-left: .5px solid #ccc;
+    height: 36px
+}
+.navbar-form {
+    width:300px
+}
+.btn-secondary {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+.SearchIcon {
+color: #ccc;
+}
+
+.SearchIcon:hover {
+       color: #005fa6;
+}
+.form-control {
+    font-size:.8em;
+}
+
+.SearchPadding {
+    padding-right: 0;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #ccc;
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+    color: #ccc;
+}
+
+:-ms-input-placeholder { /* IE 10+ */
+    color: #ccc;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+    color: #ccc;
 }

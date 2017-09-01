@@ -1,11 +1,21 @@
 <div class="container-fluid">
-    <div class="row RemoteLinkNav">
+    <div class="row RemoteLinkNav ">
 
     <div class="col" style="padding:5px 0 0 30px; ">
         <div class="AbiomedLogoNav"></div>
     </div>
-    <div class="col-1">
-        
+
+       <!--Search--> 
+        <form class="navbar-form form-inline" role="search" style="float:right;">
+            <div class="input-group add-on">
+                <input class="form-control" placeholder="Search case number" name="srch-term" id="srch-term" type="text">
+                <div class="input-group-btn">
+                    <button class="btn btn-secondary" type="submit"><span class="fa fa-search SearchIcon"></span></button>
+                </div>
+            </div>
+        </form>
+      <!--Search--> 
+     <!--COG-->
             <div ngbDropdown class="d-inline-block">
                 <div class="CogDropdown" id="dropdownBasic1" ngbDropdownToggle><span class="fa fa-cog"></span></div>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
@@ -14,7 +24,7 @@
                     <div class="dropdown-item DropdownCog">Something else is here</div>
                 </div>
             </div>
-        
-    </div>
+      <!--COG-->  
+
     </div>
 </div>
