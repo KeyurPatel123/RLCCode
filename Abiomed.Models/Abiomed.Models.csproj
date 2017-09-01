@@ -196,6 +196,7 @@
     <Compile Include="Communications\CommunicationsEvent.cs" />
     <Compile Include="Communications\PartialPayload.cs" />
     <Compile Include="Entities\AuditLog.cs" />
+    <Compile Include="Email.cs" />
     <Compile Include="Entities\RemoteLinkUser.cs" />
     <Compile Include="Web\BearerPriorityUpdate.cs" />
     <Compile Include="Web\LoginResult.cs" />

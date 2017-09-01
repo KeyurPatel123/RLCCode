@@ -36,6 +36,8 @@ namespace Abiomed_WirelessRemoteLink
             string storageConnection = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value;
             string tablePrefix = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value;
             string auditTableName = Configuration.GetSection("Auditing:TableName").Value;
+            string emailQueueName = Configuration.GetSection("Email:ServiceQueue:QueueName").Value;
+            string emailQueueConnectionString = Configuration.GetSection("Email:ServiceQueue:QueueStorageConnectionString").Value;
 
             // Add Elcamino Azure Table Identity services.
             services.AddIdentity<RemoteLinkUser, IdentityRole>((options) =>
@@ -70,11 +72,13 @@ namespace Abiomed_WirelessRemoteLink
             services.AddMvc();
 
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
-            services.AddSingleton<IAuditLogManager>(new AuditLogManager(auditLogTableName, storageConnection));
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogTableName, storageConnection);
+            services.AddSingleton<IAuditLogManager>(auditLogManager);
+            services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueConnectionString, emailQueueName));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IAuditLogManager auditLogManager)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IAuditLogManager auditLogManager, IEmailManager emailManager)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
