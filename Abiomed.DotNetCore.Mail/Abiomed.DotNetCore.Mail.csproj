@@ -6,9 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="MailKit" Version="1.18.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
     <ProjectReference Include="..\Configuration\Abiomed.Configuration.csproj" />
   </ItemGroup>
 

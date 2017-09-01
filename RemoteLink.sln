@@ -43,7 +43,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.Business
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Mail", "Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj", "{BC98BAC8-16DC-4FF7-9452-184A52321521}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.MailConsole", "Abiomed.DotNetCore.MailConsole\Abiomed.DotNetCore.MailConsole.csproj", "{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Communication", "Abiomed.DotNetCore.Communication\Abiomed.DotNetCore.Communication.csproj", "{663D30F2-DFE1-4804-B344-73C32A3BDF2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.MessagePump", "Abiomed.DotNetCore.MessagePump\Abiomed.DotNetCore.MessagePump.csproj", "{5C900FEB-D053-4E47-8C6E-584AC5BC442B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Test.EmailSendConsole", "Abiomed.DotNetCore.Test.EmailSendConsole\Abiomed.DotNetCore.Test.EmailSendConsole.csproj", "{8190E5EE-2A3E-40C6-B5AE-2636171C3B4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.MailQueueService", "Abiomed.DotNetCore.MailQueueService\Abiomed.DotNetCore.MailQueueService.csproj", "{375DE557-3226-4B88-8663-C65AC187BE61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,10 +129,22 @@ Global
 		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC98BAC8-16DC-4FF7-9452-184A52321521}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A1A6166-560D-4CB3-AD36-C0DB9284B69F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{663D30F2-DFE1-4804-B344-73C32A3BDF2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{663D30F2-DFE1-4804-B344-73C32A3BDF2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{663D30F2-DFE1-4804-B344-73C32A3BDF2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{663D30F2-DFE1-4804-B344-73C32A3BDF2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C900FEB-D053-4E47-8C6E-584AC5BC442B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C900FEB-D053-4E47-8C6E-584AC5BC442B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C900FEB-D053-4E47-8C6E-584AC5BC442B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C900FEB-D053-4E47-8C6E-584AC5BC442B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8190E5EE-2A3E-40C6-B5AE-2636171C3B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8190E5EE-2A3E-40C6-B5AE-2636171C3B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8190E5EE-2A3E-40C6-B5AE-2636171C3B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8190E5EE-2A3E-40C6-B5AE-2636171C3B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{375DE557-3226-4B88-8663-C65AC187BE61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{375DE557-3226-4B88-8663-C65AC187BE61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{375DE557-3226-4B88-8663-C65AC187BE61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{375DE557-3226-4B88-8663-C65AC187BE61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

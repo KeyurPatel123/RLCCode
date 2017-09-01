@@ -16,13 +16,15 @@ namespace Abiomed_WirelessRemoteLink.Controllers
     {
         private readonly UserManager<RemoteLinkUser> _userManager;
         private readonly SignInManager<RemoteLinkUser> _signInManager;
-        private readonly IAuditLogManager _iauditLogManager;
+        private readonly IAuditLogManager _auditLogManager;
+        private readonly IEmailManager _emailManager;
 
-        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager iauditLogManager)
+        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager auditLogManager, IEmailManager emailManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _iauditLogManager = iauditLogManager;
+            _auditLogManager = auditLogManager;
+            _emailManager = emailManager;
         }
 
         [HttpPost]
@@ -106,7 +108,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             userResponse.IsSuccess = isLoginSuccess;
             userResponse.Response = resultMessage;
-            await _iauditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", resultMessage);
+            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Login", resultMessage);
 
             return userResponse;
         }
@@ -134,7 +136,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 auditMessage = "Error attmepting to set Terms and Conditions.  User is not authenticated.";
             }
 
-            await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "TermsAndConditions", auditMessage);
+            await _auditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "TermsAndConditions", auditMessage);
             return result;
         }
 
@@ -169,6 +171,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                     if (updateActionResult.Succeeded)
                     {
+                        await _emailManager.BroadcastToQueueStorage(userRegistration.Email, "Remote Link Cloud Account Creation", "Your Remote Link Cloud Account has been created ... Some More Text here - Instructions/welcome message is an open task.", userRegistration.FirstName + " " + userRegistration.LastName);
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                         // Send an email with this link
                         //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -180,7 +183,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     }
                 }
 
-                await _iauditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Registration", "New User Registration");
+                await _auditLogManager.AuditAsync(userRegistration.Email, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "Registration", "New User Registration");
             }
             catch 
             {

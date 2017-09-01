@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
 
@@ -9,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Communication\Abiomed.DotNetCore.Communication.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj" />
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
