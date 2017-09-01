@@ -16,7 +16,6 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
         static private string _localDomainName = string.Empty;
         static private string _textPart = string.Empty;
         static private string _smtpHostName = string.Empty;
-        static private int _portNumber = 0;
 
         static void Main(string[] args)
         {
