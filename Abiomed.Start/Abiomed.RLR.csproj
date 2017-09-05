@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Abiomed.RLR</AssemblyName>
+    <RootNamespace>Abiomed.RLR</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abiomed.DotNetCore.DependencyInjection\Abiomed.DotNetCore.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.RLR.Communications\Abiomed.DotNetCore.RLR.Communications.csproj" />
+  </ItemGroup>
+
+</Project>

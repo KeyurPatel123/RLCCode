@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Models\Abiomed.DotNetCore.Models.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -7,3 +7,11 @@
     response: string;
     role: string;
 }
+
+export interface UserRegistrationInterface {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    role: string;
+}

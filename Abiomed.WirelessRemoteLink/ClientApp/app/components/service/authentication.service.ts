@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from "rxjs/Observable";
 import 'rxjs/add/operator/map'
-import { AuthenticationInterface } from "../../shared/authentication.interface";
+import { AuthenticationInterface, UserRegistrationInterface } from "../../shared/authentication.interface";
 
 @Injectable()
 export class AuthenticationService {
@@ -37,11 +37,10 @@ export class AuthenticationService {
             });
     }
 
-    createUser(): void {
-       // return this.http.post('/api/Authentication/Login', JSON.stringify({ Username: username, Password: password }))
-       //     .map((response: Response) => {
-       //
-       //         return true;
-       //     });
+    registerUser(userRegistration: UserRegistrationInterface): Observable<boolean> {
+        return this.http.post('/api/Authentication/Register', JSON.stringify(userRegistration))
+            .map((response: boolean) => {
+                return response;
+            });
     }
 }

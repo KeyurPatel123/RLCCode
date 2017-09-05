@@ -2,6 +2,7 @@ import { Component, OnInit} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { UserRegistrationInterface } from "../../shared/authentication.interface";
 
 @Component({
     selector: 'admin',
@@ -34,7 +35,15 @@ export class AdminComponent implements OnInit {
     }   
 
     private Register() {
-        //this.authenticationService.            
+
+        var userRegistration = {
+            firstName: this.firstname,
+            lastName: this.lastname,
+            phone:this.phone,
+            email: this.email,
+            role: this.role
+        }
+        this.authenticationService.registerUser(userRegistration);        
     }
 }
 

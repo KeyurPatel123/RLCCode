@@ -52,12 +52,12 @@
                                     <label for="example-tel-input" class="col-3 col-form-label">Role:</label>
                                     
                                         <label class="custom-control custom-radio">
-                                            <input id="admin" name="role" type="radio" value="admin" class="custom-control-input" formControlName="role">
+                                            <input id="admin" name="role" type="radio" value="admin" [(ngModel)]="role" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Admin</span>
                                         </label>
                                         <label class="custom-control custom-radio">
-                                            <input id="staff" name="role" value="staff" type="radio" class="custom-control-input" formControlName="role">
+                                            <input id="staff" name="role" value="staff" type="radio" [(ngModel)]="role" class="custom-control-input" formControlName="role">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">Staff</span>
                                         </label>
