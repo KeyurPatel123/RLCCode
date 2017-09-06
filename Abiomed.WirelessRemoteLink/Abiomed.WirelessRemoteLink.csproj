@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <IsPackable>false</IsPackable>
-    <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
   </PropertyGroup>
   <ItemGroup>

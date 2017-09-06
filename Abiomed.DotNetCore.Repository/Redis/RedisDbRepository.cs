@@ -8,20 +8,19 @@
 */
 
 using Abiomed.DotNetCore.Models;
-
+using Microsoft.Extensions.Caching.Redis;
+using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Abiomed.DotNetCore.Repository
 {
-    public class RedisDbRepository<T> //todo  : IRedisDbRepository<T>
+    public class RedisDbRepository<T> : IRedisDbRepository<T>
     {
-
-        public RedisDbRepository(Configuration configuration)
-        {            
-//            var manager = new RedisManagerPool(configuration.RedisConnect);
-
-
-        }
-        /* Old possibley delete!
         private readonly IDatabase _db;
         private readonly IServer _server;
         private readonly ISubscriber _subscriber;
@@ -29,8 +28,9 @@ namespace Abiomed.DotNetCore.Repository
         private Configuration _configuration;
 
         public RedisDbRepository(Configuration configuration)
-        {            
-            _connectionMultiplexer = ConnectionMultiplexer.Connect(configuration.RedisConnect);
+        {
+            _configuration = configuration;
+            _connectionMultiplexer = ConnectionMultiplexer.Connect(_configuration.RedisConnect);
 
             var endPoints = _connectionMultiplexer.GetEndPoints();
             _server = _connectionMultiplexer.GetServer(endPoints[0]);            
@@ -234,6 +234,5 @@ namespace Abiomed.DotNetCore.Repository
         PropertyInfo[] PropertiesOfT { get { return TypeOfT.GetProperties(); } }
 
         #endregion
-        */
     }
 }

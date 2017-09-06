@@ -1,28 +1,40 @@
-﻿using Abiomed.DotNetCore.DependencyInjection;
-using Abiomed.DotNetCore.RLR.Communications;
-using Autofac;
+﻿using Abiomed.DotNetCore.RLR.Communications;
 using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Abiomed.DotNetCore.Business;
 
 namespace Abiomed.Start
 {
     class Program
     {
-        private static AutofacContainer autofac;
-
         static void Main(string[] args)
         {
             try
             {
-                autofac = new AutofacContainer();
-                autofac.Build();
+                //setup our DI
+                var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<InsecureTCPServer>()
+                .AddSingleton<RLMCommunication>()
+                .BuildServiceProvider();
 
-                // todo fill out!
-                InsecureTCPServer _tcpServer = AutofacContainer.Container.Resolve<InsecureTCPServer>();
+                //configure console logging
+                serviceProvider
+                    .GetService<ILoggerFactory>()                    
+                    .AddConsole(LogLevel.Debug);
+
+                var logger = serviceProvider.GetService<ILoggerFactory>()
+                .CreateLogger<Program>();
+                logger.LogDebug("Starting application");
+
+                var _tcpServer = serviceProvider.GetService<InsecureTCPServer>();
                 _tcpServer.Run();
+
             }
             catch (Exception e)
             {
-
+                Console.Write(e.InnerException);
             }
         }
     }

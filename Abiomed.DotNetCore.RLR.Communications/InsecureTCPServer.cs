@@ -26,9 +26,8 @@ namespace Abiomed.DotNetCore.RLR.Communications
         private ILogManager _logManager;
         private RLMCommunication _RLMCommunication;
 
-        public InsecureTCPServer(ILogManager logManger, RLMCommunication rLMCommunication)
-        {
-            _logManager = logManger;
+        public InsecureTCPServer(RLMCommunication rLMCommunication)
+        {            
             _RLMCommunication = rLMCommunication;
         }
 
