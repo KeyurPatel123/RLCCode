@@ -9,10 +9,11 @@
 
 using Abiomed.DotNetCore.Models;
 using System;
+using StackExchange.Redis;
 
 namespace Abiomed.DotNetCore.Repository
 {
-    /*
+    
     public class RedisDbContext
     {
         private Configuration _configuration;
@@ -38,5 +39,5 @@ namespace Abiomed.DotNetCore.Repository
                 return lazyConnection.Value;
             }
         }
-    }*/
+    }
 }

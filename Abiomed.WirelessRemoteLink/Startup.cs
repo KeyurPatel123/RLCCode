@@ -39,6 +39,7 @@ namespace Abiomed_WirelessRemoteLink
             string emailQueueName = Configuration.GetSection("Email:ServiceQueue:QueueName").Value;
             string emailQueueConnectionString = Configuration.GetSection("Email:ServiceQueue:QueueStorageConnectionString").Value;
 
+
             // Add Elcamino Azure Table Identity services.
             services.AddIdentity<RemoteLinkUser, IdentityRole>((options) =>
             {
@@ -58,7 +59,7 @@ namespace Abiomed_WirelessRemoteLink
                 options.Lockout.MaxFailedAccessAttempts = GetNumericConfigurationItem("Authentication:LockoutMaxFailedAccessAttempts", 5);
                 options.Lockout.AllowedForNewUsers = GetBooleanConfigurationItem("Authentication:LockoutAllowedForNewUsers");
             })
-                .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
+            .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
                 {
                     IdentityConfiguration idconfig = new IdentityConfiguration();
                     idconfig.TablePrefix = tablePrefix;
@@ -67,7 +68,7 @@ namespace Abiomed_WirelessRemoteLink
                     return idconfig;
                 }))
                 .AddDefaultTokenProviders()
-                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
+                .CreateAzureTablesIfNotExists<ApplicationDbContext>();            
 
             services.AddMvc();
 
@@ -86,7 +87,8 @@ namespace Abiomed_WirelessRemoteLink
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
+                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                {
                     HotModuleReplacement = true
                 });
             }
