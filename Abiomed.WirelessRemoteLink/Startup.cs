@@ -66,8 +66,8 @@ namespace Abiomed_WirelessRemoteLink
                     idconfig.LocationMode = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:LocationMode").Value;
                     return idconfig;
                 }))
-                .AddDefaultTokenProviders()
-                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
+                .AddDefaultTokenProviders();
+               // .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
 
             services.AddMvc();
 

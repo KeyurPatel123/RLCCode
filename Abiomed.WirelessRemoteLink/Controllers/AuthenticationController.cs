@@ -38,7 +38,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             try
             {
-                var result = await _signInManager.PasswordSignInAsync(credentials.Username, credentials.Password, false, lockoutOnFailure: false);
+                var result = await PasswordSignInAsync(credentials.Username, credentials.Password);
                 var remoteLinkUser = new RemoteLinkUser();
                 bool isUserActivated = false;
                 bool hasUserAcceptedTermsAndConditions = false;
@@ -100,8 +100,9 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                         break;
                 }
             }
-            catch
+            catch(Exception EX)
             {
+                var xxx = EX.Message;
                 // ToDo: Log Error
                 // Determine UI Error Handling
             }
@@ -194,6 +195,22 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         }
 
         #region Private Helper Methods
+        private async Task<Microsoft.AspNetCore.Identity.SignInResult> PasswordSignInAsync(string userName, string password)
+        {
+            var result = new Microsoft.AspNetCore.Identity.SignInResult();
+
+            try
+            {
+                result = await _signInManager.PasswordSignInAsync(userName, password, false, lockoutOnFailure: false);
+            }
+            catch
+            {
+                result = null;
+            }
+
+            return result;
+        }
+
 
         private async Task<bool> SetTermsAndConditionsAsync(bool termsAndConditions)
         {
@@ -225,8 +242,8 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             return result;
         }
         private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated, bool hasUserAcceptedTermsAndConditions)
-        {
-            if (signInResult.Succeeded)
+        { 
+            if (signInResult == null || signInResult.Succeeded)
             {
                 if (isUserActivated)
                 {
