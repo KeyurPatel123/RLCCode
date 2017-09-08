@@ -11,18 +11,19 @@ using Abiomed.DotNetCore.Models;
 using System.Linq;
 using Abiomed.DotNetCore.Repository;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Abiomed.DotNetCore.Business
 {
     public class StatusControlCommunication : IStatusControlCommunication
     {
-        private ILogManager _logManager;
+        private ILogger<IStatusControlCommunication> _logger;
         private RLMDeviceList _rlmDeviceList;
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
 
-        public StatusControlCommunication(ILogManager logManager, RLMDeviceList rlmDeviceList, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public StatusControlCommunication(ILogger<IStatusControlCommunication> logger, RLMDeviceList rlmDeviceList, IRedisDbRepository<RLMDevice> redisDbRepository)
         {
-            _logManager = logManager;
+            _logger = logger;
             _rlmDeviceList = rlmDeviceList;
             _redisDbRepository = redisDbRepository;
     }
@@ -75,14 +76,11 @@ namespace Abiomed.DotNetCore.Business
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 deviceSerialNumber = rlmDevice.SerialNo;
 
-                string traceMessage = string.Format(@"Status Response {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, statusResponse, Definitions.LogMessageType.StatusResponse, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Status Response {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Status Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.StatusResponse, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Status Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -106,26 +104,21 @@ namespace Abiomed.DotNetCore.Business
                 deviceSerialNumber = rlmDevice.SerialNo;
 
                 string traceMessage = string.Empty;
-                Definitions.LogType traceType = Definitions.LogType.NoTrace;
                 if (bearerAuthenticationUpdateResponse.Status != Definitions.SuccessStats || bearerAuthenticationUpdateResponse.UserRef != Definitions.UserRef)
                 {
                     status.Status = RLMStatus.StatusEnum.Failure;
                     traceMessage = string.Format(@"Bearer Authentication Update Response Failure {0}", rlmDevice.SerialNo);
-                    traceType = Definitions.LogType.Error;
                 }
                 else
                 {
                     traceMessage = string.Format(@"Bearer Authentication Update Response {0}", rlmDevice.SerialNo);
-                    traceType = Definitions.LogType.Information;
                 }
 
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, bearerAuthenticationUpdateResponse, Definitions.LogMessageType.BearerAuthenticationUpdateResponse, traceType, traceMessage);
+                _logger.LogInformation(traceMessage);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Authentication Update Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerAuthenticationUpdateResponse, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Bearer Authentication Update Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -162,10 +155,10 @@ namespace Abiomed.DotNetCore.Business
                 if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
                 {
                     // Add bearer info into REDIS, clean up RLMDevice, and PUB Message 
-                    // todo _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
-                    // todo rlmDevice.BearerSlotNumber = 0;
-                    // todo rlmDevice.BearerAuthInformationList.Clear();
-                    // todo _redisDbRepository.Publish(Definitions.BearerInfoRLMDevice, rlmDevice.SerialNo);
+                    _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
+                    rlmDevice.BearerSlotNumber = 0;
+                    rlmDevice.BearerAuthInformationList.Clear();
+                    _redisDbRepository.Publish(Definitions.BearerInfoRLMDevice, rlmDevice.SerialNo);
                 }
                 else
                 {
@@ -173,14 +166,11 @@ namespace Abiomed.DotNetCore.Business
                     returnMessage = BearerAuthenticationReadIndication(deviceIpAddress);
                 }
 
-                string traceMessage = string.Format(@"Bearer Authentication Read Response {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, bearerAuthenticationReadResponse, Definitions.LogMessageType.BearerAuthenticationReadResponse, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Bearer Authentication Read Response {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Authentication Read Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerAuthenticationReadResponse, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Bearer Authentication Read Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             return returnMessage;
@@ -213,14 +203,11 @@ namespace Abiomed.DotNetCore.Business
                 // Update Bearer to be same as above
                 returnMessage[returnMessage.Length - 1] = Convert.ToByte(limitWarningRequest.LimitRequest.Bearer);
 
-                string traceMessage = string.Format(@"Limit Warning Request {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, limitWarningRequest, Definitions.LogMessageType.LimitWarningRequest, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Limit Warning Request {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Limit Warning Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.LimitWarningRequest, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Limit Warning Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -253,14 +240,11 @@ namespace Abiomed.DotNetCore.Business
                 // Update Bearer to be same as above
                 returnMessage[returnMessage.Length - 1] = Convert.ToByte(limitCriticalRequest.LimitRequest.Bearer);
 
-                string traceMessage = string.Format(@"Limit Critical Request {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, limitCriticalRequest, Definitions.LogMessageType.LimitCriticalRequest, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Limit Critical Request {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Limit Warning Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.LimitCriticalRequest, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Limit Warning Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -296,13 +280,11 @@ namespace Abiomed.DotNetCore.Business
                     traceType = Definitions.LogType.Information;
                     traceMessage = string.Format(@"Bearer Priority Confirm Response {0}", rlmDevice.SerialNo);
                 }
-
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, bearerPriorityConfirm, Definitions.LogMessageType.BearerPriorityConfirm, traceType, traceMessage);
+                _logger.LogInformation(traceMessage);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Priority Confirm Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerPriorityConfirm, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Bearer Priority Confirm Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -323,13 +305,11 @@ namespace Abiomed.DotNetCore.Business
 
                 returnMessage = General.GenerateRequest(Definitions.StatusIndication, rlmDevice);
 
-                string traceMessage = string.Format(@"Status Indication {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, string.Format("Status Indication {0}", rlmDevice.SerialNo), Definitions.LogMessageType.StatusIndication, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Status Indication {0}", rlmDevice.SerialNo);    
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Status Change Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.StatusIndication, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Status Change Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;
@@ -368,14 +348,12 @@ namespace Abiomed.DotNetCore.Business
                 returnList.AddRange(PSK);
                 
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
-                                
-                string traceMessage = string.Format(@"Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, wifiCredentials, Definitions.LogMessageType.BearerAuthenticationUpdateIndication, Definitions.LogType.Information, traceMessage);
+
+                _logger.LogInformation("Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, wifiCredentials, Definitions.LogMessageType.BearerAuthenticationUpdateIndication, Definitions.LogType.Exception, traceMessage);
+                _logger.LogDebug("Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;
@@ -404,8 +382,7 @@ namespace Abiomed.DotNetCore.Business
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Delete Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerSlotDelete, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Bearer Delete Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
             return returnMessage;
         }
@@ -430,13 +407,11 @@ namespace Abiomed.DotNetCore.Business
                 returnList[9] = bearerSlotNumberBytes[0];
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
 
-                string traceMessage = string.Format(@"Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, string.Format("Bearer Authentication Update Indication {0}", rlmDevice.SerialNo), Definitions.LogMessageType.BearerAuthenticationUpdateIndication, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerAuthenticationUpdateIndication, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;
@@ -463,14 +438,11 @@ namespace Abiomed.DotNetCore.Business
                 returnMessage[9] = wifi;
                 returnMessage[11] = cellular;
 
-                string traceMessage = string.Format(@"Bearer Priority Indication {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, string.Format("Bearer Priority Indication {0}", rlmDevice.SerialNo), Definitions.LogMessageType.BearerPriorityIndication,Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Bearer Priority Indication {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"BearerPriority Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerPriorityIndication, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("BearerPriority Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;

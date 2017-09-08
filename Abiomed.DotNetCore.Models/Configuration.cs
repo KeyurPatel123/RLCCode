@@ -74,8 +74,8 @@ namespace Abiomed.DotNetCore.Models
             string WEB = GetConnectionSetting("web");  
             string RLR = GetConnectionSetting("rlr");
             string DocDbConnectionUri = GetConnectionSetting("docdburi"); 
-            string DocDbConnectionPwd = GetConnectionSetting("docdbpwd");  
-            string RedisCon = GetConnectionSetting("redisconnect");
+            string DocDbConnectionPwd = GetConnectionSetting("docdbpwd");
+            string RedisCon = "localhost";// GetConnectionSetting("redisconnect");
             bool SecurityStatus = false;
             bool.TryParse(GetConnectionSetting("security"), out SecurityStatus);
             _security = SecurityStatus;
@@ -111,10 +111,10 @@ namespace Abiomed.DotNetCore.Models
 
         private void optionsManager()
         {
-            _keepAliveTimer = Convert.ToInt32(GetOptionSetting("keepalivetimer"));
-            _certLocation = GetOptionSetting("certkey");
-            _tcpPort = Convert.ToInt32(GetOptionSetting("tcpport"));
-            _imageCountdownTimer = Convert.ToInt32(GetOptionSetting("imagecountdowntimer"));
+            _keepAliveTimer = 10000;//  Convert.ToInt32(GetOptionSetting("keepalivetimer"));
+            _certLocation = @""; // GetOptionSetting("certkey");
+            _tcpPort = 443; // Convert.ToInt32(GetOptionSetting("tcpport"));
+            _imageCountdownTimer = 600000;// Convert.ToInt32(GetOptionSetting("imagecountdowntimer"));
         }
 
         public string DeviceStatus

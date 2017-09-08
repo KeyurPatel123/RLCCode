@@ -9,6 +9,7 @@
 
 using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Repository;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Timers;
 
@@ -20,13 +21,13 @@ namespace Abiomed.DotNetCore.Business
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmConnections = new ConcurrentDictionary<string, KeepAliveTimer>();
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmImageCountdown = new ConcurrentDictionary<string, KeepAliveTimer>();
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
-        private ILogManager _logManager;
+        private ILogger<IKeepAliveManager> _logger;
 
-        public KeepAliveManager(Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public KeepAliveManager(Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<IKeepAliveManager> logger)
         {
             _configuration = configuration;
             _redisDbRepository = redisDbRepository;
-            _logManager = new LogManager();
+            _logger = logger;
         }
 
         public void Add(string deviceIpAddress)
@@ -58,7 +59,7 @@ namespace Abiomed.DotNetCore.Business
             KeepAliveTimer keepAliveTimer;
             _rlmConnections.TryGetValue(deviceIpAddress, out keepAliveTimer);
 
-            _logManager.TraceIt(Definitions.LogType.Information, string.Format("Keep Alive Timer Expired IP Address {1}", deviceIpAddress));
+            _logger.LogInformation("Keep Alive Timer Expired IP Address {1}", deviceIpAddress);
 
             if (keepAliveTimer != null)
             {

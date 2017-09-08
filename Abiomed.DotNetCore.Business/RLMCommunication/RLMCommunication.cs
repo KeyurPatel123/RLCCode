@@ -12,12 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Abiomed.DotNetCore.Repository;
+using Microsoft.Extensions.Logging;
 
 namespace Abiomed.DotNetCore.Business
 {
     public class RLMCommunication : IRLMCommunication
     {
-        private Abiomed.Models.Configuration _configuration;
         private IDigitiserCommunication _digitiserCommunication;
         private IFileTransferCommunication _fileTransferCommunication;
         private ISessionCommunication _sessionCommunication;
@@ -27,11 +27,10 @@ namespace Abiomed.DotNetCore.Business
         private RLMDeviceList _rlmDeviceList;
         private byte[] returnMessage;
         private Dictionary<string, PartialPayload> _partialPayloadDictionary = new Dictionary<string, PartialPayload>();
-        private ILogManager _logManager;
+        private ILogger<IRLMCommunication> _logger;
 
-        public RLMCommunication(Abiomed.Models.Configuration Configuration, IDigitiserCommunication DigitiserCommunication, IFileTransferCommunication FileTransferCommunication, ISessionCommunication SessionCommunication, IStatusControlCommunication StatusControlCommunication, IRedisDbRepository<RLMDevice> redisDbRepository, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList, ILogManager logManager)
+        public RLMCommunication(IDigitiserCommunication DigitiserCommunication, IFileTransferCommunication FileTransferCommunication, ISessionCommunication SessionCommunication, IStatusControlCommunication StatusControlCommunication, IRedisDbRepository<RLMDevice> redisDbRepository, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList, ILogger<IRLMCommunication> logger)
         {
-            _configuration = Configuration;
             _digitiserCommunication = DigitiserCommunication;
             _fileTransferCommunication = FileTransferCommunication;
             _sessionCommunication = SessionCommunication;
@@ -39,7 +38,7 @@ namespace Abiomed.DotNetCore.Business
             _redisDbRepository = redisDbRepository;
             _keepAliveManager = keepAliveManager;
             _rlmDeviceList = rlmDeviceList;
-            _logManager = logManager;
+            _logger = logger;
         }
 
         #region Process Message Dictionary
@@ -117,8 +116,7 @@ namespace Abiomed.DotNetCore.Business
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"RLM {0} already removed, during processing of message received. {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("RLM {0} already removed, during processing of message received. {1}", deviceIpAddress, e.ToString());
             }
             return returnMessage;
         }
@@ -287,7 +285,7 @@ namespace Abiomed.DotNetCore.Business
             if (difference != 0)
             {
                 multipleMessages = true;
-                _logManager.TraceIt(Definitions.LogType.Information, @"RLM sent multiple messages");
+                _logger.LogDebug("RLM sent multiple messages");
             }
 
             if (multipleMessages)
@@ -307,7 +305,7 @@ namespace Abiomed.DotNetCore.Business
                         // Determine if partial message                        
                         if (payload != (data.Length - 6))
                         {
-                            _logManager.TraceIt(Definitions.LogType.Information, @"RLM sent Partial message");
+                            _logger.LogDebug("RLM sent Partial message");
 
                             // Hold onto message          
                             PartialPayload partialPayload = new PartialPayload();
@@ -350,7 +348,7 @@ namespace Abiomed.DotNetCore.Business
             if (validMessage == false)
             {
                 status = false;
-                _logManager.TraceIt(Definitions.LogType.Information, string.Format("RLM {0} invalid message type", deviceIpAddress));
+                _logger.LogDebug("RLM {0} invalid message type", deviceIpAddress);
             }
             #endregion
 
@@ -362,45 +360,10 @@ namespace Abiomed.DotNetCore.Business
                 if (difference != 0)
                 {
                     status = false;
-                    string traceMessage = string.Format("RLM {0} invalid payload size, expected {1}, received {2}.", deviceIpAddress, payloadBytes, (dataMessage.Length - 6));
-                    _logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", messageToProcess, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
+                    _logger.LogDebug("RLM {0} invalid payload size, expected {1}, received {2}.", deviceIpAddress, payloadBytes, (dataMessage.Length - 6));
                 }
             }
-            #endregion
-
-            #region Sequence Number and Session has started
-            /* todo maybe?????
-            if (status)
-            {
-                // Get sequence number and store
-                UInt16 sequence = BitConverter.ToUInt16(dataMessage.Skip(4).Take(2).Reverse().ToArray(), 0);
-
-                RLMDevice rlmDevice;
-                _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-
-                // Check if exist, may be first round
-                if (rlmDevice != null)
-                {
-                    // Ensure the current sequence is less than 1. If not, throw status flag
-                    if ((sequence - 1) != rlmDevice.ClientSequence)
-                    {
-                        status = false;
-                        //string traceMessage = string.Format("RLM {0} invalid sequence number expected {1}, received {2}", deviceIpAddress, (rlmDevice.ClientSequence + 1), sequence);
-                        //_logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
-                    }
-                    rlmDevice.ClientSequence = sequence;
-                }
-                // First round, make sure sequence = 0, but if Session Start okay!
-                // TODO TODO TODO!, when restarting RLM need to see sequence, not a priority
-                else if (sequence != 0 || msgId != Definitions.SessionRequest)
-                {
-                    //status = false;
-                    //string traceMessage = string.Format"RLM {0} invalid sequence number or not session start message. expected 0, received sequence {1}, MSG", deviceIpAddress, sequence, msgId);
-                    //_logManager.Log(deviceIpAddress, "TCP SERVICE ROOT", e, Definitions.LogMessageType.Unknown, Definitions.LogType.Error, traceMessage);
-                }
-            }
-            */
-            #endregion          
+            #endregion                       
             return status;
         }
 

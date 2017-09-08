@@ -16,6 +16,9 @@ using System.Threading;
 using Abiomed.DotNetCore.Models;
 using System.Collections.Concurrent;
 using Abiomed.DotNetCore.Business;
+using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+using Abiomed.DotNetCore.Repository;
 
 namespace Abiomed.DotNetCore.RLR.Communications
 {
@@ -23,16 +26,62 @@ namespace Abiomed.DotNetCore.RLR.Communications
     {
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private ConcurrentDictionary<string, TCPStateObjectInsecure> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObjectInsecure>();
-        private ILogManager _logManager;
+        private ILogger<InsecureTCPServer> _logger;
         private RLMCommunication _RLMCommunication;
+        IRedisDbRepository<RLMDevice> _redisDbRepository;
 
-        public InsecureTCPServer(RLMCommunication rLMCommunication)
+        private List<RedisChannel> userInteractionEvents = new List<RedisChannel>()
+        {
+            Definitions.KeepAliveIndicationEvent,
+            Definitions.BearerChangeIndicationEvent,
+            Definitions.StatusIndicationEvent,
+            Definitions.BearerAuthenticationReadIndicationEvent,
+            Definitions.BearerAuthenticationUpdateIndicationEvent,
+            Definitions.BearerDeleteEvent,
+            Definitions.BearerPriorityIndicationEvent,
+            Definitions.StreamingVideoControlIndicationEvent,
+            Definitions.ScreenCaptureIndicationEvent,
+            Definitions.OpenRLMLogFileIndicationEvent,
+            Definitions.CloseSessionIndicationEvent,
+            Definitions.VideoStopEvent,
+            Definitions.ImageStopEvent,
+        };
+
+        public InsecureTCPServer(RLMCommunication rLMCommunication, ILogger<InsecureTCPServer> logger, IRedisDbRepository<RLMDevice> redisDbRepository)
         {            
             _RLMCommunication = rLMCommunication;
+            _logger = logger;
+            _redisDbRepository = redisDbRepository;
+
+            // Subscribe to removal of RLM Device
+            _redisDbRepository.Subscribe(Definitions.RemoveRLMDeviceRLR, (channel, message) => {
+                string deviceIpAddress = (string)message;
+                RemoveConnection(deviceIpAddress);
+            });
+
+            // Subscribe to all user interactions!
+            _redisDbRepository.Subscribe(userInteractionEvents, (channel, message) => {
+                string msg = (string)message;
+                string deviceIpAddress;
+                string[] msgSplit = new string[0];
+
+                if (msg.Contains("-"))
+                {
+                    msgSplit = msg.Split('-');
+                    deviceIpAddress = msgSplit[0];
+                    msgSplit = msgSplit.Skip(1).ToArray();
+                }
+                else
+                {
+                    deviceIpAddress = msg;
+                }
+                ProcessUserInteractionEvent(deviceIpAddress, channel, msgSplit);
+            });
         }
 
         public void Run()
         {
+            _logger.LogInformation("Starting TCP Listener on Port 443");
             // Bind the socket to the local endpoint port 443 and listen for incoming connections.            
             try
             {
@@ -54,7 +103,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
             }
             catch (Exception e)
             {
-                _logManager.TraceIt(Definitions.LogType.Exception, "Failed to create TCP Listener");
+                _logger.LogError("Failed to create TCP Listener {0}", e);
             }
         }
 
@@ -85,13 +134,13 @@ namespace Abiomed.DotNetCore.RLR.Communications
 
                 _tcpStateObjectList.TryAdd(state.DeviceIpAddress, state);
 
-                _logManager.TraceIt(Definitions.LogType.Information, string.Format("RLM connected at connection {0}", state.DeviceIpAddress));
+                _logger.LogInformation("RLM connected at connection {0}", state.DeviceIpAddress);
                 state.WorkStream.BeginRead(state.buffer, 0, TCPStateObjectInsecure.BufferSize, new AsyncCallback(ReadCallback), state);
             }
             catch (Exception e)
             {
                 TcpListener listener = (TcpListener)ar.AsyncState;
-                _logManager.TraceIt(Definitions.LogType.Exception, e.Message);
+                _logger.LogError(e.Message);
             }
         }
 
@@ -111,9 +160,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
                 if (bytesRead > 0)
                 {
                     var receivedBuffer = state.buffer.Take(bytesRead);
-
-                    string traceMessage = string.Format("Message received from RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(receivedBuffer.ToArray()));
-                    _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
+                    _logger.LogDebug("Message received from RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(receivedBuffer.ToArray()));
 
                     // Process message
                     RLMStatus Status;
@@ -128,9 +175,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
                         // Send Message if there is something to send back
                         if (returnMessage.Length > 0)
                         {
-                            //traceMessage = string.Format("Sending message to RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
-                            _logManager.TraceIt(Definitions.LogType.Information, traceMessage);
-
+                            _logger.LogDebug("Sending message to RLM {0}, data {1}", state.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
                             Send(state.DeviceIpAddress, handler, returnMessage);
                         }
                     }
@@ -143,7 +188,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
                 }
                 else
                 {
-                    _logManager.Log(state.DeviceIpAddress, "", state, Definitions.LogMessageType.ReadCallback, Definitions.LogType.Error, string.Format("ReadCallback - RLM {0} closed connection", state.DeviceIpAddress));
+                    _logger.LogInformation("ReadCallback - RLM {0} closed connection", state.DeviceIpAddress);
 
                     // kill connection
                     RemoveConnection(state.DeviceIpAddress);
@@ -151,7 +196,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
             }
             catch (Exception e)
             {
-                _logManager.Log(state.DeviceIpAddress, "", state, Definitions.LogMessageType.ReadCallback, Definitions.LogType.Exception, string.Format("ReadCallback: RLM {0} closed connection, Exception Raised: {1}", state.DeviceIpAddress, e.ToString()));
+                _logger.LogError("ReadCallback: RLM {0} closed connection, Exception Raised: {1}", state.DeviceIpAddress, e.ToString());
                 RemoveConnection(state.DeviceIpAddress);
             }
         }
@@ -165,7 +210,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
             }
             catch (Exception e)
             {
-                _logManager.Log(deviceIpAddress, "", handler, Definitions.LogMessageType.SendCallback, Definitions.LogType.Exception, string.Format("Send Error, Closing connection ", e));
+                _logger.LogError("Send Error, Closing connection", e);
                 RemoveConnection(deviceIpAddress);
             }
         }
@@ -221,7 +266,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
                 // Send Message if there is something to send back
                 if (returnMessage.Length > 0)
                 {
-                    _logManager.TraceIt(Definitions.LogType.Information, string.Format("Sending message to RLM {0}, data {1}", tcpState.DeviceIpAddress, General.ByteArrayToHexString(returnMessage)));
+                    _logger.LogDebug("Sending message to RLM {0}, data {1}", tcpState.DeviceIpAddress, General.ByteArrayToHexString(returnMessage));
                     Send(deviceIpAddress, tcpState.WorkStream, returnMessage);
                 }
             }

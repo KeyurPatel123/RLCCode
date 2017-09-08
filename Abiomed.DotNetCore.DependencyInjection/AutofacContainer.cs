@@ -23,8 +23,6 @@ namespace Abiomed.DotNetCore.DependencyInjection
             builder.RegisterType<SessionCommunication>().As<ISessionCommunication>();
             builder.RegisterType<StatusControlCommunication>().As<IStatusControlCommunication>();
             builder.RegisterType<RLMCommunication>().As<IRLMCommunication>();
-            builder.RegisterType<LogManager>().As<ILogManager>().SingleInstance();
-
 
             builder.RegisterType<KeepAliveManager>().As<IKeepAliveManager>().SingleInstance();
             #endregion

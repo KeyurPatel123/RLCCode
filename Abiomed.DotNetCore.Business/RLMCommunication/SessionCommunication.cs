@@ -12,21 +12,22 @@ using Abiomed.DotNetCore.Repository;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Abiomed.DotNetCore.Business
 {
     public class SessionCommunication : ISessionCommunication
     {
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
-        private ILogManager _logManager;
-        private Abiomed.Models.Configuration _configuration;
+        private ILogger<ISessionCommunication> _logger;
+        private Abiomed.DotNetCore.Models.Configuration _configuration;
         private IKeepAliveManager _keepAliveManager;
         private RLMDeviceList _rlmDeviceList;
 
-        public SessionCommunication(IRedisDbRepository<RLMDevice> redisDbRepository, ILogManager logManager, Abiomed.Models.Configuration configuration, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList)
+        public SessionCommunication(IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<ISessionCommunication> logger, Abiomed.DotNetCore.Models.Configuration configuration, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList)
         {            
             _redisDbRepository = redisDbRepository;
-            _logManager = logManager;
+            _logger = logger;
             _configuration = configuration;
             _keepAliveManager = keepAliveManager;
             _rlmDeviceList = rlmDeviceList;
@@ -122,14 +123,11 @@ namespace Abiomed.DotNetCore.Business
                 sessionMessage.CopyTo(returnMessage, 0);
                 streamIndicator.CopyTo(returnMessage, sessionMessage.Length);
 
-                string traceMessage = string.Format(@"Session Request Session {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, sessionRequest, Definitions.LogMessageType.SessionRequest, Definitions.LogType.Information, traceMessage);
-
+                _logger.LogInformation("Session Request Session {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage  = string.Format(@"Session Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.SessionRequest, Definitions.LogType.Information, traceMessage);
+                _logger.LogError("Session Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
             return returnMessage;
@@ -152,14 +150,11 @@ namespace Abiomed.DotNetCore.Business
                 returnMessage = General.GenerateRequest(Definitions.BearerConfirm, rlmDevice);
                 deviceSerialNumber = rlmDevice.SerialNo;
 
-                string traceMessage = string.Format(@"Bearer Request {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, bearerRequest, Definitions.LogMessageType.BearerRequest, Definitions.LogType.Information, traceMessage);                
+                _logger.LogInformation("Bearer Request {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.BearerRequest, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Bearer Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -181,14 +176,11 @@ namespace Abiomed.DotNetCore.Business
                 deviceSerialNumber = rlmDevice.SerialNo;
 
                 // The status will indicate rather to keep the session going. For this, we should not do any error checking.
-
-                string traceMessage = string.Format(@"Session Close Response {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, sessionCloseResponse, Definitions.LogMessageType.SessionCloseResponse, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Session Close Response {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Session Close Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.SessionCloseResponse, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Session Close Response Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -200,30 +192,12 @@ namespace Abiomed.DotNetCore.Business
             byte[] returnMessage = new byte[0];
             string deviceSerialNumber = string.Empty;
             try
-            {
-                // temp
-                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };
-                /*
-                CloseBearerRequest closeBearerRequest = new CloseBearerRequest();
-                closeBearerRequest.BearerStatistics.Bytes = BitConverter.ToUInt64(message.Skip(6).Take(8).Reverse().ToArray(), 0);
-                closeBearerRequest.BearerStatistics.Frames = BitConverter.ToInt32(message.Skip(14).Take(4).Reverse().ToArray(), 0);
-                closeBearerRequest.BearerStatistics.Seq = BitConverter.ToInt32(message.Skip(18).Take(2).Reverse().ToArray(), 0);
-                closeBearerRequest.BearerStatistics.Count = BitConverter.ToInt32(message.Skip(20).Take(2).Reverse().ToArray(), 0);
-
-                RLMDevice rlmDevice;
-                _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
-                returnMessage = General.GenerateRequest(Definitions.CloseBearerConfirm, rlmDevice);
-
-                deviceSerialNumber = rlmDevice.SerialNo;
-                string traceMessage = string.Format(@"Close Bearer Request {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, closeBearerRequest, Definitions.LogMessageType.CloseBearerRequest, Definitions.LogType.Information);
-                */
+            {                
+                status = new RLMStatus() { Status = RLMStatus.StatusEnum.Success };                
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Close Bearer Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.CloseBearerRequest, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Close Bearer Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -263,14 +237,11 @@ namespace Abiomed.DotNetCore.Business
                 deviceSerialNumber = rlmDevice.SerialNo;
 
                 returnMessage = General.GenerateRequest(Definitions.SessionCloseConfirm, rlmDevice);
-                string traceMessage = string.Format(@"Session Close Request {0}", rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, sessionCloseRequest, Definitions.LogMessageType.SessionCloseRequest, Definitions.LogType.Information, traceMessage);                
+                _logger.LogInformation("Session Close Request {0}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Session Close Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.SessionCloseRequest, Definitions.LogType.Exception, traceMessage);
-
+                _logger.LogError("Session Close Request Failure {0} Exception {1}", deviceIpAddress, e.ToString());
                 status = new RLMStatus() { Status = RLMStatus.StatusEnum.Failure };
             }
 
@@ -294,13 +265,11 @@ namespace Abiomed.DotNetCore.Business
                 // Replace with correct bearer
                 returnMessage[7] = Convert.ToByte(bearer);
 
-                string traceMessage = string.Format(@"Updated bearer to {0}, RLM Serial: {1}", bearer, rlmDevice.SerialNo);
-                _logManager.Log(deviceIpAddress, rlmDevice.SerialNo, string.Format("Updated bearer to {0}", bearer), Definitions.LogMessageType.BearerChangeIndication, Definitions.LogType.Information, traceMessage);
+                _logger.LogInformation("Updated bearer to {0}, RLM Serial: {1}", bearer, rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
-                string traceMessage = string.Format(@"Bearer Change Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
-                _logManager.Log(deviceIpAddress, deviceSerialNumber, e, Definitions.LogMessageType.SessionCloseRequest, Definitions.LogType.Exception, traceMessage);
+                _logger.LogError("Bearer Change Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;
@@ -314,7 +283,7 @@ namespace Abiomed.DotNetCore.Business
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
             returnMessage = General.GenerateRequest(Definitions.KeepAliveIndication, rlmDevice);
 
-            _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Keep Alive Indication {0}", rlmDevice.SerialNo));
+            _logger.LogDebug("Keep Alive Indication {0}", rlmDevice.SerialNo);
            
             return returnMessage;
         }
@@ -327,12 +296,11 @@ namespace Abiomed.DotNetCore.Business
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
             if (rlmDevice != null)
             {
-                returnMessage = General.GenerateRequest(Definitions.CloseSessionIndication, rlmDevice);
-                _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Close Session Indication {0}", rlmDevice.SerialNo));
+                _logger.LogInformation("Close Session Indication {0}", rlmDevice.SerialNo);
             }
             else
             {
-                _logManager.TraceIt(Definitions.LogType.Information, string.Format(@"Close Session Indication - device does not exist {0}", deviceIpAddress));
+                _logger.LogInformation("Close Session Indication - device does not exist {0}", deviceIpAddress);
             }
             return returnMessage;
         }

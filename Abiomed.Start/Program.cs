@@ -3,6 +3,8 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Abiomed.DotNetCore.Business;
+using Abiomed.DotNetCore.Models;
+using Abiomed.DotNetCore.Repository;
 
 namespace Abiomed.Start
 {
@@ -17,6 +19,15 @@ namespace Abiomed.Start
                 .AddLogging()
                 .AddSingleton<InsecureTCPServer>()
                 .AddSingleton<RLMCommunication>()
+                .AddSingleton<RLMDeviceList>()
+                .AddSingleton<IDigitiserCommunication, DigitiserCommunication>()
+                .AddSingleton<IFileTransferCommunication, FileTransferCommunication>()
+                .AddSingleton<ISessionCommunication, SessionCommunication>()
+                .AddSingleton<IStatusControlCommunication, StatusControlCommunication>()
+                .AddSingleton<IRLMCommunication, RLMCommunication>()
+                .AddSingleton<IKeepAliveManager, KeepAliveManager>()
+                .AddSingleton<DotNetCore.Models.Configuration>()
+                .AddScoped(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
                 .BuildServiceProvider();
 
                 //configure console logging
@@ -24,13 +35,13 @@ namespace Abiomed.Start
                     .GetService<ILoggerFactory>()                    
                     .AddConsole(LogLevel.Debug);
 
-                var logger = serviceProvider.GetService<ILoggerFactory>()
+                var _logger = serviceProvider.GetService<ILoggerFactory>()
                 .CreateLogger<Program>();
-                logger.LogDebug("Starting application");
+                                
+                _logger.LogInformation("Starting RLR");
 
                 var _tcpServer = serviceProvider.GetService<InsecureTCPServer>();
                 _tcpServer.Run();
-
             }
             catch (Exception e)
             {
