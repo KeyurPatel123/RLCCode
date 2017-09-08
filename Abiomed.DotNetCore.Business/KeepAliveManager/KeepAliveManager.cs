@@ -8,6 +8,7 @@
 */
 
 using Abiomed.DotNetCore.Models;
+using Abiomed.DotNetCore.Configuration;
 using Abiomed.DotNetCore.Repository;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
@@ -17,22 +18,27 @@ namespace Abiomed.DotNetCore.Business
 {
     public class KeepAliveManager : IKeepAliveManager
     {
-        private Models.Configuration _configuration;
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmConnections = new ConcurrentDictionary<string, KeepAliveTimer>();
         private ConcurrentDictionary<string, KeepAliveTimer> _rlmImageCountdown = new ConcurrentDictionary<string, KeepAliveTimer>();
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
         private ILogger<IKeepAliveManager> _logger;
+        private int _keepAliveTimer;
+        private int _imageCountDownTimer;
+        private IConfigurationCache _configurationCache;
 
-        public KeepAliveManager(Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<IKeepAliveManager> logger)
+        public KeepAliveManager(IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<IKeepAliveManager> logger, IConfigurationCache configurationCache)
         {
-            _configuration = configuration;
             _redisDbRepository = redisDbRepository;
             _logger = logger;
+            _configurationCache = configurationCache;
+
+            _keepAliveTimer = _configurationCache.GetNumericConfigurationItem("optionsmanager", "keepalivetimer");
+            _imageCountDownTimer = _configurationCache.GetNumericConfigurationItem("optionsmanager", "imagecountdowntimer");
         }
 
         public void Add(string deviceIpAddress)
         {
-            KeepAliveTimer keepAliveTimer = new KeepAliveTimer(deviceIpAddress, _configuration.KeepAliveTimer, TimerExpiredCallback);
+            KeepAliveTimer keepAliveTimer = new KeepAliveTimer(deviceIpAddress, _keepAliveTimer, TimerExpiredCallback);
             _rlmConnections.TryAdd(deviceIpAddress, keepAliveTimer);
         }
 
@@ -82,7 +88,7 @@ namespace Abiomed.DotNetCore.Business
 
         public void ImageTimerAdd(string deviceIpAddress)
         {            
-            KeepAliveTimer keepAliveTimer = new KeepAliveTimer(deviceIpAddress, _configuration.ImageCountDownTimer, ImageCounterTimerExpiredCallback);
+            KeepAliveTimer keepAliveTimer = new KeepAliveTimer(deviceIpAddress, _imageCountDownTimer, ImageCounterTimerExpiredCallback);
             _rlmImageCountdown.TryAdd(deviceIpAddress, keepAliveTimer);
         }
 

@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Models\Abiomed.DotNetCore.Models.csproj" />
   </ItemGroup>
 

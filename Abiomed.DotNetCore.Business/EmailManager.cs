@@ -8,6 +8,7 @@ using Microsoft.Azure.ServiceBus;
 using System.Threading;
 using Abiomed.DotNetCore.Storage;
 using Newtonsoft.Json;
+using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -37,12 +38,13 @@ namespace Abiomed.DotNetCore.Business
 
         // Stop Gap until Service Bus Works
         private IQueueStorage _queueStorage;
+        //private IConfigurationCache _configurationCache;
         private bool _isServiceBusMode = false;
 
         #endregion
 
         #region Constructors
-        public EmailManager(AuditLogManager auditLogManager, string queueName, string queueStorageConnectionString)
+        public EmailManager(IAuditLogManager auditLogManager, string queueName, string queueStorageConnectionString)
         {
             if (auditLogManager == null)
             {
@@ -51,7 +53,7 @@ namespace Abiomed.DotNetCore.Business
             ValidateRequiredString(queueName, "Queue Name");
             ValidateRequiredString(queueStorageConnectionString, "Storage Connection");
 
-            _isServiceBusMode = false;
+           _isServiceBusMode = false;
             _queueStorage = new QueueStorage(queueStorageConnectionString, queueName);
             _queueName = queueName;
             _auditLogManager = auditLogManager;

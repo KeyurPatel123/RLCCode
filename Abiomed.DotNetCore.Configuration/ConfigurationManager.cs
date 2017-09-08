@@ -1,7 +1,10 @@
 ﻿using Abiomed.DotNetCore.Storage;
+using Abiomed.DotNetCore.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Abiomed.DotNetCore.Configuration
 {
@@ -17,28 +20,49 @@ namespace Abiomed.DotNetCore.Configuration
     /// - Rowkey is the Configuration Item Key within the Partition
     /// - Then Value
     /// </summary>
-    public class ConfigurationManager
+    public class ConfigurationManager : IConfigurationManager
     {
+        #region Private Member Variables
+
+        private const string _configurationTableCannotBeNullEmptyOrWhitespace = "Configuration Table Context cannot be null, empty, or whitespace.";
+        private const string _configurationItemsCannotBeNull = "Configuration Items cannot be null or empty list.";
+        private const string _partitionKeyCannotBeNullEmptyOrWhitespace = "Partition Key cannot be null, empty, or whitespace.";
+        private const string _rowKeyCannotBeNullEmptyOrWhitespace = "Row Key cannot be null, empty, or whitespace.";
+        private const string _valueCannotBeNullEmptyOrWhitespace = "Value cannot be null, empty, or whitespace.";
+
         private ITableStorage _iTableStorage;
-        private string _tableContext;
+        private string _tableContext = string.Empty;
 
-        public ConfigurationManager()
+        private IConfigurationRoot _configuration { get; set; }
+
+        #endregion
+
+        #region Constructors
+
+        public ConfigurationManager(ITableStorage tableStorage)
         {
-            SetTableContext("config"); // TODO Need to set from somewhere instead of HardCode.
-            Initialize();
+            _iTableStorage = tableStorage;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+
+            _configuration = builder.Build();
+            _tableContext = _configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value;
         }
 
-        public ConfigurationManager(string tableContext)
-        {
-            SetTableContext(tableContext);
-            Initialize();
-        }
+        #endregion
 
+        #region Public Methods
+
+        /// <summary>
+        /// Changes or Sets the Table to be used in the operation
+        /// </summary>
+        /// <param name="tableName">Table Name to use</param>
         public void SetTableContext(string tableName)
         {
             if (string.IsNullOrWhiteSpace(tableName))
             {
-                throw new ArgumentOutOfRangeException("Configuration Table Context cannot be null, empty, or whitespace.");
+                throw new ArgumentOutOfRangeException(_configurationTableCannotBeNullEmptyOrWhitespace);
             }
 
             _tableContext = tableName;
@@ -49,32 +73,42 @@ namespace Abiomed.DotNetCore.Configuration
         /// </summary>
         /// <param name="featureKey">In Azure Terms this is the PartitionKey</param>
         /// <param name="itemKey">In Azure Terms this is the RowKey</param>
-        /// <returns></returns>
+        /// <returns>ApplicationConfiguration Entry</returns>
         public async Task<ApplicationConfiguration> GetItemAsync(string featureKey, string itemKey)
         {
             return await _iTableStorage.GetItemAsync<ApplicationConfiguration>(featureKey, itemKey, _tableContext);
         }
 
+        /// <summary>
+        /// Gets a List of all settings for a given feature (or Partition)
+        /// </summary>
+        /// <param name="featureKey">In Azure Terms this is the PartitionKey</param>
+        /// <returns>List of ApplicationConfiguration Entries</returns>
         public async Task<List<ApplicationConfiguration>> GetFeatureAsync(string featureKey)
         {
            return await _iTableStorage.GetPartitionItemsAsync<ApplicationConfiguration>(featureKey, _tableContext);
         }
-       
+
+        /// <summary>
+        /// Gats all the items in the configuration table
+        /// </summary>
+        /// <returns>List of ApplicationConfiguration Entries</returns>
         public async Task<List<ApplicationConfiguration>> GetAllAsync()
         {
             return await _iTableStorage.GetAllAsync<ApplicationConfiguration>(_tableContext);
         }
         
+
         public async Task StoreConfigurationItemsAsync(List<ApplicationConfiguration> configurationItems, string configurationContext = null)
         {
             if (configurationItems == null)
             {
-                throw new ArgumentNullException("ConfigurationItems cannot be null.");
+                throw new ArgumentNullException(_configurationItemsCannotBeNull);
             }
 
             if (configurationItems.Count == 0)
             {
-                throw new ArgumentOutOfRangeException("ConfigurationItems cannot be an empty list.");
+                throw new ArgumentOutOfRangeException(_configurationItemsCannotBeNull);
             }
 
             if (!string.IsNullOrWhiteSpace(configurationContext))
@@ -84,7 +118,7 @@ namespace Abiomed.DotNetCore.Configuration
 
             if (string.IsNullOrWhiteSpace(_tableContext))
             {
-                throw new ArgumentOutOfRangeException("Configuration Table Context cannot be null, empty, or whitespace.");
+                throw new ArgumentOutOfRangeException(_configurationTableCannotBeNullEmptyOrWhitespace);
             }
 
             foreach (ApplicationConfiguration item in configurationItems)
@@ -93,42 +127,40 @@ namespace Abiomed.DotNetCore.Configuration
             }
         }
 
-        public async Task LoadFactoryConfiguration()
+        /// <summary>
+        /// Adds an item to the Configuation Table
+        /// </summary>
+        /// <param name="partitionKey">Feature</param>
+        /// <param name="rowKey">Key name</param>
+        /// <param name="value">Value</param>
+        /// <returns></returns>
+        public async Task AddConfigurationItemAsync(string partitionKey, string rowKey, string value)
         {
-            // TODO These will need to be mpoved to an XML file or something similar.
-            await AddConfigurationItem(@"connectionmanager", @"run", @"localhost");
-            await AddConfigurationItem(@"connectionmanager", @"wowza", @"rtmp://live-remotelink.channel.mediaservices.windows.net:1935/live/584ea49698714ec4872ba4db0b44fc6");
-            await AddConfigurationItem(@"connectionmanager", @"web", @"10.11.0.19");
-            await AddConfigurationItem(@"connectionmanager", @"rlr", @"10.11.0.12");
-            await AddConfigurationItem(@"connectionmanager", @"docdburi", @"https://abmd.documents.azure.com:443/");
-            await AddConfigurationItem(@"connectionmanager", @"docdbpwd", @"7KA3x3At9kGf8ZGo98xHx7d3h1G3nZw7HqxY3FhQKnZdZayrkal7gIPMK9FKf39UisSUxcWdLAfkjtDRZhlXtQ==");
-            await AddConfigurationItem(@"connectionmanager", @"redisconnect", @"abmd.redis.cache.windows.net, abortConnect=false,ssl=true,password=6sfN8jGyo0al+dMDdML4KMt0f59lCuqX0Wk9FJfxwPw=");
-            await AddConfigurationItem(@"connectionmanager", @"security", @"false");
+            if (string.IsNullOrWhiteSpace(partitionKey))
+            {
+                throw new ArgumentOutOfRangeException(_partitionKeyCannotBeNullEmptyOrWhitespace);
+            }
 
-            await AddConfigurationItem(@"optionsmanager", @"keepalivetimer", @"600000");
-            await AddConfigurationItem(@"optionsmanager", @"certkey", @"C:\Certs\RLR.abiomed.com\rlr.abiomed.com.pfx");
-            await AddConfigurationItem(@"optionsmanager", @"tcpport", @"443");
-            await AddConfigurationItem(@"optionsmanager", @"imagecountdowntimer", @"60000000");
-            await AddConfigurationItem(@"smtpmanager", @"fromfriendlyname", @"Abiomed RLC Admin");
-            await AddConfigurationItem(@"smtpmanager", @"fromemail", @"admin_abiomed@outlook.com");
-            await AddConfigurationItem(@"smtpmanager", @"bodytexttype", @"plain");
-            await AddConfigurationItem(@"smtpmanager", @"localdomain", @"www.abiomed.com");
-            await AddConfigurationItem(@"smtpmanager", @"host", @"USDVREX01.abiomed.com");
-            await AddConfigurationItem(@"smtpmanager", @"port", @"25");
-        }
+            if (string.IsNullOrWhiteSpace(rowKey))
+            {
+                throw new ArgumentOutOfRangeException(_rowKeyCannotBeNullEmptyOrWhitespace);
+            }
 
-        private async Task AddConfigurationItem(string partitionKey, string rowKey, string value)
-        {
-            ApplicationConfiguration appConfig = new ApplicationConfiguration();
-            appConfig.PartitionKey = partitionKey;
-            appConfig.RowKey = rowKey;
-            appConfig.Value = value;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentOutOfRangeException(_valueCannotBeNullEmptyOrWhitespace);
+            }
+
+            ApplicationConfiguration appConfig = new ApplicationConfiguration
+            {
+                PartitionKey = partitionKey,
+                RowKey = rowKey,
+                Value = value
+            };
+
             await _iTableStorage.InsertOrMergeAsync(_tableContext, appConfig);
         }
 
-        private void Initialize()
-        {            
-            _iTableStorage = new TableStorage("DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w==");
-        }
+        #endregion
     }
 }

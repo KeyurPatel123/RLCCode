@@ -1,4 +1,5 @@
 ﻿using Abiomed.DotNetCore.Business;
+using Abiomed.DotNetCore.Configuration;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,22 +16,16 @@ namespace Abiomed.DotNetCore.MailQueueService
         static string _localDomain = string.Empty;
         static string _textPart = string.Empty;
         static string _hostName = string.Empty;
+        static string _connection = string.Empty;
         static int _port = 0;
 
         static int _pollingInterval = 0;
         static IEmailManager _emailManager;
-        private static IConfigurationRoot _configuration { get; set; }
         private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Starting Queue = Email");
-
-            var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json");
-
-            _configuration = builder.Build();
             Initialize().Wait();
 
             while (true)
@@ -45,10 +40,8 @@ namespace Abiomed.DotNetCore.MailQueueService
 
         static private async Task Initialize()
         {
-            string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
-            ITableStorage tableStorage = new TableStorage(storageConnection);
+            ITableStorage tableStorage = new TableStorage();
             _configurationManager = new ConfigurationManager(tableStorage);
-            _configurationManager.SetTableContext(_configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value);
             string queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
             _pollingInterval = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "pollinginterval")).Value);
             _from = (await _configurationManager.GetItemAsync("smtpmanager", "fromemail")).Value;
@@ -57,10 +50,13 @@ namespace Abiomed.DotNetCore.MailQueueService
             _textPart = (await _configurationManager.GetItemAsync("smtpmanager", "bodytexttype")).Value;
             _hostName = (await _configurationManager.GetItemAsync("smtpmanager", "host")).Value;
             _port = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "portnumber")).Value);
-            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogName, storageConnection);
 
-            _emailManager = new EmailManager(auditLogManager, queueName, storageConnection);
+            _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queuestorage")).Value;
+
+            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogName);
+
+            _emailManager = new EmailManager(auditLogManager, queueName, _connection);
         }
     }
 }

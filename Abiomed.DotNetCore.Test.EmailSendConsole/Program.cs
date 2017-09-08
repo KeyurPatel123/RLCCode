@@ -1,4 +1,5 @@
 ﻿using Abiomed.DotNetCore.Business;
+using Abiomed.DotNetCore.Configuration;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -13,17 +14,10 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
         private static string _queueName = string.Empty;
         private static string _connection = string.Empty;
 
-        private static IConfigurationRoot _configuration { get; set; }
         private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
-            var builder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json");
-
-            _configuration = builder.Build();
-
             MainAsync(args).GetAwaiter().GetResult();
         }
 
@@ -40,15 +34,13 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
 
         private static async Task Initialize()
         {
-            string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
-            ITableStorage tableStorage = new TableStorage(storageConnection);
+            ITableStorage tableStorage = new TableStorage();
             _configurationManager = new ConfigurationManager(tableStorage);
-            _configurationManager.SetTableContext(_configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value);
 
             _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
             _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
             string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogName, storageConnection);
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogName);
             _emailManager = new EmailManager(auditLogManager, _queueName, _connection);
         }
 

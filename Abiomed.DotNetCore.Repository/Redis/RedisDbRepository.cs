@@ -8,7 +8,7 @@
 */
 
 using Abiomed.DotNetCore.Models;
-using Microsoft.Extensions.Caching.Redis;
+using Abiomed.DotNetCore.Configuration;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -25,12 +25,16 @@ namespace Abiomed.DotNetCore.Repository
         private readonly IServer _server;
         private readonly ISubscriber _subscriber;
         private ConnectionMultiplexer _connectionMultiplexer;
-        private Configuration _configuration;
+        private IConfigurationCache _configurationCache;
 
-        public RedisDbRepository(Configuration configuration)
+        public RedisDbRepository(IConfigurationCache configurationCache)
         {
-            _configuration = configuration;
-            _connectionMultiplexer = ConnectionMultiplexer.Connect(_configuration.RedisConnect);
+            _configurationCache = configurationCache;
+            _configurationCache.LoadCache().Wait();
+
+            string redisConnect = string.Empty;
+            _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect", out redisConnect);
+            _connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnect);
 
             var endPoints = _connectionMultiplexer.GetEndPoints();
             _server = _connectionMultiplexer.GetServer(endPoints[0]);            

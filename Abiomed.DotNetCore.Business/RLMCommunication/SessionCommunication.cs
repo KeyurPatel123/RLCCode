@@ -9,6 +9,7 @@
 using System;
 using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Repository;
+using Abiomed.DotNetCore.Configuration;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
@@ -20,17 +21,20 @@ namespace Abiomed.DotNetCore.Business
     {
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
         private ILogger<ISessionCommunication> _logger;
-        private Abiomed.DotNetCore.Models.Configuration _configuration;
         private IKeepAliveManager _keepAliveManager;
         private RLMDeviceList _rlmDeviceList;
+        private IConfigurationCache _configurationCache;
+        private bool _isSecurity;
 
-        public SessionCommunication(IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<ISessionCommunication> logger, Abiomed.DotNetCore.Models.Configuration configuration, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList)
+        public SessionCommunication(IRedisDbRepository<RLMDevice> redisDbRepository, ILogger<ISessionCommunication> logger, IKeepAliveManager keepAliveManager, RLMDeviceList rlmDeviceList, IConfigurationCache configurationCache)
         {            
             _redisDbRepository = redisDbRepository;
             _logger = logger;
-            _configuration = configuration;
             _keepAliveManager = keepAliveManager;
             _rlmDeviceList = rlmDeviceList;
+            _configurationCache = configurationCache;
+
+            _isSecurity = _configurationCache.GetBooleanConfigurationItem("connectionmanager","security");
         }
 
         #region Receiving
@@ -105,7 +109,7 @@ namespace Abiomed.DotNetCore.Business
                 {
                     
                     List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;
-                    if (_configuration.Security)
+                    if (_isSecurity)
                     {
                         secureStream = Definitions.StreamVideoControlIndicationRTMPS;
                     }

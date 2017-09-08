@@ -73,7 +73,7 @@ namespace Abiomed_WirelessRemoteLink
             services.AddMvc();
 
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogTableName, storageConnection);
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogTableName);
             services.AddSingleton<IAuditLogManager>(auditLogManager);
             services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueName, emailQueueConnectionString));
         }

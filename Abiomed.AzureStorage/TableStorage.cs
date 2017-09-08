@@ -4,6 +4,8 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;  
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Abiomed.DotNetCore.Storage
 {
@@ -18,6 +20,8 @@ namespace Abiomed.DotNetCore.Storage
         private CloudTableClient _tableClient = null;
         private CloudTable _table = null;
 
+        private IConfigurationRoot _configuration { get; set; }
+
         #endregion 
 
         #region Constructors
@@ -25,15 +29,16 @@ namespace Abiomed.DotNetCore.Storage
         /// <summary>
         /// Constructor 
         /// </summary>
-        /// <param name="tableName"></param>
-        public TableStorage(string connection)
+        public TableStorage()
         {
-            if (string.IsNullOrWhiteSpace(connection))
-            {
-                throw new ArgumentOutOfRangeException(tableContextCannotBeNull);
-            }
 
-            Initialize(connection);
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+
+            _configuration = builder.Build();
+
+            Initialize(_configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value);
         }
 
         /// <summary>

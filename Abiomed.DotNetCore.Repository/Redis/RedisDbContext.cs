@@ -7,7 +7,7 @@
  * Author: Alessandro Agnello 
 */
 
-using Abiomed.DotNetCore.Models;
+using Abiomed.DotNetCore.Configuration;
 using System;
 using StackExchange.Redis;
 
@@ -16,13 +16,13 @@ namespace Abiomed.DotNetCore.Repository
     
     public class RedisDbContext
     {
-        private Configuration _configuration;
-        
-        private string _connectionString = "";
+        private IConfigurationCache _configurationCache;
+        private string _connectionString = string.Empty;
 
-        public RedisDbContext(Configuration configuration)
+        public RedisDbContext(IConfigurationCache configurationCache)
         {
-            _connectionString = configuration.RedisConnect;
+            string redisConnect = string.Empty;
+            _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect", out _connectionString);
 
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
             {

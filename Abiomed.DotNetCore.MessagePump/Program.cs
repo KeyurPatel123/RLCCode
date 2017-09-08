@@ -4,6 +4,7 @@ using Abiomed.DotNetCore.Business;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Abiomed.DotNetCore.Storage;
+using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed.DotNetCore.MessagePump
 {
@@ -20,17 +21,10 @@ namespace Abiomed.DotNetCore.MessagePump
         static private string _smtpHostName = string.Empty;
         static private int _portNumber = 0;
 
-        private static IConfigurationRoot _configuration { get; set; }
         private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
-            var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json");
-
-            _configuration = builder.Build();
-
             MainAsync(args).GetAwaiter().GetResult();
         }
 
@@ -48,15 +42,13 @@ namespace Abiomed.DotNetCore.MessagePump
 
         static private async Task Initialize()
         {
-            string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
-            ITableStorage tableStorage = new TableStorage(storageConnection);
+            ITableStorage tableStorage = new TableStorage();
             _configurationManager = new ConfigurationManager(tableStorage);
-            _configurationManager.SetTableContext(_configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value);
 
             _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
             _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
             string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogName, storageConnection);
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogName);
 
             _fromEmail = (await _configurationManager.GetItemAsync("smtpmanager", "fromemail")).Value;
             _fromFriendlyname = (await _configurationManager.GetItemAsync("smtpmanager", "fromfriendlyname")).Value;

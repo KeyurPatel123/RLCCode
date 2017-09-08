@@ -5,15 +5,29 @@ using Microsoft.Extensions.Logging;
 using Abiomed.DotNetCore.Business;
 using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Repository;
+using Abiomed.DotNetCore.Configuration;
+using Abiomed.DotNetCore.Storage;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Abiomed.Start
 {
     class Program
     {
+        private static IConfigurationRoot _configuration { get; set; }
+
         static void Main(string[] args)
         {
             try
             {
+                var builder = new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json");
+
+                _configuration = builder.Build();
+
+                string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
+
                 //setup our DI
                 var serviceProvider = new ServiceCollection()
                 .AddLogging()
@@ -26,7 +40,9 @@ namespace Abiomed.Start
                 .AddSingleton<IStatusControlCommunication, StatusControlCommunication>()
                 .AddSingleton<IRLMCommunication, RLMCommunication>()
                 .AddSingleton<IKeepAliveManager, KeepAliveManager>()
-                .AddSingleton<DotNetCore.Models.Configuration>()
+                .AddSingleton<IConfigurationCache, ConfigurationCache>()
+                .AddSingleton<IConfigurationManager, ConfigurationManager>()
+                .AddSingleton<ITableStorage, TableStorage>()
                 .AddScoped(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
                 .BuildServiceProvider();
 

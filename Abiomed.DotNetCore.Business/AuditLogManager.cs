@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Abiomed.DotNetCore.Storage;
 using Abiomed.Models;
+using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -11,14 +12,25 @@ namespace Abiomed.DotNetCore.Business
 
         private ITableStorage _iTableStorage;
         private string _auditTableName;
+        private IConfigurationCache _configurationCache; 
 
         #endregion
 
         #region Constructors
 
-        public AuditLogManager(string tableName, string connectionString)
+        public AuditLogManager(string tableName)
         {
-            Initialize(tableName, connectionString);
+            Initialize(tableName);
+        }
+
+        public AuditLogManager(ITableStorage tableStorage, IConfigurationCache configurationCache)
+        {
+            _configurationCache = configurationCache;
+            _iTableStorage = tableStorage;
+
+            _auditTableName = string.Empty;
+
+            Initialize();
         }
 
         #endregion
@@ -70,11 +82,14 @@ namespace Abiomed.DotNetCore.Business
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="storageConnection"></param>
-        private void Initialize(string tableName, string storageConnection)
+        private void Initialize()
         {
-            _iTableStorage = new TableStorage(storageConnection);
+            _iTableStorage.SetTableContextAsync(_auditTableName).Wait();
+        }
+
+        private void Initialize(string tableName)
+        {
             _iTableStorage.SetTableContextAsync(tableName).Wait();
-            _auditTableName = tableName;
         }
 
         #endregion

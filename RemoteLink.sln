@@ -65,7 +65,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.Reposito
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.Common", "Abiomed.DotNetCore.Common\Abiomed.DotNetCore.Common.csproj", "{6B98834A-557F-417C-9109-667515964466}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.FactoryData.Loader", "Abiomed.DotNetCore.FactoryData.Loader\Abiomed.DotNetCore.FactoryData.Loader.csproj", "{DF01A58C-2664-4E0B-8D8A-BE4F17B32802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.FactoryData.Loader", "Abiomed.DotNetCore.FactoryData.Loader\Abiomed.DotNetCore.FactoryData.Loader.csproj", "{DF01A58C-2664-4E0B-8D8A-BE4F17B32802}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abiomed.DotNetCore.Configuration", "Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj", "{E0A280B4-4F53-409E-9990-6E47D102F537}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +191,10 @@ Global
 		{DF01A58C-2664-4E0B-8D8A-BE4F17B32802}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF01A58C-2664-4E0B-8D8A-BE4F17B32802}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF01A58C-2664-4E0B-8D8A-BE4F17B32802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0A280B4-4F53-409E-9990-6E47D102F537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0A280B4-4F53-409E-9990-6E47D102F537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0A280B4-4F53-409E-9990-6E47D102F537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0A280B4-4F53-409E-9990-6E47D102F537}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -212,7 +218,7 @@ Global
 		{98CBC798-7FB7-4240-BFDC-A7CD7CE8E9FF} = {EE3D7FCB-A9FA-4C96-A0E1-BCE5F139B4AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BDF4D57B-4BE2-45F3-A9AA-995C3FBBACF9}
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+		SolutionGuid = {BDF4D57B-4BE2-45F3-A9AA-995C3FBBACF9}
 	EndGlobalSection
 EndGlobal

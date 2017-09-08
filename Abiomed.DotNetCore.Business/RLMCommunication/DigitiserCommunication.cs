@@ -10,8 +10,8 @@ using System;
 using Abiomed.DotNetCore.Models;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
 using Abiomed.DotNetCore.Repository;
+using Abiomed.DotNetCore.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Abiomed.DotNetCore.Business
@@ -21,16 +21,19 @@ namespace Abiomed.DotNetCore.Business
         private IKeepAliveManager _keepAliveManager;
         private ILogger<IDigitiserCommunication> _logger;
         private RLMDeviceList _rlmDeviceList;
-        private Abiomed.DotNetCore.Models.Configuration _configuration;
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
+        private IConfigurationCache _configurationCache;
+        private bool _isSecurity;
 
-        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogger<IDigitiserCommunication> logger, RLMDeviceList rlmDeviceList, Abiomed.DotNetCore.Models.Configuration configuration, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogger<IDigitiserCommunication> logger, RLMDeviceList rlmDeviceList, IRedisDbRepository<RLMDevice> redisDbRepository, IConfigurationCache configurationCache)
         {            
             _keepAliveManager = keepAliveManager;
             _logger = logger;
             _rlmDeviceList = rlmDeviceList;
-            _configuration = configuration;
+            _configurationCache = configurationCache;
             _redisDbRepository = redisDbRepository;
+
+            _isSecurity = _configurationCache.GetBooleanConfigurationItem("connectionmanager", "security");
         }
 
         #region Receiving
@@ -147,7 +150,7 @@ namespace Abiomed.DotNetCore.Business
             RLMDevice rlmDevice;
             _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
             List<byte> secureStream = Definitions.StreamVideoControlIndicationRTMP;            
-            if (_configuration.Security)
+            if (_isSecurity)
             {
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
             }
