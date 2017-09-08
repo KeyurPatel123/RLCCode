@@ -75,7 +75,7 @@ namespace Abiomed_WirelessRemoteLink
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
             AuditLogManager auditLogManager = new AuditLogManager(auditLogTableName, storageConnection);
             services.AddSingleton<IAuditLogManager>(auditLogManager);
-            services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueConnectionString, emailQueueName));
+            services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueName, emailQueueConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

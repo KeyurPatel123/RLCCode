@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.RLR.Communications\Abiomed.DotNetCore.RLR.Communications.csproj" />
   </ItemGroup>

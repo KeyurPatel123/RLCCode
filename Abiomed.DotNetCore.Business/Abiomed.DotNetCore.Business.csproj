@@ -6,12 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Communication\Abiomed.DotNetCore.Communication.csproj" />
-    <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Models\Abiomed.DotNetCore.Models.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Repository\Abiomed.DotNetCore.Repository.csproj" />

@@ -42,7 +42,7 @@ namespace Abiomed.DotNetCore.Business
         #endregion
 
         #region Constructors
-        public EmailManager(AuditLogManager auditLogManager, string queueStorageConnectionString, string queueName)
+        public EmailManager(AuditLogManager auditLogManager, string queueName, string queueStorageConnectionString)
         {
             if (auditLogManager == null)
             {

@@ -17,17 +17,16 @@ namespace Abiomed.DotNetCore.Storage
 
         private CloudTableClient _tableClient = null;
         private CloudTable _table = null;
-        private CloudStorageAccount _storageAccount = null;
 
         #endregion 
 
         #region Constructors
 
         /// <summary>
-        /// Constructor (overload) that sets the Table Context
+        /// Constructor 
         /// </summary>
         /// <param name="tableName"></param>
-        public TableStorage(string connection, string tableName = "")
+        public TableStorage(string connection)
         {
             if (string.IsNullOrWhiteSpace(connection))
             {
@@ -35,12 +34,6 @@ namespace Abiomed.DotNetCore.Storage
             }
 
             Initialize(connection);
-
-            if (!string.IsNullOrEmpty(tableName))
-            {
-                // Create the Table.
-                SetTableContextAsync(tableName).Wait();
-            }
         }
 
         /// <summary>
@@ -48,8 +41,8 @@ namespace Abiomed.DotNetCore.Storage
         /// </summary>
         private void Initialize(string storageConnection)
         {
-            _storageAccount = CloudStorageAccount.Parse(storageConnection);
-            _tableClient = _storageAccount.CreateCloudTableClient();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnection);
+            _tableClient = storageAccount.CreateCloudTableClient();
         }
 
         #endregion
@@ -297,18 +290,22 @@ namespace Abiomed.DotNetCore.Storage
             await _table.DeleteIfExistsAsync();
         }
 
-        #endregion
-
-        #region Private Methods
-
         /// <summary>
         /// Creates a New Table if it does not exist and sets the operation context to the specified table.
         /// </summary>
         /// <param name="tableName">Table Name to set context</param>
-        private async Task SetTableContextAsync(string tableName)
+        public async Task SetTableContextAsync(string tableName)
         {
-            _table = _tableClient.GetTableReference(tableName);
-            await _table.CreateIfNotExistsAsync();
+            if (string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentOutOfRangeException(tableContextCannotBeNull);
+            }
+
+            if (_table == null || _table.Name != tableName)
+            {
+                _table = _tableClient.GetTableReference(tableName);
+                await _table.CreateIfNotExistsAsync();
+            }
         }
         
         #endregion

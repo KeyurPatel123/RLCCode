@@ -21,5 +21,6 @@ namespace Abiomed.DotNetCore.Storage
        
         Task DropAsync();
         Task DropAsync(string tableName);
+        Task SetTableContextAsync(string tableName);
     }
 }

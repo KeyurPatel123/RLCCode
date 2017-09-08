@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Threading;
-using Abiomed.DotNetCore.Communication;
 using Abiomed.DotNetCore.Business;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Abiomed.DotNetCore.Storage;
 
 namespace Abiomed.DotNetCore.MessagePump
 {
@@ -19,15 +20,24 @@ namespace Abiomed.DotNetCore.MessagePump
         static private string _smtpHostName = string.Empty;
         static private int _portNumber = 0;
 
+        private static IConfigurationRoot _configuration { get; set; }
+        private static IConfigurationManager _configurationManager { get; set; }
+
         static void Main(string[] args)
         {
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+
+            _configuration = builder.Build();
+
             MainAsync(args).GetAwaiter().GetResult();
         }
 
         static private async Task MainAsync(string[] args)
         {
             Console.WriteLine("Starting Email Message Pump");
-            Initialize();
+            await Initialize();
             _emailManager.Listen(_fromEmail, _fromFriendlyname, _localDomainName, _smtpHostName, _portNumber, _textPart);
 
             Console.WriteLine("Press any key to exit after receiving all the messages.");
@@ -36,19 +46,26 @@ namespace Abiomed.DotNetCore.MessagePump
             await _emailManager.Stop();
         }
 
-        static private void Initialize()
+        static private async Task Initialize()
         {
-            // TODO - When Convert to .NetCore 2.0 Add to appsettings.json and read from that.
-            _queueName = "email";
-            _connection = "Endpoint=sb://remotelinkmessagebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=R9mtWNYmXF+4LtmZkrZAqFUT1U1FQxGkE5gvQGctntc=";
-            _fromEmail = "santa_abiomed@outlook.com";
-            _fromFriendlyname = "Abiomed Admin";
-            _localDomainName = "www.abiomed.com";
-            _textPart = "plain";
-            _smtpHostName = "USDVREX01.abiomed.com";
-            _portNumber = 25;
+            string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
+            ITableStorage tableStorage = new TableStorage(storageConnection);
+            _configurationManager = new ConfigurationManager(tableStorage);
+            _configurationManager.SetTableContext(_configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value);
 
-            _emailManager = new EmailManager(new AuditLogManager("abiomedauditlog", "DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w=="), _queueName, _connection, EmailServiceActor.Listener);
+            _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
+            _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
+            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogName, storageConnection);
+
+            _fromEmail = (await _configurationManager.GetItemAsync("smtpmanager", "fromemail")).Value;
+            _fromFriendlyname = (await _configurationManager.GetItemAsync("smtpmanager", "fromfriendlyname")).Value;
+            _localDomainName = (await _configurationManager.GetItemAsync("smtpmanager", "localdomain")).Value;
+            _textPart = (await _configurationManager.GetItemAsync("smtpmanager", "bodytexttype")).Value;
+            _smtpHostName = (await _configurationManager.GetItemAsync("smtpmanager", "host")).Value;
+            _portNumber = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "portnumber")).Value);
+
+            _emailManager = new EmailManager(auditLogManager, _queueName, _connection, EmailServiceActor.Listener);
         }
     }
 }

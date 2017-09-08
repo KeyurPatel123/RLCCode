@@ -2,13 +2,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Abiomed.DotNetCore.Storage;
 
 namespace Abiomed.DotNetCore.MailQueueService
 {
     class Program
     {
-        static string _storagePath = string.Empty;
-        static string _queueName = string.Empty;
         static string _from = string.Empty;
         static string _fromFriendlyName = string.Empty;
         static string _localDomain = string.Empty;
@@ -18,12 +19,20 @@ namespace Abiomed.DotNetCore.MailQueueService
 
         static int _pollingInterval = 0;
         static IEmailManager _emailManager;
+        private static IConfigurationRoot _configuration { get; set; }
+        private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Starting Queue = Email");
 
-            Initialize();
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+
+            _configuration = builder.Build();
+            Initialize().Wait();
+
             while (true)
             {
                 Task.Run(async () =>
@@ -34,20 +43,24 @@ namespace Abiomed.DotNetCore.MailQueueService
             }
         }
 
-        static private void Initialize()
+        static private async Task Initialize()
         {
-            // TODO - When Convert to .NetCore 2.0 Add to appsettings.json and read from that.
-            _queueName = "email";
-            _storagePath = "DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w==";
-            _pollingInterval = 5000;
-            _from = "NoReply_Abiomed@outlook.com";
-            _fromFriendlyName = "No Reply";
-            _localDomain = "www.abiomed.com";
-            _textPart = "plain";
-            _hostName = "USDVREX01.abiomed.com";
-            _port = 25;
+            string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
+            ITableStorage tableStorage = new TableStorage(storageConnection);
+            _configurationManager = new ConfigurationManager(tableStorage);
+            _configurationManager.SetTableContext(_configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value);
+            string queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
+            _pollingInterval = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "pollinginterval")).Value);
+            _from = (await _configurationManager.GetItemAsync("smtpmanager", "fromemail")).Value;
+            _fromFriendlyName = (await _configurationManager.GetItemAsync("smtpmanager", "fromfriendlyname")).Value;
+            _localDomain = (await _configurationManager.GetItemAsync("smtpmanager", "localdomain")).Value;
+            _textPart = (await _configurationManager.GetItemAsync("smtpmanager", "bodytexttype")).Value;
+            _hostName = (await _configurationManager.GetItemAsync("smtpmanager", "host")).Value;
+            _port = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "portnumber")).Value);
+            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
+            AuditLogManager auditLogManager = new AuditLogManager(auditLogName, storageConnection);
 
-            _emailManager = new EmailManager(new AuditLogManager("abiomedauditlog", "DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w=="), _storagePath, _queueName);
+            _emailManager = new EmailManager(auditLogManager, queueName, storageConnection);
         }
     }
 }

@@ -72,7 +72,8 @@ namespace Abiomed.DotNetCore.Business
         /// <param name="storageConnection"></param>
         private void Initialize(string tableName, string storageConnection)
         {
-            _iTableStorage = new TableStorage(storageConnection, tableName);
+            _iTableStorage = new TableStorage(storageConnection);
+            _iTableStorage.SetTableContextAsync(tableName).Wait();
             _auditTableName = tableName;
         }
 

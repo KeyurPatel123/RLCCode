@@ -23,11 +23,11 @@ namespace Abiomed.DotNetCore.Models
         private int _imageCountdownTimer = 600000;        
         private string _type = @"localhost";
         private string _certLocation = "";
-        private int _tcpPort;
-        private string _documentDBConnection = @"https://localhost:8081";
-        private string _documentDBConnectionPassword = @"C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        //private int _tcpPort;
+        //private string _documentDBConnection = @"https://localhost:8081";
+        //private string _documentDBConnectionPassword = @"C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         private string _redisConnect = @"localhost";
-        private bool _security = false;
+        //private bool _security = false;
         private string _signalRConnection = @"http://localhost:8080";
         // todo private Abiomed.Configuration.ConfigurationManager _configurationManager;
         // todo private System.Collections.Generic.List<ApplicationConfiguration> _settings;
@@ -78,7 +78,7 @@ namespace Abiomed.DotNetCore.Models
             string RedisCon = "localhost";// GetConnectionSetting("redisconnect");
             bool SecurityStatus = false;
             bool.TryParse(GetConnectionSetting("security"), out SecurityStatus);
-            _security = SecurityStatus;
+            //_security = SecurityStatus;
             _deviceStatus = GetConnectionSetting("imagesend");
 
             // Configure WOWZA Url
@@ -87,7 +87,7 @@ namespace Abiomed.DotNetCore.Models
             Definitions.StreamVideoControlIndication.Insert(14, WOWZALength);
             Definitions.StreamVideoControlIndication.InsertRange(15, WOWZABytes);
 
-            _security = SecurityStatus;
+            //_security = SecurityStatus;
 
             if (_type != @"localhost")
             {
@@ -102,8 +102,8 @@ namespace Abiomed.DotNetCore.Models
 
                 _imageSend = str.ToString();
 
-                _documentDBConnection = DocDbConnectionUri;
-                _documentDBConnectionPassword = DocDbConnectionPwd;
+               // _documentDBConnection = DocDbConnectionUri;
+               // _documentDBConnectionPassword = DocDbConnectionPwd;
                 _redisConnect = RedisCon;
                 _signalRConnection = @"http://13.82.178.248:80";
             }
@@ -111,10 +111,10 @@ namespace Abiomed.DotNetCore.Models
 
         private void optionsManager()
         {
-            _keepAliveTimer = 10000;//  Convert.ToInt32(GetOptionSetting("keepalivetimer"));
-            _certLocation = @""; // GetOptionSetting("certkey");
-            _tcpPort = 443; // Convert.ToInt32(GetOptionSetting("tcpport"));
-            _imageCountdownTimer = 600000;// Convert.ToInt32(GetOptionSetting("imagecountdowntimer"));
+            _keepAliveTimer = Convert.ToInt32(GetOptionSetting("keepalivetimer"));
+            _certLocation = GetOptionSetting("certkey");
+            _tcpPort = Convert.ToInt32(GetOptionSetting("tcpport"));
+            _imageCountdownTimer = Convert.ToInt32(GetOptionSetting("imagecountdowntimer"));
         }
 
         public string DeviceStatus
@@ -147,23 +147,23 @@ namespace Abiomed.DotNetCore.Models
             set { _certLocation = value; }
         }
 
-        public int TcpPort
-        {
-            get { return _tcpPort; }
-            set { _tcpPort = value; }
-        }
+       // public int TcpPort
+       // {
+          //  get { return _tcpPort; }
+          //  set { _tcpPort = value; }
+        //}
 
-        public string DocumentDBConnection
-        {
-            get { return _documentDBConnection; }
-            set { _documentDBConnection = value; }
-        }
+        //public string DocumentDBConnection
+        //{
+        //    get { return _documentDBConnection; }
+        //    set { _documentDBConnection = value; }
+        //}
 
-        public string DocumentDBConnectionPassword
-        {
-            get { return _documentDBConnectionPassword; }
-            set { _documentDBConnectionPassword = value; }
-        }
+        //public string DocumentDBConnectionPassword
+        //{
+        //    get { return _documentDBConnectionPassword; }
+        //    set { _documentDBConnectionPassword = value; }
+        //}
 
         public string RedisConnect
         {
@@ -171,11 +171,11 @@ namespace Abiomed.DotNetCore.Models
             set { _redisConnect = value; }
         }
 
-        public bool Security
-        {
-            get { return _security; }
-            set { _security = value; }
-        }
+        //public bool Security
+        //{
+        //    get { return _security; }
+        //    set { _security = value; }
+        //}
 
         public string SignalRConnection
         {
