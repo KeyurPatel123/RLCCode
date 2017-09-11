@@ -13,11 +13,17 @@ using ElCamino.AspNetCore.Identity.AzureTable.Model;
 using Abiomed.Storage;
 using Abiomed.Models;
 using Abiomed.DotNetCore.Business;
+using Abiomed.DotNetCore.Storage;
+using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed_WirelessRemoteLink
 {
     public class Startup
     {
+        private Abiomed.DotNetCore.Storage.ITableStorage _tableStorage;
+        private IConfigurationCache _configurationCache;
+        private IConfigurationManager _configurationManager;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -38,7 +44,6 @@ namespace Abiomed_WirelessRemoteLink
             string auditTableName = Configuration.GetSection("Auditing:TableName").Value;
             string emailQueueName = Configuration.GetSection("Email:ServiceQueue:QueueName").Value;
             string emailQueueConnectionString = Configuration.GetSection("Email:ServiceQueue:QueueStorageConnectionString").Value;
-
 
             // Add Elcamino Azure Table Identity services.
             services.AddIdentity<RemoteLinkUser, IdentityRole>((options) =>
@@ -72,8 +77,13 @@ namespace Abiomed_WirelessRemoteLink
 
             services.AddMvc();
 
+            _tableStorage = new Abiomed.DotNetCore.Storage.TableStorage();
+            _configurationManager = new ConfigurationManager(_tableStorage);
+            _configurationCache = new ConfigurationCache(_configurationManager);
+            _configurationCache.LoadCache().Wait();
+
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogTableName);
+            AuditLogManager auditLogManager = new AuditLogManager(_tableStorage, _configurationCache);
             services.AddSingleton<IAuditLogManager>(auditLogManager);
             services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueName, emailQueueConnectionString));
         }

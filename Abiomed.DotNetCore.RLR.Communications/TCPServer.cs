@@ -64,7 +64,7 @@ namespace Abiomed.RLR.DotNetCore.Communications
             _logger = logger;
 
             // Get Options
-            _configurationCache.GetConfigurationItem("optionsmanager", "certkey", out _certLocation);
+            _certLocation = _configurationCache.GetConfigurationItem("optionsmanager", "certkey");
             _port = _configurationCache.GetNumericConfigurationItem("optionsmanager", "tcpport");
 
             CreateCertificate();

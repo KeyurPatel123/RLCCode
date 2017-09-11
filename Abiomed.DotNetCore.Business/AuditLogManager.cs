@@ -28,7 +28,7 @@ namespace Abiomed.DotNetCore.Business
             _configurationCache = configurationCache;
             _iTableStorage = tableStorage;
 
-            _auditTableName = _configurationCache.GetConfigurationItem("", "");
+            _auditTableName = _configurationCache.GetConfigurationItem("auditlogmanager", "tablename");
 
             Initialize();
         }
