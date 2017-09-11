@@ -18,17 +18,10 @@ namespace Abiomed.DotNetCore.Business
 
         #region Constructors
 
-        public AuditLogManager(string tableName)
-        {
-            Initialize(tableName);
-        }
-
         public AuditLogManager(ITableStorage tableStorage, IConfigurationCache configurationCache)
         {
             _configurationCache = configurationCache;
             _iTableStorage = tableStorage;
-
-            _auditTableName = _configurationCache.GetConfigurationItem("auditlogmanager", "tablename");
 
             Initialize();
         }
@@ -84,12 +77,8 @@ namespace Abiomed.DotNetCore.Business
         /// <param name="storageConnection"></param>
         private void Initialize()
         {
+            _auditTableName = _configurationCache.GetConfigurationItem("auditlogmanager", "tablename");
             _iTableStorage.SetTableContextAsync(_auditTableName).Wait();
-        }
-
-        private void Initialize(string tableName)
-        {
-            _iTableStorage.SetTableContextAsync(tableName).Wait();
         }
 
         #endregion

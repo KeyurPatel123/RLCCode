@@ -12,16 +12,12 @@ namespace Abiomed.DotNetCore.MessagePump
     {
         static private IEmailManager _emailManager;
 
-        static private string _queueName = string.Empty;
-        static private string _connection = string.Empty;
         static private string _fromEmail = string.Empty;
         static private string _fromFriendlyname = string.Empty;
         static private string _localDomainName = string.Empty;
         static private string _textPart = string.Empty;
         static private string _smtpHostName = string.Empty;
         static private int _portNumber = 0;
-
-        private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
@@ -43,21 +39,21 @@ namespace Abiomed.DotNetCore.MessagePump
         static private async Task Initialize()
         {
             ITableStorage tableStorage = new TableStorage();
-            _configurationManager = new ConfigurationManager(tableStorage);
+            ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
+            IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
+            await configurationCache.LoadCache();
 
-            _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
-            _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
-            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogName);
+            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
+            string connection = configurationCache.GetConfigurationItem("smtpmanager", "queueconnection");
 
-            _fromEmail = (await _configurationManager.GetItemAsync("smtpmanager", "fromemail")).Value;
-            _fromFriendlyname = (await _configurationManager.GetItemAsync("smtpmanager", "fromfriendlyname")).Value;
-            _localDomainName = (await _configurationManager.GetItemAsync("smtpmanager", "localdomain")).Value;
-            _textPart = (await _configurationManager.GetItemAsync("smtpmanager", "bodytexttype")).Value;
-            _smtpHostName = (await _configurationManager.GetItemAsync("smtpmanager", "host")).Value;
-            _portNumber = int.Parse((await _configurationManager.GetItemAsync("smtpmanager", "portnumber")).Value);
+            _fromEmail = configurationCache.GetConfigurationItem("smtpmanager", "fromemail");
+            _fromFriendlyname = configurationCache.GetConfigurationItem("smtpmanager", "fromfriendlyname");
+            _localDomainName = configurationCache.GetConfigurationItem("smtpmanager", "localdomain");
+            _textPart = configurationCache.GetConfigurationItem("smtpmanager", "bodytexttype");
+            _smtpHostName = configurationCache.GetConfigurationItem("smtpmanager", "host");
+            _portNumber = configurationCache.GetNumericConfigurationItem("smtpmanager", "portnumber");
 
-            _emailManager = new EmailManager(auditLogManager, _queueName, _connection, EmailServiceActor.Listener);
+            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), queueName, connection, EmailServiceActor.Listener);
         }
     }
 }

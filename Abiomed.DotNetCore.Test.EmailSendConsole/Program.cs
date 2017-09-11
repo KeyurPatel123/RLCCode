@@ -9,10 +9,6 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
     class Program
     {
         private static IEmailManager _emailManager;
-        private static string _queueName = string.Empty;
-        private static string _connection = string.Empty;
-
-        private static IConfigurationManager _configurationManager { get; set; }
 
         static void Main(string[] args)
         {
@@ -33,13 +29,14 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
         private static async Task Initialize()
         {
             ITableStorage tableStorage = new TableStorage();
-            _configurationManager = new ConfigurationManager(tableStorage);
+            ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
+            IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
+            await configurationCache.LoadCache();
 
-            _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
-            _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
-            string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            IAuditLogManager auditLogManager = new AuditLogManager(auditLogName);
-            _emailManager = new EmailManager(auditLogManager, _queueName, _connection);
+            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
+            string connection = configurationCache.GetConfigurationItem("smtpmanager", "queueconnection");
+
+            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), queueName, connection);
         }
 
     }

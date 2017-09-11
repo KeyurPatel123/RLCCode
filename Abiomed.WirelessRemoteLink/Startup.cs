@@ -20,10 +20,6 @@ namespace Abiomed_WirelessRemoteLink
 {
     public class Startup
     {
-        private Abiomed.DotNetCore.Storage.ITableStorage _tableStorage;
-        private IConfigurationCache _configurationCache;
-        private IConfigurationManager _configurationManager;
-
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -77,19 +73,29 @@ namespace Abiomed_WirelessRemoteLink
 
             services.AddMvc();
 
-            _tableStorage = new Abiomed.DotNetCore.Storage.TableStorage();
-            _configurationManager = new ConfigurationManager(_tableStorage);
-            _configurationCache = new ConfigurationCache(_configurationManager);
-            _configurationCache.LoadCache().Wait();
+            Abiomed.DotNetCore.Storage.TableStorage tableStorage = new Abiomed.DotNetCore.Storage.TableStorage();
+            services.AddSingleton<Abiomed.DotNetCore.Storage.ITableStorage>(tableStorage);
+            ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
+            services.AddSingleton<IConfigurationManager>(configurationManager);
+            ConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
+            configurationCache.LoadCache().Wait();
+            services.AddSingleton<IConfigurationCache>(configurationCache);
 
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
-            AuditLogManager auditLogManager = new AuditLogManager(_tableStorage, _configurationCache);
+            AuditLogManager auditLogManager = new AuditLogManager(tableStorage, configurationCache);
             services.AddSingleton<IAuditLogManager>(auditLogManager);
             services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueName, emailQueueConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IAuditLogManager auditLogManager, IEmailManager emailManager)
+        public void Configure(IApplicationBuilder app, 
+                                IHostingEnvironment env, 
+                                ILoggerFactory loggerFactory, 
+                                IAuditLogManager auditLogManager, 
+                                IEmailManager emailManager, 
+                                Abiomed.DotNetCore.Storage.ITableStorage tableStorage,
+                                IConfigurationManager configurationManager,
+                                IConfigurationCache configurationCache)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
