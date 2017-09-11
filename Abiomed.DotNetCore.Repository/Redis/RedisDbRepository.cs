@@ -29,8 +29,7 @@ namespace Abiomed.DotNetCore.Repository
 
         public RedisDbRepository(IConfigurationCache configurationCache)
         {
-            _configurationCache = configurationCache;
-            _configurationCache.LoadCache().Wait();
+            _configurationCache = configurationCache;            
 
             string redisConnect = string.Empty;
             _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect", out redisConnect);

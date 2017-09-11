@@ -9,6 +9,7 @@ using Abiomed.DotNetCore.Configuration;
 using Abiomed.DotNetCore.Storage;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Abiomed.RLR.DotNetCore.Communications;
 
 namespace Abiomed.Start
 {
@@ -32,6 +33,7 @@ namespace Abiomed.Start
                 var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<InsecureTCPServer>()
+                .AddSingleton<TCPServer>()
                 .AddSingleton<RLMCommunication>()
                 .AddSingleton<RLMDeviceList>()
                 .AddSingleton<IDigitiserCommunication, DigitiserCommunication>()
@@ -56,8 +58,22 @@ namespace Abiomed.Start
                                 
                 _logger.LogInformation("Starting RLR");
 
-                var _tcpServer = serviceProvider.GetService<InsecureTCPServer>();
-                _tcpServer.Run();
+                var configurationCache = serviceProvider.GetService<IConfigurationCache>();
+                configurationCache.LoadCache().Wait();
+
+                var security = configurationCache.GetBooleanConfigurationItem("connectionmanager", "security");
+
+                if(security)
+                {
+                    var _tcpServer = serviceProvider.GetService<TCPServer>();
+                    _tcpServer.Run();
+                }
+                else
+                {
+                    var _tcpServer = serviceProvider.GetService<InsecureTCPServer>();
+                    _tcpServer.Run();
+                }
+                
             }
             catch (Exception e)
             {

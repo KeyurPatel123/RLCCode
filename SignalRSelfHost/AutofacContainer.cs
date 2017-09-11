@@ -31,11 +31,11 @@ namespace Abiomed.SignalRSelfHost
             builder.RegisterHubs(Assembly.GetExecutingAssembly()).SingleInstance();
 
             builder.RegisterType<Startup>().SingleInstance();
-            builder.RegisterType<LogManager>().As<ILogManager>().SingleInstance();
-            builder.RegisterGeneric(typeof(DocumentDBRepository<>)).SingleInstance();
+            //builder.RegisterType<LogManager>().As<ILogManager>().SingleInstance();
+            //builder.RegisterGeneric(typeof(DocumentDBRepository<>)).SingleInstance();
 
             builder.RegisterGeneric(typeof(RedisDbRepository<>)).As(typeof(IRedisDbRepository<>)).SingleInstance();
-            builder.RegisterType<Configuration>().SingleInstance();
+            //builder.RegisterType<Configuration>().SingleInstance();
 
             // Set the dependency resolver to be Autofac.
             Container = builder.Build();

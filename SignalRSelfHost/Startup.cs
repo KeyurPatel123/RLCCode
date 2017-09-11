@@ -11,10 +11,10 @@ namespace Abiomed.SignalRSelfHost
 {
     public class Startup
     {
-        private Configuration _configuration;
-        public Startup(Configuration configuration)
+        //private Configuration _configuration;
+        public Startup()
         {
-            _configuration = configuration;
+            //_configuration = configuration;
         }
 
         public void Start()
@@ -25,7 +25,7 @@ namespace Abiomed.SignalRSelfHost
             // for more information.
             using (WebApp.Start<Startup>("http://*:8080"))
             {
-                Console.WriteLine("Server running on {0}", _configuration.SignalRConnection);
+                Console.WriteLine("Server running on 8088");
                 Console.ReadLine();
             }
         }

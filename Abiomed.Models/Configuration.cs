@@ -27,7 +27,7 @@ namespace Abiomed.Models
         private int _tcpPort;
         private string _documentDBConnection = @"https://localhost:8081";
         private string _documentDBConnectionPassword = @"C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-        private string _redisConnect = @"localhost";
+        private string _redisConnect = @"abmd.redis.cache.windows.net, abortConnect=false,ssl=true,password=6sfN8jGyo0al+dMDdML4KMt0f59lCuqX0Wk9FJfxwPw=";
         private bool _security = false;
         private string _signalRConnection = @"http://localhost:8080";
         private Abiomed.Configuration.ConfigurationManager _configurationManager;
@@ -77,7 +77,7 @@ namespace Abiomed.Models
             string DocDbConnectionUri = GetConnectionSetting("docdburi"); 
             string DocDbConnectionPwd = GetConnectionSetting("docdbpwd");  
             string RedisCon = GetConnectionSetting("redisconnect");
-            bool SecurityStatus = false;
+            bool SecurityStatus = true;
             bool.TryParse(GetConnectionSetting("security"), out SecurityStatus);
             _security = SecurityStatus;
             _deviceStatus = GetConnectionSetting("imagesend");
