@@ -2,6 +2,9 @@
 using Abiomed.DotNetCore.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Abiomed.DotNetCore.Configuration 
 {
@@ -10,8 +13,8 @@ namespace Abiomed.DotNetCore.Configuration
         private const string _featureNameCannotBeNullEmptyOrWhitespace = "Feature Name cannot be null, empty, or whitespace.";
         private const string _keyNameCannotBeNullEmptyOrWhitespace = "Key Name cannot be null, empty, or whitespace.";
         private const string _keyNotFound = "Key not found - value could not be trieved from configurationCache.";
-        private const string _couldNotConvertToInt = "Value {0} retrieved from configuration Cache is not a numeric type.";
-        private const string _couldNotConvertToBool = "Value {0} retrieved from configuration Cache is not a boolean type.";
+        private const string _couldNotConvertToInt = "Configuration Setting {0} : {1} with Value {2} is not numeric.";
+        private const string _couldNotConvertToBool = "Configuration Setting {0} : {1} with Value {2} is not boolean.";
 
         private List<ConfigurationSetting> _configurationSettings;
         private IConfigurationManager _configurationManager;
@@ -36,12 +39,12 @@ namespace Abiomed.DotNetCore.Configuration
 
                 _configurationSettings.Add(configurationSetting);
             }
+
+            OverrideSettings();
         }
 
-        public void GetConfigurationItem(string featureName, string keyName, out string value)
+        public string GetConfigurationItem(string featureName, string keyName)
         {
-            value = string.Empty;
-
             if (string.IsNullOrWhiteSpace(featureName))
             {
                 throw new ArgumentOutOfRangeException(_featureNameCannotBeNullEmptyOrWhitespace);
@@ -59,7 +62,7 @@ namespace Abiomed.DotNetCore.Configuration
                 throw new ArgumentOutOfRangeException(_keyNotFound);
             }
 
-            value = configurationSetting.Value;
+           return configurationSetting.Value;
         }
 
         public int GetNumericConfigurationItem(string featureName, string keyName)
@@ -74,12 +77,11 @@ namespace Abiomed.DotNetCore.Configuration
                 throw new ArgumentOutOfRangeException(_keyNameCannotBeNullEmptyOrWhitespace);
             }
 
-            string value = string.Empty;
-            GetConfigurationItem(featureName, keyName, out value);
+            string value = GetConfigurationItem(featureName, keyName);
             int result = int.MinValue;
             if (!int.TryParse(value, out result))
             {
-                throw new InvalidCastException(string.Format(_couldNotConvertToInt, value));
+                throw new InvalidCastException(string.Format(_couldNotConvertToInt, featureName, keyName, value));
             }
 
             return result;
@@ -97,16 +99,43 @@ namespace Abiomed.DotNetCore.Configuration
                 throw new ArgumentOutOfRangeException(_keyNameCannotBeNullEmptyOrWhitespace);
             }
 
-            string value = string.Empty;
-            GetConfigurationItem(featureName, keyName, out value);
+            string value = GetConfigurationItem(featureName, keyName);
             bool result = false;
             if (!bool.TryParse(value, out result))
             {
-                throw new InvalidCastException(string.Format(_couldNotConvertToBool, value));
+                throw new InvalidCastException(string.Format(_couldNotConvertToBool, featureName, keyName, value));
             }
 
             return result;
         }
 
+        private void OverrideSettings()
+        {
+            var settingsToOverride = new List<ConfigurationSetting>();
+
+            string path = Directory.GetCurrentDirectory() + @"\overrideappsettings.json";
+
+            if (File.Exists(path))
+            {
+                JArray settings = JArray.Parse(File.ReadAllText(path));
+                IList<ConfigurationSetting> configurationSettings = settings.Select(p => new ConfigurationSetting
+                {
+                    Category = (string)p["Category"],
+                    Name = (string)p["Name"],
+                    Value = (string)p["Value"]
+                }).ToList();
+
+                foreach (var setting in configurationSettings)
+                {
+                    ConfigurationSetting configurationSetting = _configurationSettings.Find(x => x.Category == setting.Category && x.Name == setting.Name);
+
+                    if (configurationSetting != null)
+                    {
+                        _configurationSettings.Remove(configurationSetting);
+                    }
+                    _configurationSettings.Add(setting);
+                }
+            }
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace Abiomed.DotNetCore.Business
             _auditLogManager = auditLogManager;
         }
 
-        public EmailManager(AuditLogManager auditLogManager, string queueName, string connection, EmailServiceActor serviceActor)
+        public EmailManager(IAuditLogManager auditLogManager, string queueName, string connection, EmailServiceActor serviceActor)
         {
             if (auditLogManager == null)
             {

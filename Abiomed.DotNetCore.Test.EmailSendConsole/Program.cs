@@ -2,8 +2,6 @@
 using Abiomed.DotNetCore.Configuration;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.IO;
 using Abiomed.DotNetCore.Storage;
 
 namespace Abiomed.DotNetCore.Test.EmailSendConsole
@@ -40,7 +38,7 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
             _queueName = (await _configurationManager.GetItemAsync("smtpmanager", "queuename")).Value;
             _connection = (await _configurationManager.GetItemAsync("smtpmanager", "queueconnection")).Value;
             string auditLogName = (await _configurationManager.GetItemAsync("auditlogmanager", "tablename")).Value;
-            AuditLogManager auditLogManager = new AuditLogManager(auditLogName);
+            IAuditLogManager auditLogManager = new AuditLogManager(auditLogName);
             _emailManager = new EmailManager(auditLogManager, _queueName, _connection);
         }
 

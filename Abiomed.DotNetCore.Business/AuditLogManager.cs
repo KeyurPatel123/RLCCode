@@ -28,7 +28,7 @@ namespace Abiomed.DotNetCore.Business
             _configurationCache = configurationCache;
             _iTableStorage = tableStorage;
 
-            _auditTableName = string.Empty;
+            _auditTableName = _configurationCache.GetConfigurationItem("", "");
 
             Initialize();
         }

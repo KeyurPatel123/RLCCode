@@ -5,7 +5,7 @@ namespace Abiomed.DotNetCore.Configuration
     public interface IConfigurationCache
     {
         Task LoadCache();
-        void GetConfigurationItem(string featureName, string keyName, out string value);
+        string GetConfigurationItem(string featureName, string keyName);
         int GetNumericConfigurationItem(string featureName, string keyName);
         bool GetBooleanConfigurationItem(string featureName, string keyName);
     }

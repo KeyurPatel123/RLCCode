@@ -32,8 +32,7 @@ namespace Abiomed.DotNetCore.Repository
             _configurationCache = configurationCache;
             _configurationCache.LoadCache().Wait();
 
-            string redisConnect = string.Empty;
-            _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect", out redisConnect);
+            string redisConnect = _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect");
             _connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnect);
 
             var endPoints = _connectionMultiplexer.GetEndPoints();
@@ -178,6 +177,7 @@ namespace Abiomed.DotNetCore.Repository
         }
 
         #endregion
+
         #region Helpers
 
         //generate a key from a given key and the class name of the object we are storing
