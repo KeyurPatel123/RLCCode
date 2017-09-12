@@ -30,16 +30,17 @@ namespace Abiomed.DotNetCore.ServiceBus
             {
                 throw new ArgumentNullException(_configurationCacheCannotBeNull);
             }
+            _configurationCache = configurationCache;
 
-            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
+            string queueName = _configurationCache.GetConfigurationItem("smtpmanager", "queuename");
 
             if (string.IsNullOrWhiteSpace(queueName))
             {
                 throw new ArgumentOutOfRangeException(_queueNameCannotBeEmpty);
             }
 
-            string connection = configurationCache.GetConfigurationItem("smtpmanager", "servicebusconnection");
-            if (string.IsNullOrWhiteSpace(queueName))
+            string connection = _configurationCache.GetConfigurationItem("smtpmanager", "servicebusconnection");
+            if (string.IsNullOrWhiteSpace(connection))
             {
                 throw new ArgumentOutOfRangeException(_connectionStringCannotBeEmpty);
             }
