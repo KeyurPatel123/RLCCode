@@ -21,6 +21,7 @@ namespace Abiomed.DotNetCore.Repository
 
         public RedisDbContext(IConfigurationCache configurationCache)
         {
+            _configurationCache = configurationCache;
             string redisConnect = _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect");
 
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>

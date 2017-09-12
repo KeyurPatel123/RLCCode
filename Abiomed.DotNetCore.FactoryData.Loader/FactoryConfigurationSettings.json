@@ -78,5 +78,20 @@
     "Category": "auditlogmanager",
     "Name": "tablename",
     "Value": "abiomedauditlog"
+  },
+  {
+    "Category": "userrole",
+    "Name": "staff",
+    "Value": "abiomed employee staff role"
+  },
+  {
+    "Category": "userrole",
+    "Name": "admin",
+    "Value": "administrator role"
+  },
+  {
+    "Category": "userrole",
+    "Name": "csc",
+    "Value": "csc staff role"
   }
 ]

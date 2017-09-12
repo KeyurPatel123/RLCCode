@@ -41,14 +41,17 @@ namespace Abiomed.DotNetCore.Configuration
             List<ApplicationConfiguration> applicationConfigurations =  await _configurationManager.GetAllAsync();
             foreach(ApplicationConfiguration applicationConfiguration in applicationConfigurations)
             {
-                ConfigurationSetting configurationSetting = new ConfigurationSetting
+                if (applicationConfiguration.Active)
                 {
-                    Category = applicationConfiguration.PartitionKey,
-                    Name = applicationConfiguration.RowKey,
-                    Value = applicationConfiguration.Value
-                };
+                    ConfigurationSetting configurationSetting = new ConfigurationSetting
+                    {
+                        Category = applicationConfiguration.PartitionKey,
+                        Name = applicationConfiguration.RowKey,
+                        Value = applicationConfiguration.Value
+                    };
 
-                _configurationSettings.Add(configurationSetting);
+                    _configurationSettings.Add(configurationSetting);
+                }
             }
 
             OverrideSettings();
