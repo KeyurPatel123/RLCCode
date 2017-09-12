@@ -36,8 +36,6 @@ namespace Abiomed.DotNetCore.MessagePump
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
             await configurationCache.LoadCache();
 
-            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
-            string connection = configurationCache.GetConfigurationItem("smtpmanager", "queueconnection");
             configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.ServiceBus.ToString());
             configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());
 

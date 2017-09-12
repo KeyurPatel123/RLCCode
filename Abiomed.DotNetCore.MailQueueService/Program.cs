@@ -11,14 +11,6 @@ namespace Abiomed.DotNetCore.MailQueueService
 {
     class Program
     {
-        static string _from = string.Empty;
-        static string _fromFriendlyName = string.Empty;
-        static string _localDomain = string.Empty;
-        static string _textPart = string.Empty;
-        static string _hostName = string.Empty;
-        static string _connection = string.Empty;
-        static int _port = 0;
-
         static int _pollingInterval = 0;
         static IEmailManager _emailManager;
 
@@ -44,6 +36,7 @@ namespace Abiomed.DotNetCore.MailQueueService
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
             await configurationCache.LoadCache();
 
+            _pollingInterval = configurationCache.GetNumericConfigurationItem("smtpmanager", "pollinginterval");
             configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());
             configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());
 
