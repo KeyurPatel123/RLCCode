@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Abiomed.DotNetCore.Storage
 {
@@ -23,24 +23,15 @@ namespace Abiomed.DotNetCore.Storage
         private CloudStorageAccount _storageAccount = null;
         private CloudQueueMessage _retrievedMessage = null;
 
+        private IConfigurationRoot _configuration { get; set; }
+
         #endregion
 
         #region Constructors
 
-        public QueueStorage(string connection, string queueName = "")
+        public QueueStorage()
         {
-            if (string.IsNullOrWhiteSpace(connection))
-            {
-                throw new ArgumentOutOfRangeException(QueueNameCannotBeNull);
-            }
-
-            Initialize(connection);
-
-            if (!string.IsNullOrEmpty(queueName))
-            {
-                // Create the Table.
-                SetQueueAsync(queueName).Wait();
-            }
+            Initialize();
         }
 
         #endregion
@@ -170,6 +161,21 @@ namespace Abiomed.DotNetCore.Storage
             return _queue.Name;
         }
 
+        /// <summary>
+        /// Sets the Context as to which Queue is the active Queue being used by this instance
+        /// </summary>
+        /// <param name="queueName"></param>
+        public async Task SetQueueAsync(string queueName)
+        {
+            if (string.IsNullOrWhiteSpace(queueName))
+            {
+                throw new ArgumentOutOfRangeException(QueueNameCannotBeNull);
+            }
+
+            _queue = _queueClient.GetQueueReference(queueName);
+            await _queue.CreateIfNotExistsAsync();
+        }
+
         #endregion
 
         #region Private Methods
@@ -177,20 +183,15 @@ namespace Abiomed.DotNetCore.Storage
         /// <summary>
         /// Shared Constructor Initialization Code
         /// </summary>
-        private void Initialize(string storageConnection)
+        private void Initialize()
         {
-            _storageAccount = CloudStorageAccount.Parse(storageConnection);
-            _queueClient = _storageAccount.CreateCloudQueueClient();
-        }
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            _configuration = builder.Build();
 
-        /// <summary>
-        /// Sets the Context as to which Queue is the active Queue being used by this instance
-        /// </summary>
-        /// <param name="queueName"></param>
-        private async Task SetQueueAsync(string queueName)
-        {
-            _queue = _queueClient.GetQueueReference(queueName);
-            await _queue.CreateIfNotExistsAsync();
+            _storageAccount = CloudStorageAccount.Parse(_configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value);
+            _queueClient = _storageAccount.CreateCloudQueueClient();
         }
 
         #endregion

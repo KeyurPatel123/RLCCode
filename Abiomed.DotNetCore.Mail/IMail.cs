@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Abiomed.Models;
 
-namespace Abiomed.DotNetCore
+namespace Abiomed.DotNetCore.Mail
 {
     public interface IMail
     {

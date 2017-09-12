@@ -6,12 +6,15 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
-namespace Abiomed.DotNetCore.Configuration 
+namespace Abiomed.DotNetCore.Configuration
 {
     public class ConfigurationCache : IConfigurationCache
     {
+        #region Member Variables
+
         private const string _featureNameCannotBeNullEmptyOrWhitespace = "Feature Name cannot be null, empty, or whitespace.";
         private const string _keyNameCannotBeNullEmptyOrWhitespace = "Key Name cannot be null, empty, or whitespace.";
+        private const string _valueCannotBeNullEmptyOrWhitespace = "Value cannot be null, empty, or whitespace.";
         private const string _keyNotFound = "Key not found - value could not be trieved from configurationCache.";
         private const string _couldNotConvertToInt = "Configuration Setting {0} : {1} with Value {2} is not numeric.";
         private const string _couldNotConvertToBool = "Configuration Setting {0} : {1} with Value {2} is not boolean.";
@@ -19,10 +22,18 @@ namespace Abiomed.DotNetCore.Configuration
         private List<ConfigurationSetting> _configurationSettings;
         private IConfigurationManager _configurationManager;
 
+        #endregion
+
+        #region Constructors
+
         public ConfigurationCache(IConfigurationManager configurationManager)
         {
             _configurationManager = configurationManager; 
         }
+
+        #endregion
+
+        #region Public Methods
 
         public async Task LoadCache()
         {
@@ -77,9 +88,8 @@ namespace Abiomed.DotNetCore.Configuration
                 throw new ArgumentOutOfRangeException(_keyNameCannotBeNullEmptyOrWhitespace);
             }
 
-            string value = GetConfigurationItem(featureName, keyName);
-            int result = int.MinValue;
-            if (!int.TryParse(value, out result))
+            string value = GetConfigurationItem(featureName, keyName);;
+            if (!int.TryParse(value, out int result))
             {
                 throw new InvalidCastException(string.Format(_couldNotConvertToInt, featureName, keyName, value));
             }
@@ -100,14 +110,42 @@ namespace Abiomed.DotNetCore.Configuration
             }
 
             string value = GetConfigurationItem(featureName, keyName);
-            bool result = false;
-            if (!bool.TryParse(value, out result))
+            if (!bool.TryParse(value, out bool result))
             {
                 throw new InvalidCastException(string.Format(_couldNotConvertToBool, featureName, keyName, value));
             }
 
             return result;
         }
+
+        public void AddItemToCache(string category, string name, string value)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                throw new ArgumentOutOfRangeException(_featureNameCannotBeNullEmptyOrWhitespace);
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentOutOfRangeException(_keyNameCannotBeNullEmptyOrWhitespace);
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentOutOfRangeException(_valueCannotBeNullEmptyOrWhitespace);
+            }
+
+            ConfigurationSetting configurationSetting = new ConfigurationSetting
+            {
+                Category = category,
+                Name = name,
+                Value = value
+            };
+            _configurationSettings.Add(configurationSetting);
+
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private void OverrideSettings()
         {
@@ -137,5 +175,7 @@ namespace Abiomed.DotNetCore.Configuration
                 }
             }
         }
+
+        #endregion
     }
 }

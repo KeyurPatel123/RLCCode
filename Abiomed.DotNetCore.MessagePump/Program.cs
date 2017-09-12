@@ -12,13 +12,6 @@ namespace Abiomed.DotNetCore.MessagePump
     {
         static private IEmailManager _emailManager;
 
-        static private string _fromEmail = string.Empty;
-        static private string _fromFriendlyname = string.Empty;
-        static private string _localDomainName = string.Empty;
-        static private string _textPart = string.Empty;
-        static private string _smtpHostName = string.Empty;
-        static private int _portNumber = 0;
-
         static void Main(string[] args)
         {
             MainAsync(args).GetAwaiter().GetResult();
@@ -28,7 +21,7 @@ namespace Abiomed.DotNetCore.MessagePump
         {
             Console.WriteLine("Starting Email Message Pump");
             await Initialize();
-            _emailManager.Listen(_fromEmail, _fromFriendlyname, _localDomainName, _smtpHostName, _portNumber, _textPart);
+            _emailManager.Listen();
 
             Console.WriteLine("Press any key to exit after receiving all the messages.");
             Console.ReadKey();
@@ -45,15 +38,10 @@ namespace Abiomed.DotNetCore.MessagePump
 
             string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
             string connection = configurationCache.GetConfigurationItem("smtpmanager", "queueconnection");
+            configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.ServiceBus.ToString());
+            configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());
 
-            _fromEmail = configurationCache.GetConfigurationItem("smtpmanager", "fromemail");
-            _fromFriendlyname = configurationCache.GetConfigurationItem("smtpmanager", "fromfriendlyname");
-            _localDomainName = configurationCache.GetConfigurationItem("smtpmanager", "localdomain");
-            _textPart = configurationCache.GetConfigurationItem("smtpmanager", "bodytexttype");
-            _smtpHostName = configurationCache.GetConfigurationItem("smtpmanager", "host");
-            _portNumber = configurationCache.GetNumericConfigurationItem("smtpmanager", "portnumber");
-
-            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), queueName, connection, EmailServiceActor.Listener);
+            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), configurationCache);
         }
     }
 }

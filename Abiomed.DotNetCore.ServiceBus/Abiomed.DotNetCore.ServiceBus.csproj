@@ -1,18 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="1.18.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
-    <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
-    <ProjectReference Include="..\Configuration\Abiomed.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

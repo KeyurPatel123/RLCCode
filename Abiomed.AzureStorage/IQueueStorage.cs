@@ -15,5 +15,6 @@ namespace Abiomed.DotNetCore.Storage
         string GetMessageContent();
         Task ChangeQueueAsync(string newQueueName);
         string GetMyQueueName();
+        Task SetQueueAsync(string queueName);
     }
 }

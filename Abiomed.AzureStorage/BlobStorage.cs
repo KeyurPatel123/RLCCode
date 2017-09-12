@@ -5,6 +5,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO;
 using Abiomed.DotNetCore.Common;
+using Microsoft.Extensions.Configuration;
 
 namespace Abiomed.DotNetCore.Storage
 {
@@ -25,6 +26,8 @@ namespace Abiomed.DotNetCore.Storage
         private CloudBlobClient _blobClient = null;
         private CloudBlobContainer _blobContainer = null;
 
+        private IConfigurationRoot _configuration { get; set; }
+
         #endregion
 
         #region Constructors
@@ -35,16 +38,6 @@ namespace Abiomed.DotNetCore.Storage
         public BlobStorage()
         {
             Initialize();
-        }
-
-        /// <summary>
-        /// Blob Storage Constructor taking Container name as A Parameter
-        /// </summary>
-        /// <param name="containerName">The Blob Storage Container Name</param>
-        public BlobStorage(string containerName)
-        {
-            Initialize();
-            SetContainerContextAsync(containerName).Wait();
 
             // Impoprtant Note - According to https://docs.microsoft.com/en-us/azure/storage/storage-dotnet-how-to-use-blobs 
             // Anyone on the Internet can see blobs in a public container. However, you can modify or delete them only if you have the appropriate account access key or a shared access signature.
@@ -171,8 +164,12 @@ namespace Abiomed.DotNetCore.Storage
         {
             try
             {
-                _storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w==");                
-                // todo _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json");
+                _configuration = builder.Build();
+
+                _storageAccount = CloudStorageAccount.Parse(_configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value);                
                 _blobClient = _storageAccount.CreateCloudBlobClient();
             }
             catch (StorageException storageException)

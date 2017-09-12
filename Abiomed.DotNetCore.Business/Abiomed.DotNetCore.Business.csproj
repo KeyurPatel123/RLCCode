@@ -11,11 +11,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
-    <ProjectReference Include="..\Abiomed.DotNetCore.Communication\Abiomed.DotNetCore.Communication.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Models\Abiomed.DotNetCore.Models.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Repository\Abiomed.DotNetCore.Repository.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.ServiceBus\Abiomed.DotNetCore.ServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>

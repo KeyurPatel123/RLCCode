@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Abiomed.DotNetCore.Communication;
 using Abiomed.Models;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
@@ -9,6 +7,8 @@ using System.Threading;
 using Abiomed.DotNetCore.Storage;
 using Newtonsoft.Json;
 using Abiomed.DotNetCore.Configuration;
+using Abiomed.DotNetCore.Mail;
+using Abiomed.DotNetCore.ServiceBus;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -25,58 +25,72 @@ namespace Abiomed.DotNetCore.Business
         private const string _instanceIsInServiceBusMode = "Running in Service Bus Mode";
         private const string _portNumberMustBeGreaterThanZero = "Port number must be greater than zero";
         private const string _cannotBeNullEmptyOrWhitespace = " cannot be null, empty or whitespace";
-        private const string _auditLogManagerCannotBeNull = "Audit Log Manager object cannot be null";
+        private const string _auditLogManagerCannotBeNull = "Audit Log Manager cannot be null";
+        private const string _configurationCacheCannotBeNull = "ConfigurationCache cannot be null";
+        private const string _smtpManagerTypeNotConfigured = "SMTP Manager Type (Queue or Service Bus) is not defined";
+        private const string _smtpActorNotConfigured = "SMTP Actor (Listener or Broadcaster) not defined";
 
-        private string _queueName = string.Empty;
-        private string _connection = string.Empty;
         private EmailServiceActor _runningAs = new EmailServiceActor();
 
         static private IMail _mail;
         private IServiceBus _serviceBus;
         private IQueueClient _queueClient;
         private IAuditLogManager _auditLogManager;
+        private IConfigurationCache _configurationCache;
 
         // Stop Gap until Service Bus Works
         private IQueueStorage _queueStorage;
-        //private IConfigurationCache _configurationCache;
+
         private bool _isServiceBusMode = false;
 
         #endregion
 
         #region Constructors
-        public EmailManager(IAuditLogManager auditLogManager, string queueName, string queueStorageConnectionString)
+
+        public EmailManager(IAuditLogManager auditLogManager, IConfigurationCache configurationCache)
         {
             if (auditLogManager == null)
             {
                 throw new ArgumentNullException(_auditLogManagerCannotBeNull);
             }
-            ValidateRequiredString(queueName, "Queue Name");
-            ValidateRequiredString(queueStorageConnectionString, "Storage Connection");
 
-           _isServiceBusMode = false;
-            _queueStorage = new QueueStorage(queueStorageConnectionString, queueName);
-            _queueName = queueName;
-            _auditLogManager = auditLogManager;
-        }
-
-        public EmailManager(IAuditLogManager auditLogManager, string queueName, string connection, EmailServiceActor serviceActor)
-        {
-            if (auditLogManager == null)
+            if (configurationCache == null)
             {
-                throw new ArgumentNullException(_auditLogManagerCannotBeNull);
-            }
-            ValidateRequiredString(queueName, "Queue Name");
-            ValidateRequiredString(connection, "Connection");
-
-            if (serviceActor == EmailServiceActor.Unknown)
-            {
-                throw new ArgumentOutOfRangeException(_serviceActorMustBeListenerOrBroadcaster);
+                throw new ArgumentNullException(_configurationCacheCannotBeNull);
             }
 
-            _isServiceBusMode = true;
-            _serviceBus = new ServiceBus(queueName, connection);
-            _runningAs = serviceActor;
+            // Is it a queue or service bus
+            if (!Enum.TryParse(configurationCache.GetConfigurationItem("smtpmanager", "emailservicetype"), out EmailServiceType emailServiceType))
+            {
+                throw new ArgumentOutOfRangeException(_smtpManagerTypeNotConfigured);
+            }
+
+            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
+            ValidateRequiredString(queueName, "Queue Name");
+
+            if (!Enum.TryParse(configurationCache.GetConfigurationItem("smtpmanager", "emailserviceactor"), out EmailServiceActor emailServiceActor))
+            {
+                throw new ArgumentOutOfRangeException(_smtpActorNotConfigured);
+            }
+
             _auditLogManager = auditLogManager;
+            _configurationCache = configurationCache;
+            _runningAs = emailServiceActor;
+            _mail = new Mail.Mail(_configurationCache);
+
+            switch (emailServiceType)
+            {
+                case EmailServiceType.ServiceBus:
+                    _isServiceBusMode = true;
+                    _serviceBus = new ServiceBus.ServiceBus(configurationCache);
+                    break;
+                case EmailServiceType.Queue:
+                default:
+                    _queueStorage = new QueueStorage();
+                    _queueStorage.SetQueueAsync(queueName);
+                    _isServiceBusMode = false;
+                    break;
+            }
         }
 
         #endregion
@@ -84,12 +98,8 @@ namespace Abiomed.DotNetCore.Business
         #region Public Methods
 
         #region Listeners
-        public void Listen(string fromEmail,
-                            string fromFriendlyName,
-                            string localDomainName,
-                            string smtpHostName,
-                            int smtpPortNumber,
-                            string textPart = "plain")
+
+        public void Listen()
         {
             if (_runningAs != EmailServiceActor.Listener)
             {
@@ -100,18 +110,8 @@ namespace Abiomed.DotNetCore.Business
             {
                 throw new InvalidOperationException(_instanceIsInQueueMode);
             }
-            ValidateRequiredString(fromEmail, "From Email");
-            ValidateRequiredString(fromFriendlyName, "From Name");
-            ValidateRequiredString(localDomainName, "Domain Name");
-            ValidateRequiredString(smtpHostName, "Host Name");
-
-            if (smtpPortNumber < 1)
-            {
-                throw new ArgumentOutOfRangeException(_portNumberMustBeGreaterThanZero);
-            }
 
             _queueClient = _serviceBus.GetQueueClient();
-            _mail = new Mail(fromEmail, fromFriendlyName, localDomainName, textPart, smtpHostName, smtpPortNumber);
 
             try
             {
@@ -130,31 +130,18 @@ namespace Abiomed.DotNetCore.Business
             }
             catch (Exception exception)
             {
+                // TODO Better Logging of Message
                 Console.WriteLine($"{DateTime.Now} > Exception: {exception.Message}");
             }
         }
 
-        public async Task ListenToQueueStorage(string fromEmail,
-                            string fromFriendlyName,
-                            string localDomainName,
-                            string smtpHostName,
-                            int smtpPortNumber,
-                            string textPart = "plain")
+        public async Task ListenToQueueStorage()
         {
             if (_isServiceBusMode)
             {
                 throw new InvalidOperationException(_instanceIsInServiceBusMode);
             }
-            ValidateRequiredString(fromEmail, "From Email");
-            ValidateRequiredString(fromFriendlyName, "From Name");
-            ValidateRequiredString(localDomainName, "Domain Name");
-            ValidateRequiredString(smtpHostName, "Host Name");
-            if (smtpPortNumber < 1)
-            {
-                throw new ArgumentOutOfRangeException(_portNumberMustBeGreaterThanZero);
-            }
-
-            _mail = new Mail(fromEmail, fromFriendlyName, localDomainName, textPart, smtpHostName, smtpPortNumber);
+          
             bool processMessages = true;
             while (processMessages)
             {
@@ -175,6 +162,7 @@ namespace Abiomed.DotNetCore.Business
                 }
             }
         }
+
         #endregion
 
         #region Broadcasters 

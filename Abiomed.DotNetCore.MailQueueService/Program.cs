@@ -31,7 +31,7 @@ namespace Abiomed.DotNetCore.MailQueueService
             {
                 Task.Run(async () =>
                 {
-                    await _emailManager.ListenToQueueStorage(_from, _fromFriendlyName, _localDomain, _hostName, _port, _textPart);
+                    await _emailManager.ListenToQueueStorage();
                 }).GetAwaiter().GetResult();
                 Thread.Sleep(_pollingInterval);
             }
@@ -44,17 +44,10 @@ namespace Abiomed.DotNetCore.MailQueueService
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
             await configurationCache.LoadCache();
 
-            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
-            _pollingInterval = configurationCache.GetNumericConfigurationItem("smtpmanager", "pollinginterval");
-            _from = configurationCache.GetConfigurationItem("smtpmanager", "fromemail");
-            _fromFriendlyName = configurationCache.GetConfigurationItem("smtpmanager", "fromfriendlyname");
-            _localDomain = configurationCache.GetConfigurationItem("smtpmanager", "localdomain");
-            _textPart = configurationCache.GetConfigurationItem("smtpmanager", "bodytexttype");
-            _hostName = configurationCache.GetConfigurationItem("smtpmanager", "host");
-            _port = configurationCache.GetNumericConfigurationItem("smtpmanager", "portnumber");
-            _connection = configurationCache.GetConfigurationItem("smtpmanager", "queuestorage");
+            configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());
+            configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());
 
-            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), queueName, _connection);
+            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), configurationCache);
         }
     }
 }

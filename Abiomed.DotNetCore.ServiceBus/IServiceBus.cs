@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 
-namespace Abiomed.DotNetCore.Communication
+namespace Abiomed.DotNetCore.ServiceBus
 {
     public interface IServiceBus
     {

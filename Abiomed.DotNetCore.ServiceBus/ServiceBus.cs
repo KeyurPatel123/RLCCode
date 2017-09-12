@@ -3,34 +3,53 @@ using Microsoft.Azure.ServiceBus;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Abiomed.DotNetCore.Configuration;
 
-namespace Abiomed.DotNetCore.Communication
+namespace Abiomed.DotNetCore.ServiceBus
 {
 
     public class ServiceBus : IServiceBus
     {
+        #region Member Variables
+
         private const string _messageCannotBeNull = "Message cannot be null.";
         private const string _queueNameCannotBeEmpty = "Queue Name cannot be null or empty.";
         private const string _connectionStringCannotBeEmpty = "Connection String cannot be null or empty";
-        private const string _invalidReceiveMode = "Invalid Receive Mode";
+        private const string _configurationCacheCannotBeNull = "Configuration Cache cannot be null";
 
+        private IConfigurationCache _configurationCache;
         private IQueueClient _queueClient;
 
-        public ServiceBus(string queueName, string connection)
+        #endregion
+
+        #region Constructors
+
+        public ServiceBus(IConfigurationCache configurationCache)
         {
-            if (string.IsNullOrWhiteSpace(connection))
+            if (configurationCache == null)
             {
-                throw new ArgumentOutOfRangeException(_connectionStringCannotBeEmpty);
+                throw new ArgumentNullException(_configurationCacheCannotBeNull);
             }
+
+            string queueName = configurationCache.GetConfigurationItem("smtpmanager", "queuename");
 
             if (string.IsNullOrWhiteSpace(queueName))
             {
                 throw new ArgumentOutOfRangeException(_queueNameCannotBeEmpty);
             }
 
+            string connection = configurationCache.GetConfigurationItem("smtpmanager", "servicebusconnection");
+            if (string.IsNullOrWhiteSpace(queueName))
+            {
+                throw new ArgumentOutOfRangeException(_connectionStringCannotBeEmpty);
+            }
+
             _queueClient = new QueueClient(connection, queueName, ReceiveMode.PeekLock);
         }
 
+        #endregion
+
+        #region Public Methods
         public async Task CloseAsync()
         {
             if (!_queueClient.IsClosedOrClosing)
@@ -63,5 +82,7 @@ namespace Abiomed.DotNetCore.Communication
                 // TODO: Exception Handling here
             }
         }
+
+        #endregion
     }
 }

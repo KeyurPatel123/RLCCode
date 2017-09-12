@@ -1,15 +1,17 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
 using MailKit.Security;
-using System;
 using System.Threading.Tasks;
 using Abiomed.Models;
 using Newtonsoft.Json;
+using Abiomed.DotNetCore.Configuration;
 
-namespace Abiomed.DotNetCore
+namespace Abiomed.DotNetCore.Mail
 {
     public class Mail : IMail
     {
+        #region Member Variables
+
         private MailboxAddress _fromMailboxAddress;
         private string _textPart = string.Empty;
         private string _smtpClientName  = string.Empty;
@@ -17,14 +19,26 @@ namespace Abiomed.DotNetCore
         private string _localDomain = string.Empty;
         private int _port = 25;
 
-        public Mail(string fromEmailAddress, string fromFriendlyName, string localDomain, string textPart, string smtpHostName, int port)
+        private IConfigurationCache _configurationCache;
+
+        #endregion
+
+        #region Constructors
+
+        public Mail(IConfigurationCache configurationCache)
         {
+            string fromFriendlyName = configurationCache.GetConfigurationItem("smtpmanager", "fromfriendlyname");
+            string fromEmailAddress = configurationCache.GetConfigurationItem("smtpmanager", "fromemail");
             _fromMailboxAddress = new MailboxAddress(fromFriendlyName, fromEmailAddress);
-            _localDomain = localDomain; 
-            _textPart = textPart; 
-            _smtpHostName = smtpHostName;
-            _port = port; 
+            _localDomain = configurationCache.GetConfigurationItem("smtpmanager", "localdomain");
+            _textPart = configurationCache.GetConfigurationItem("smtpmanager", "bodytexttype");
+            _smtpHostName = configurationCache.GetConfigurationItem("smtpmanager", "host");
+            _port = configurationCache.GetNumericConfigurationItem("smtpmanager", "portnumber");
         }
+
+        #endregion
+
+        #region Public Methods
 
         public async Task SendEmailAsync(string jsonMessage)
         {
@@ -61,5 +75,7 @@ namespace Abiomed.DotNetCore
                 await client.DisconnectAsync(true).ConfigureAwait(false);
             }
         }
+
+        #endregion
     }
 }

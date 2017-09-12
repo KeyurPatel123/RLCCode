@@ -66,13 +66,8 @@
   },
   {
     "Category": "smtpmanager",
-    "Name": "queueconnection",
+    "Name": "servicebusconnection",
     "Value": "Endpoint=sb://remotelinkmessagebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=R9mtWNYmXF+4LtmZkrZAqFUT1U1FQxGkE5gvQGctntc="
-  },
-  {
-    "Category": "smtpmanager",
-    "Name": "queuestorage",
-    "Value": "DefaultEndpointsProtocol=https;AccountName=remotelink;AccountKey=ykKtbMsrZJI8DvikFLhWgy7EpGheIfUJzKB87nTgoQm0hwLcYBYhnMxEJhcD+HIHMZ/bBvSf9kjHNg+4CnYd4w=="
   },
   {
     "Category": "smtpmanager",

@@ -10,4 +10,12 @@ namespace Abiomed.DotNetCore.Business
         Broadcaster = 0,
         Listener = 1
     }
+
+    public enum EmailServiceType
+    {
+        Unknown = -1,
+        ServiceBus = 0,
+        Queue = 1
+    }
+
 }

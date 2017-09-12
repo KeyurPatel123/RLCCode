@@ -84,7 +84,10 @@ namespace Abiomed_WirelessRemoteLink
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
             AuditLogManager auditLogManager = new AuditLogManager(tableStorage, configurationCache);
             services.AddSingleton<IAuditLogManager>(auditLogManager);
-            services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, emailQueueName, emailQueueConnectionString));
+
+            configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());
+            configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Broadcaster.ToString());
+            services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, configurationCache));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -131,15 +134,13 @@ namespace Abiomed_WirelessRemoteLink
 
         private bool GetBooleanConfigurationItem(string key)
         {
-            bool result = false;
-            bool.TryParse(Configuration.GetSection(key).Value, out result);
+            bool.TryParse(Configuration.GetSection(key).Value, out bool result);
             return result;
         }
 
         private int GetNumericConfigurationItem(string key, int defaultValue)
         {
-            int result = 0;
-            if (!int.TryParse(Configuration.GetSection(key).Value, out result))
+            if (!int.TryParse(Configuration.GetSection(key).Value, out int result))
             {
                 result = defaultValue;
             }

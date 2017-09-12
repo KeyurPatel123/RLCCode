@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
-    <ProjectReference Include="..\Abiomed.DotNetCore.Communication\Abiomed.DotNetCore.Communication.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj" />
     <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
