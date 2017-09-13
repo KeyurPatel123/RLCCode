@@ -31,7 +31,8 @@ btn-info {
 .AbiomedLogo {
     height: 50px;
     width:300px;
-    background: url(../../assets/images/AbiomedLogo.svg) no-repeat; 
+    background-image: url(../../assets/images/AbiomedLogo.svg); 
+    /*background-repeat:no-repeat;*/
     padding-bottom:20px;
 }
 

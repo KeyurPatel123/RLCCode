@@ -1,17 +1,7 @@
 ﻿[
   {
     "Category": "connectionmanager",
-    "Name": "run",
-    "Value": "www.abiomed.com"
-  },
-  {
-    "Category": "connectionmanager",
     "Name": "security",
-    "Value": "true"
-  },
-  {
-    "Category": "optionsmanager",
-    "Name": "imagecountdowntimer",
-    "Value": "5000"
-  }
+    "Value": "false"
+  }  
 ]
