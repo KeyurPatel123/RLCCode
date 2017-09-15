@@ -1,6 +1,9 @@
 ﻿button {
     cursor:pointer;
 }
+body {
+    background-color:red;
+}
 .AbiomedLogoModal {
     height: 25px;
     width: 150px;
@@ -10,6 +13,6 @@
 }
 .ModalBody {
     max-height: 450px;
-    // max-height: calc(100vh - 300px);
+    /*max-height: calc(100vh - 300px);*/
     overflow-y: auto;
 }

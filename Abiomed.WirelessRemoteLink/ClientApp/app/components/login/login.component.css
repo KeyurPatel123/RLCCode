@@ -10,6 +10,38 @@ p {
     font-weight:200;
 }
 
+::-webkit-input-placeholder {
+    font-size: 1em;
+    color: #555;
+    text-transform: uppercase;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+:-moz-placeholder { /* older Firefox*/
+    font-size: 1em;
+    color: #555;
+    text-transform: uppercase;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+    font-size: 1em;
+    color: #555;
+    text-transform: uppercase;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+:-ms-input-placeholder {
+    font-size: 1em;
+    color: #555;
+    text-transform: uppercase;
+    text-transform: uppercase;
+    text-align: center;
+}
+
 /* Bootstrap Overloads */
 input-group-lg {
     text-align: center;
@@ -28,12 +60,41 @@ btn-info {
     background-color: white;
 }
 
+.container-fluid {
+    padding-right:0;
+    padding-left:0;
+    
+}
+
+.FlexLogo {
+    width: 300px;
+    margin: 20px;
+}
+.FlexLogin {
+    width: 350px;
+    margin: 20px;
+}
+.FlexIntro {
+    width: 350px;
+    margin: 15px;
+}
+.Tagline {
+    text-align: right;
+    width:229px;
+    font-size: 1em;
+    color: #a40046;
+    margin-right:30px;
+}
+
 .AbiomedLogo {
     height: 50px;
-    width:300px;
-    background-image: url(../../assets/images/AbiomedLogo.svg); 
-    /*background-repeat:no-repeat;*/
-    padding-bottom:20px;
+    width: 300px;
+    background: url(../../assets/images/AbioLogo2.svg) no-repeat;
+    padding-bottom: 20px;
+    background-position: 0 0;
+}
+*::-ms-backdrop, .AbiomedLogo {
+    background-position: -33px 0;
 }
 
 .NavBarLogin {
@@ -43,8 +104,9 @@ btn-info {
 
 .FillBackground {
     background-color: #0E355A;
-    /*height: calc(80vh - 70px);*/
-    padding-top: 20px;
+    height: calc(80vh - 70px);
+    padding-top: 40px;
+    height: 100%;
 }
 
 .Input {
@@ -54,7 +116,12 @@ btn-info {
 .LoginButton {
     text-transform: uppercase;
     padding-top: 15px;
-    padding-bottom: 15px;    
+    padding-bottom: 15px;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -webkit-transition: .25s box-shadow;
+    transition: .25s box-shadow;
 }
 
 .ForgotPassword {
@@ -63,10 +130,12 @@ btn-info {
     font-size:.8em;
 }
 
+
+
 .LoginFooter {
     background-color: #0E355A;
     color: #efefef;
-    font-size: .7em;
+    font-size: .9em;
     text-align:center;
 }
 
@@ -74,12 +143,7 @@ btn-info {
     color:black;
 }
 
-.Tagline {
-    text-align: right;
-    font-size: 1em;
-    color: #a40046;
-    padding: 52px 70px 0 0;
-}
+
 
 /* Error validation Styles */
 .ErrorArrowBox {
