@@ -87,9 +87,9 @@ btn-info {
 }
 
 .AbiomedLogo {
-    height: 50px;
-    width: 300px;
-    background: url(../../assets/images/AbioLogo2.svg) no-repeat;
+    width: 250px;
+    height:90px;
+    background: url(../../assets/images/AbioLogoTagline.svg) no-repeat;
     padding-bottom: 20px;
     background-position: 0 0;
 }
