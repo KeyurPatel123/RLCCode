@@ -37,9 +37,10 @@ export class AuthenticationService {
             });
     }
 
-    registerUser(userRegistration: UserRegistrationInterface): Observable<boolean> {
-        return this.http.post('/api/Authentication/Register', JSON.stringify(userRegistration))
-            .map((response: boolean) => {
+    registerUser(userRegistration: UserRegistrationInterface): Observable<any> {
+        var json = JSON.stringify(userRegistration);
+        return this.http.post('/api/Authentication/Register', userRegistration)            
+            .map((response: any) => {
                 return response;
             });
     }

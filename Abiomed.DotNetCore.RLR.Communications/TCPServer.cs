@@ -32,7 +32,7 @@ namespace Abiomed.RLR.DotNetCore.Communications
         private IConfigurationCache _configurationCache;
         private X509Certificate2 serverCertificate = null;
         private string _certLocation = string.Empty;
-        private int _port = 443;
+        private int _port = int.MaxValue;
         private ConcurrentDictionary<string, TCPStateObject> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObject>();
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private IRedisDbRepository<RLMDevice> _redisDbRepository;
@@ -108,7 +108,7 @@ namespace Abiomed.RLR.DotNetCore.Communications
             {
                 var listener = new TcpListener(IPAddress.Any, _port);
                 listener.Start();
-                _logger.LogInformation("TCP Server Started Success");                
+                _logger.LogInformation("TCP Server Started Success on port {0}", _port);                
                 
                 while (true)
                 {
@@ -133,14 +133,13 @@ namespace Abiomed.RLR.DotNetCore.Communications
 
         private void AcceptCallback(IAsyncResult ar)
         {
+            // Signal the main thread to continue.
+            allDone.Set();
+
+            TcpListener listener = (TcpListener)ar.AsyncState;
+            TcpClient handler = listener.EndAcceptTcpClient(ar);            
             try
-            {
-                // Signal the main thread to continue.
-                allDone.Set();
-
-                TcpListener listener = (TcpListener)ar.AsyncState;
-                TcpClient handler = listener.EndAcceptTcpClient(ar);
-
+            {                
                 // Connect to SSL Stream and Authenticate
                 var sslStream = new SslStream(handler.GetStream(), false);
                 sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls12, false);
@@ -163,9 +162,11 @@ namespace Abiomed.RLR.DotNetCore.Communications
             }
             catch (Exception e)
             {
-                TcpListener listener = (TcpListener)ar.AsyncState;
-
-                _logger.LogError("RLM connection failed {0} Exception {1}", listener.LocalEndpoint, e.ToString());                               
+                if (handler != null)
+                {
+                    handler.Close();
+                    _logger.LogInformation("Bad RLM connection {0} Closed connection", listener.LocalEndpoint);
+                }                                                                               
             }
         }
 
@@ -222,7 +223,7 @@ namespace Abiomed.RLR.DotNetCore.Communications
             catch (Exception e)
             {
                 TCPStateObject state = (TCPStateObject)ar.AsyncState;
-                _logger.LogError("ReadCallback - RLM {0} closed connection. {1}", state.DeviceIpAddress, e.ToString());
+                //_logger.LogError("ReadCallback - RLM {0} closed connection. {1}", state.DeviceIpAddress, e.ToString());
                 RemoveConnection(state.DeviceIpAddress);
             }
         }

@@ -9,9 +9,9 @@
 }
 
 export interface UserRegistrationInterface {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    role: string;
+    FirstName: string;
+    LastName: string;
+    Email: string;
+    Phone: string;
+    Roles: Array<string>;
 }

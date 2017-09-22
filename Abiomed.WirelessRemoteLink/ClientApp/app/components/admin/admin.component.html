@@ -9,7 +9,12 @@
         </div>
         <!--Add New User Panel-->
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-10">                
+                <div *ngIf="created" class="row ResponseUserWell {{creationStatus}}">
+                    <div class="col-md-12">
+                        <div class="UserCreated ">User Created Succesfully</div>
+                    </div>                    
+                </div>
                 <!--Add User-->
                 <div class="row NewUserWell">
                     <div class="col-md-4 NewUserIntro">
@@ -18,8 +23,6 @@
                     </div>
                     <div class="col-md-8 AddAbioUserForm">
                         <form novalidate class="FormContainer form-group" (ngSubmit)="Register()" [formGroup]="createForm">  
-                            
-                            
                                 <div class="form-group row">
                                     <label for="example-text-input" class="col-3 col-form-label">First Name:</label>
                                     <input class="form-control col-9" type="text" value="" [(ngModel)]="firstname" formControlName="firstname">
@@ -69,10 +72,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 d-flex flex-row-reverse">
-                                        <input type="submit" class="btn btn-primary btn-sm align-self-end" value="Create User" [disabled]="!createForm.valid">
+                                        <input type="submit" class="btn btn-primary btn-sm align-self-end" value="Create User" [disabled]="!createForm.valid" [ngClass]="{'cursor':createForm.valid}">
                                     </div>
                                 </div>
-
                             </form>
                     </div>
                 </div>

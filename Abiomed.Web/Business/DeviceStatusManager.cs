@@ -40,15 +40,19 @@ namespace Abiomed.Web
         }
 
         public void DeleteDevice(string serialNumber)
-        {            
-            var index = _devices.FindIndex(x => x.SerialNumber == serialNumber);
-            _devices.RemoveAt(index);
+        {
+
+                var index = _devices.FindIndex(x => x.SerialNumber == serialNumber);
+                _devices.RemoveAt(index);
         }
 
         public void UpdateDevice(RLMDevice device)
         {
-            var index = _devices.FindIndex(x => x.SerialNumber == device.SerialNo);
-            _devices[index] = Convert(device);            
+            if (device != null)
+            {
+                var index = _devices.FindIndex(x => x.SerialNumber == device.SerialNo);
+                _devices[index] = Convert(device);
+            }
         }
 
         public void UpdateDevice(RLMDeviceList devices)

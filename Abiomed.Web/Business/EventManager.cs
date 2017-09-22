@@ -68,9 +68,12 @@ namespace Abiomed.Web
             // Create List of devices
             foreach(var activeDevice in activeDevices)
             {
-                RLMDevice device = _redisDbRepository.StringGet(activeDevice);
-                rlmDeviceListLocal.RLMDevices.TryAdd(device.DeviceIpAddress, device);
-            }
+                RLMDevice device = _redisDbRepository.RLMModelGet(activeDevice);
+                if (device != null)
+                {
+                    rlmDeviceListLocal.RLMDevices.TryAdd(device.DeviceIpAddress, device);
+                }
+            }               
 
             // Set to global list
             _deviceStatusManager.InitDevice(rlmDeviceListLocal);
@@ -78,7 +81,7 @@ namespace Abiomed.Web
 
         private void AddDevice(string addedDevice)
         {
-            RLMDevice device = _redisDbRepository.StringGet(addedDevice);
+            RLMDevice device = _redisDbRepository.StringGet(addedDevice);            
             _deviceStatusManager.AddDevice(device);
         }
 

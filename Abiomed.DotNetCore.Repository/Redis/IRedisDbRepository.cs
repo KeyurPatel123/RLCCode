@@ -57,6 +57,8 @@ namespace Abiomed.DotNetCore.Repository
         /// <param name="key"></param>
         /// <param name="value"></param>
         void StringSet(string key, T value);
+        void StringSet(string key, string value);
+
 
         /// <summary>
         /// String Get

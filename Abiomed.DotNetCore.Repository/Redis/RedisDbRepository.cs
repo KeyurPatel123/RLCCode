@@ -26,18 +26,22 @@ namespace Abiomed.DotNetCore.Repository
         private readonly ISubscriber _subscriber;
         private ConnectionMultiplexer _connectionMultiplexer;
         private IConfigurationCache _configurationCache;
+        RedisDbContext redisDbContext;
 
         public RedisDbRepository(IConfigurationCache configurationCache)
         {
             _configurationCache = configurationCache;            
 
             string redisConnect = _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect");
-            _connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnect);
 
-            var endPoints = _connectionMultiplexer.GetEndPoints();
-            _server = _connectionMultiplexer.GetServer(endPoints[0]);            
-            _db = _connectionMultiplexer.GetDatabase();
-            _subscriber = _connectionMultiplexer.GetSubscriber();
+            redisDbContext = new RedisDbContext(_configurationCache);
+            
+            //_connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnect);
+
+            var endPoints = redisDbContext.Connection.GetEndPoints();
+            _server = redisDbContext.Connection.GetServer(endPoints[0]);            
+            _db = redisDbContext.Connection.GetDatabase();
+            _subscriber = redisDbContext.Connection.GetSubscriber();           
         }
 
         #region Get Save Delete HASH
@@ -104,6 +108,12 @@ namespace Abiomed.DotNetCore.Repository
             }
 
             _db.StringSet(key, bytes);
+        }
+
+        public void StringSet(string key, string JSON)
+        {
+            key = GenerateKey(key);
+            _db.StringSet(key, JSON);
         }
 
         public T StringGet(string key)

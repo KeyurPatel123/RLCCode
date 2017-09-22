@@ -74,7 +74,7 @@ namespace Abiomed.DotNetCore.Business
 
             Remove(deviceIpAddress);
 
-            //todo _redisDbRepository.Publish(Definitions.RemoveRLMDeviceRLR, deviceIpAddress);
+            _redisDbRepository.Publish(Definitions.RemoveRLMDeviceRLR, deviceIpAddress);
         }
 
         private void ImageCounterTimerExpiredCallback(object sender, ElapsedEventArgs e, string deviceIpAddress)

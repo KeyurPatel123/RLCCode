@@ -18,6 +18,7 @@ using System.Reflection;
 using Abiomed.Models;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
 
 namespace Abiomed.Repository
 {
@@ -26,17 +27,31 @@ namespace Abiomed.Repository
         private readonly IDatabase _db;
         private readonly IServer _server;
         private readonly ISubscriber _subscriber;
-        private ConnectionMultiplexer _connectionMultiplexer;
+//        private ConnectionMultiplexer _connectionMultiplexer;
         private Configuration _configuration;
+        private Lazy<ConnectionMultiplexer> lazyConnection;
+
 
         public RedisDbRepository(Configuration configuration)
-        {            
-            _connectionMultiplexer = ConnectionMultiplexer.Connect(configuration.RedisConnect);
+        {
+            //_connectionMultiplexer = ConnectionMultiplexer.Connect(configuration.RedisConnect);
+            lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
+            {
+                return ConnectionMultiplexer.Connect(configuration.RedisConnect);
+            });
 
-            var endPoints = _connectionMultiplexer.GetEndPoints();
-            _server = _connectionMultiplexer.GetServer(endPoints[0]);            
-            _db = _connectionMultiplexer.GetDatabase();
-            _subscriber = _connectionMultiplexer.GetSubscriber();
+            var endPoints = lazyConnection.Value.GetEndPoints();
+            _server = lazyConnection.Value.GetServer(endPoints[0]);            
+            _db = lazyConnection.Value.GetDatabase();
+            _subscriber = lazyConnection.Value.GetSubscriber();            
+        }
+
+        public ConnectionMultiplexer Connection
+        {
+            get
+            {
+                return lazyConnection.Value;
+            }
         }
 
         #region Get Save Delete HASH
@@ -120,6 +135,24 @@ namespace Abiomed.Repository
             }
             
             return returnObject;
+        }
+
+        public T RLMModelGet(string key)
+        {
+            byte[] returnObject = new byte[0];
+
+            key += ":abiomed.dotnetcore.models.rlmdevice";
+            key = key.ToLower();
+
+            //byte[] bytes = (byte[])_db.StringGet(key);
+            string jsonStr = _db.StringGet(key);
+
+            T rlmDevice = default(T);
+            if (jsonStr != null)
+            {
+                rlmDevice = JsonConvert.DeserializeObject<T>(jsonStr);
+            }
+            return rlmDevice;
         }
 
         public void StringDelete(string key)

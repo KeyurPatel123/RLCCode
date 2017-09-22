@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, Inject} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, ModalDismissReasons, NgbTooltip, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
+import { DOCUMENT } from "@angular/common";
 
 @Component({
     selector: 'login',
@@ -20,22 +21,22 @@ export class LoginComponent implements OnInit, OnDestroy  {
     loginError: boolean;
     modalRef: NgbModalRef;
 
-    constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal) { }
+    constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal, @Inject(DOCUMENT) private document: any) { }
 
     ngOnInit() {
-      //  document.querySelector('body').style.backgroundColor = '#0E355A';
+        this.document.querySelector('body').style.backgroundColor = '#0E355A';
         this.loginError = false;
         this.authenticationService.logout();
         this.validateForm();        
     }
     
     ngOnDestroy() {
-       // document.querySelector('body').style.backgroundColor = '';
+        this.document.querySelector('body').style.backgroundColor = '';
     }
    
     private validateForm() {
         this.loginForm = new FormGroup({
-            username: new FormControl('', [Validators.required]),           
+            username: new FormControl('', [Validators.required, Validators.email]),           
             password: new FormControl('', [Validators.required]),           
         });
     }
@@ -65,6 +66,11 @@ export class LoginComponent implements OnInit, OnDestroy  {
 
     public Enroll() {
         this.router.navigate(['/admin']);
+    }
+
+    public Demo() {
+        // Todo update!
+        this.router.navigate(['/summary']);
     }
 
     public OpenTermsAndConditionsModal(modal) {

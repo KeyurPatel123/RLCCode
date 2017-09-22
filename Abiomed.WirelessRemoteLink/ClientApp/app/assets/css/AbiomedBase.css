@@ -8,11 +8,10 @@ body {
     height: 25px;
     width: 150px;
     background: url(../../assets/images/AbiomedLogo.svg);
-    /*background-repeat:no-repeat;*/
+    background-repeat:no-repeat;
     margin-left:10px;
 }
 .ModalBody {
     max-height: 450px;
-    /*max-height: calc(100vh - 300px);*/
     overflow-y: auto;
 }

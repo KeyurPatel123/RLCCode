@@ -14,6 +14,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -72,11 +73,14 @@ namespace Abiomed.DotNetCore.Business
 
                 // If device online, update device
                 string addedOrUpdatedDevice = deviceOnline ? Definitions.UpdateRLMDevice : Definitions.AddRLMDevice;
-                
+
+                // Temp go from object to JSON. In future need to move back!
+                string rlmJson = JsonConvert.SerializeObject(rlmDevice);                
+
                 // Add/Update set and publish message
-                // todo _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
-                // todo _redisDbRepository.AddToSet(Definitions.RLMDeviceSet, rlmDevice.SerialNo);
-                // todo _redisDbRepository.Publish(addedOrUpdatedDevice, rlmDevice.SerialNo);
+                _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmJson);
+                _redisDbRepository.AddToSet(Definitions.RLMDeviceSet, rlmDevice.SerialNo);
+                _redisDbRepository.Publish(addedOrUpdatedDevice, rlmDevice.SerialNo);
 
                 // Remove old entry
                 if (deviceOnline)

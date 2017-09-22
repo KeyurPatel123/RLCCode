@@ -3,5 +3,10 @@
     "Category": "connectionmanager",
     "Name": "security",
     "Value": "false"
+  },
+  {
+    "Category": "connectionmanager",
+    "Name": "redisconnect",
+    "Value": "localhost"
   }  
 ]

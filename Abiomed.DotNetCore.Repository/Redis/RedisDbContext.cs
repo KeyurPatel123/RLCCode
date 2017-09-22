@@ -26,7 +26,7 @@ namespace Abiomed.DotNetCore.Repository
 
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
             {
-                return ConnectionMultiplexer.Connect(_connectionString);
+                return ConnectionMultiplexer.Connect(redisConnect);
             });
         }
 

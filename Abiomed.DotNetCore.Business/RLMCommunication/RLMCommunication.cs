@@ -151,6 +151,8 @@ namespace Abiomed.DotNetCore.Business
 
         public byte[] ProcessEvent(string deviceIpAddress, string message, string[] options)
         {
+            _logger.LogInformation("Process user event {0} from RLM Device {1}", message, deviceIpAddress);
+
             // Init return message
             byte[] returnMessage = new byte[0];
 
@@ -225,7 +227,7 @@ namespace Abiomed.DotNetCore.Business
 
         private void CloseTCPSessionEvent(string deviceIpAddress)
         {
-            // todo _redisDbRepository.Publish(Definitions.RemoveRLMDeviceRLR, deviceIpAddress);
+            _redisDbRepository.Publish(Definitions.RemoveRLMDeviceRLR, deviceIpAddress);
         }
 
         public byte[] GenerateCloseSession(string deviceIpAddress)
@@ -241,9 +243,9 @@ namespace Abiomed.DotNetCore.Business
             if (rlmDevice != null)
             {
                 // Delete from REDIS and local and Remove Keep Alive Timer
-                //todo _redisDbRepository.StringDelete(rlmDevice.SerialNo);
-                //todo _redisDbRepository.RemoveFromSet(Definitions.RLMDeviceSet, rlmDevice.SerialNo);
-                //todo _redisDbRepository.Publish(Definitions.DeleteRLMDevice, rlmDevice.SerialNo);
+                _redisDbRepository.StringDelete(rlmDevice.SerialNo);
+                _redisDbRepository.RemoveFromSet(Definitions.RLMDeviceSet, rlmDevice.SerialNo);
+                _redisDbRepository.Publish(Definitions.DeleteRLMDevice, rlmDevice.SerialNo);
 
                 _keepAliveManager.Remove(deviceIpAddress);
                 _keepAliveManager.ImageTimerDelete(deviceIpAddress);

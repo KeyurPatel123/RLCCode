@@ -1,4 +1,4 @@
-using Abiomed.Models;
+using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System;
 using System.Security.Claims;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
+using Abiomed.Models;
+using System.Linq;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
 {
@@ -144,9 +146,9 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Register")]
         [AllowAnonymous]
-        public async Task<bool> Post([FromBody] UserRegistration userRegistration)
+        public async Task<RegisterResponse> Post([FromBody] UserRegistration userRegistration)
         {
-            var status = false;
+            RegisterResponse registerResponse = new RegisterResponse();
 
             try
             {
@@ -156,13 +158,14 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     LastName = userRegistration.LastName,
                     InstitutionName = userRegistration.InstitutionName,
                     InstitutionLocationProvince = userRegistration.InstitutionLocationProvince,
-                    UserName = userRegistration.UserName,
+                    UserName = userRegistration.Email,
                     Email = userRegistration.Email,
                     EmailConfirmed = bool.Parse(userRegistration.EmailConfirmed),
                     Activated = bool.Parse(userRegistration.Activated),
                     AcceptedTermsAndConditions = bool.Parse(userRegistration.AcceptedTermsAndConditions),
-                    AcceptedTermsAndConditionsDate = userRegistration.AcceptedTermsAndConditionsDate
                 };
+
+                userRegistration.Password = "!Abcdef12345";
 
                 var result = await _userManager.CreateAsync(remoteLinkUser, userRegistration.Password);
                 if (result.Succeeded)
@@ -179,8 +182,23 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                         //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                         //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                         //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
-                        await _signInManager.SignInAsync(remoteLinkUser, isPersistent: false);
-                        status = true;
+                        //await _signInManager.SignInAsync(remoteLinkUser, isPersistent: false);
+                        registerResponse.CreationResult =  RegisterResponse.CreationStatus.Success.ToString();
+                        registerResponse.Response = "User Created Succesfully";
+                    }
+                }
+                else
+                {
+                    var error = result.Errors.First();
+                    if(error.Code == "DuplicateUserName")
+                    {
+                        registerResponse.CreationResult = RegisterResponse.CreationStatus.AlreadyExist.ToString();
+                        registerResponse.Response = "Email already registered";
+                    }
+                    else
+                    {
+                        registerResponse.CreationResult = RegisterResponse.CreationStatus.GeneralFailure.ToString();
+                        registerResponse.Response = "User Creation Fail";
                     }
                 }
 
@@ -190,7 +208,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             {
                 // ToDo Handle/Log Error
             }
-            return status;
+            return registerResponse;
 
         }
 

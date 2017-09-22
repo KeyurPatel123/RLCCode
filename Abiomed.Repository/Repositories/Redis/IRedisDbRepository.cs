@@ -103,5 +103,9 @@ namespace Abiomed.Repository
         /// <param name="callback"></param>
         void Subscribe(List<RedisChannel> channel, Action<RedisChannel, RedisValue> callback);
 
+
+        // Temp delete later on
+        T RLMModelGet(string key);
+
     }
 }

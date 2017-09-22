@@ -19,6 +19,7 @@ using Abiomed.DotNetCore.Business;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Abiomed.DotNetCore.Repository;
+using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed.DotNetCore.RLR.Communications
 {
@@ -27,6 +28,8 @@ namespace Abiomed.DotNetCore.RLR.Communications
         private static ManualResetEvent allDone = new ManualResetEvent(false);
         private ConcurrentDictionary<string, TCPStateObjectInsecure> _tcpStateObjectList = new ConcurrentDictionary<string, TCPStateObjectInsecure>();
         private ILogger<InsecureTCPServer> _logger;
+        private IConfigurationCache _configurationCache;
+        private int _port = int.MaxValue;
         private RLMCommunication _RLMCommunication;
         IRedisDbRepository<RLMDevice> _redisDbRepository;
 
@@ -47,11 +50,14 @@ namespace Abiomed.DotNetCore.RLR.Communications
             Definitions.ImageStopEvent,
         };
 
-        public InsecureTCPServer(RLMCommunication rLMCommunication, ILogger<InsecureTCPServer> logger, IRedisDbRepository<RLMDevice> redisDbRepository)
+        public InsecureTCPServer(RLMCommunication rLMCommunication, IConfigurationCache configurationCache, ILogger<InsecureTCPServer> logger, IRedisDbRepository<RLMDevice> redisDbRepository)
         {            
             _RLMCommunication = rLMCommunication;
             _logger = logger;
             _redisDbRepository = redisDbRepository;
+            _configurationCache = configurationCache;
+
+           _port = _configurationCache.GetNumericConfigurationItem("optionsmanager", "tcpport");
 
             // Subscribe to removal of RLM Device
             _redisDbRepository.Subscribe(Definitions.RemoveRLMDeviceRLR, (channel, message) => {
@@ -80,13 +86,13 @@ namespace Abiomed.DotNetCore.RLR.Communications
         }
 
         public void Run()
-        {
-            _logger.LogInformation("Starting TCP Listener on Port 443");
-            // Bind the socket to the local endpoint port 443 and listen for incoming connections.            
+        {            
+            // Bind the socket to the local endpoint port and listen for incoming connections.            
             try
             {
-                var listener = new TcpListener(IPAddress.Any, 443);
+                var listener = new TcpListener(IPAddress.Any, _port);
                 listener.Start();
+                _logger.LogInformation("Starting TCP Listener on Port {0}", _port);
 
                 while (true)
                 {
@@ -183,7 +189,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
 
                 // Check if still connected, Await for more data
                 if (state.TcpClient.Connected)
-                {
+                {                    
                     handler.BeginRead(state.buffer, 0, TCPStateObjectInsecure.BufferSize, new AsyncCallback(ReadCallback), state);
                 }
                 else
@@ -196,7 +202,7 @@ namespace Abiomed.DotNetCore.RLR.Communications
             }
             catch (Exception e)
             {
-                _logger.LogError("ReadCallback: RLM {0} closed connection, Exception Raised: {1}", state.DeviceIpAddress, e.ToString());
+                //_logger.LogError("ReadCallback: RLM {0} closed connection, Exception Raised: {1}", state.DeviceIpAddress, e.ToString());
                 RemoveConnection(state.DeviceIpAddress);
             }
         }

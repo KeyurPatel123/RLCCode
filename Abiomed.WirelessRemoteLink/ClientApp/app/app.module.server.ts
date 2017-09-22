@@ -3,6 +3,7 @@ import { ServerModule } from '@angular/platform-server';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { sharedConfig } from './app.module.shared';
+import { DOCUMENT } from '@angular/common';
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,

@@ -7,6 +7,7 @@ import { EnrollmentComponent } from './components/enrollment/enrollment.componen
 import { ForgotPasswordComponent } from "./components/forgotPassword/forgotPassword.component";
 import { AdminComponent } from "./components/admin/admin.component";
 import { FooterMenuComponent } from "./components/footermenu/footermenu.component";
+import { SummaryComponent } from "./components/summary/summary.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [ AppComponent ],    
@@ -16,6 +17,7 @@ export const sharedConfig: NgModule = {
         FooterMenuComponent,
         LoginComponent,
         EnrollmentComponent,
+        SummaryComponent,
         ForgotPasswordComponent,
         AdminComponent
     ],
@@ -25,7 +27,8 @@ export const sharedConfig: NgModule = {
             { path: 'enrollment', component: EnrollmentComponent },
             { path: 'forgot-password', component: ForgotPasswordComponent },
             { path: 'admin', component: AdminComponent },
-            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            { path: 'summary', component: SummaryComponent},
+            { path: '', redirectTo: '/login', pathMatch: 'full' },
             { path: '**', redirectTo: 'login' }
         ])
     ]

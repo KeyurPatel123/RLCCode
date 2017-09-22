@@ -264,8 +264,8 @@ function DevicesController($uibModal, $q, $timeout, dataService, SignalRFactory,
         playerInstance.setup({
             playlist: [{
                 sources: [
-                    { file: "rtmps://rlv.abiomed.com:443/live/RL11223"},
-                    { file: "https://rlv.abiomed.com:443/live/RL11223/playlist.m3u8" },
+                    { file: "rtmps://rlv.abiomed.com:443/live/" + streamName},
+                    { file: "https://rlv.abiomed.com:443/live/" + streamName + "/playlist.m3u8" },
                 ],
             }],
             width: "100%",

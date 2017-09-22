@@ -10,6 +10,7 @@ using Abiomed.DotNetCore.Storage;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Abiomed.RLR.DotNetCore.Communications;
+using System.Threading;
 
 namespace Abiomed.Start
 {
@@ -21,6 +22,11 @@ namespace Abiomed.Start
         {
             try
             {
+                // Get the current settings.
+                int minWorker, minIOC;
+                ThreadPool.GetMinThreads(out minWorker, out minIOC);
+                ThreadPool.SetMinThreads(1000, minIOC);
+
                 var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
                             .AddJsonFile("appsettings.json");
@@ -45,17 +51,15 @@ namespace Abiomed.Start
                 .AddSingleton<IConfigurationCache, ConfigurationCache>()
                 .AddSingleton<IConfigurationManager, ConfigurationManager>()
                 .AddSingleton<ITableStorage, TableStorage>()
-                .AddScoped(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
+                .AddSingleton(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
                 .BuildServiceProvider();
 
                 //configure console logging
-                serviceProvider
-                    .GetService<ILoggerFactory>()                    
-                    .AddConsole(LogLevel.Debug);
-
-                var _logger = serviceProvider.GetService<ILoggerFactory>()
-                .CreateLogger<Program>();
-                                
+                var _logger = serviceProvider
+                    .GetService<ILoggerFactory>()
+                    .AddConsole(LogLevel.Trace)                    
+                    .CreateLogger<Program>();  
+                                                
                 _logger.LogInformation("Starting RLR");
 
                 var configurationCache = serviceProvider.GetService<IConfigurationCache>();

@@ -299,11 +299,9 @@ namespace Abiomed.DotNetCore.Business
         {
             try
             {
-                // todo RLMImage rlmImage = new RLMImage { Data = imageData, SerialNumber = serialNumber };
-                // todo 
-                // todo _redisDbRepository.StringSet(serialNumber, rlmImage);
-                // todo 
-                // todo _redisDbRepository.Publish(Definitions.ImageCapture, serialNumber);                                
+                RLMImage rlmImage = new RLMImage { Data = imageData, SerialNumber = serialNumber };                
+                _redisDbRepository.StringSet(serialNumber, rlmImage);                
+                _redisDbRepository.Publish(Definitions.ImageCapture, serialNumber);                                
             }
             catch (Exception e)
             {
@@ -319,7 +317,7 @@ namespace Abiomed.DotNetCore.Business
             fileName.Append(rlmDevice.SerialNo);
             fileName.Append("-");
             fileName.Append(rlmDevice.ConnectionTime.ToString("yyyyMMdd_hhmmss"));
-            fileName.Append(".txt");
+            fileName.Append(".gz");
 
             try
             {
