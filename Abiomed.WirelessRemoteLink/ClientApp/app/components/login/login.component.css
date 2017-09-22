@@ -14,6 +14,11 @@ p {
     font-weight:200;
 }
 
+.LoginBody {
+    height: 100vh;
+    background-color: #0E355A;
+}
+
 ::-webkit-input-placeholder {
     font-size: .8em;
     color: #ccc;
@@ -69,12 +74,6 @@ btn-info {
     background-color: white;
 }
 
-.container-fluid {
-    padding-right: 0;
-    padding-left: 0;
-
-}
-
 .FlexLogo {
     width: 300px;
     margin: 20px;
@@ -115,14 +114,8 @@ btn-info {
 
 
 .FillBackground {
-    background-color: #0E355A;
-    /*height: calc(70vh - 70px);*/
-    padding-top: 40px;
-    min-height: 100%;
-    height:100%;
-    margin-bottom: -400px;
-    padding-bottom: 400px;
-    overflow: hidden;
+    background-color: #0E355A;    
+    padding-top: 40px;    
 }
 
 .Input {

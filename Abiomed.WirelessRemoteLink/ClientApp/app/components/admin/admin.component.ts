@@ -25,7 +25,8 @@ export class AdminComponent implements OnInit {
     ngOnInit() {
         this.ValidateForm();
         this.created = false;
-        
+        this.creationStatus = "";
+        this.creationResponse = "";
     }
 
     private ValidateForm() {
@@ -33,7 +34,7 @@ export class AdminComponent implements OnInit {
             firstname: new FormControl('', [Validators.required]),
             lastname: new FormControl('', [Validators.required]),
             phone: new FormControl(''),
-            email: new FormControl('', [Validators.required]),
+            email: new FormControl('', [Validators.required, Validators.email]),
             role: new FormControl('', [Validators.required]),
         });
     }   
