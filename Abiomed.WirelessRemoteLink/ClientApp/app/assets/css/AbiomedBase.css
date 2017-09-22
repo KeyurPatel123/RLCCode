@@ -17,3 +17,9 @@
     max-height: 450px;
     overflow-y: auto;
 }
+input[type=text]::-ms-clear {
+    display: none;
+}
+input[password]::-ms-reveal {
+    display: none;
+}

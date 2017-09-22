@@ -40,15 +40,18 @@ p {
 }
 
 .Success {
-    background-color: greenyellow;
+    background-color: #99ff99;
+    border: solid 2px #339933;
 }
 
 .AlreadyExist {
-    background-color: yellow;
+    background-color: #ffff99;
+    border: solid 2px #CCCC00;
 }
 
 .Fail {
-    background-color:red;
+    background-color: #FFCCCC;
+    border: solid 2px #CC3333;
 }
 .UserCreated {
     text-align:center;
