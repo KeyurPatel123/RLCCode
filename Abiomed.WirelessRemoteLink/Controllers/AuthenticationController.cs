@@ -1,3 +1,4 @@
+using Abiomed.Models;
 using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -6,8 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System;
 using System.Security.Claims;
-using ElCamino.AspNetCore.Identity.AzureTable.Model;
-using Abiomed.Models;
 using System.Linq;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
@@ -32,11 +31,11 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<UserResponse> Post([FromBody]Credentials credentials)
+        public async Task<Abiomed.DotNetCore.Models.UserResponse> Post([FromBody]Credentials credentials)
         {
             string resultMessage = "Invalid Username/password combination";
             bool isLoginSuccess = false;
-            UserResponse userResponse = new UserResponse();
+            Abiomed.DotNetCore.Models.UserResponse userResponse = new Abiomed.DotNetCore.Models.UserResponse();
 
             try
             {
@@ -146,7 +145,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Register")]
         [AllowAnonymous]
-        public async Task<RegisterResponse> Post([FromBody] UserRegistration userRegistration)
+        public async Task<RegisterResponse> Post([FromBody] Abiomed.DotNetCore.Models.UserRegistration userRegistration)
         {
             RegisterResponse registerResponse = new RegisterResponse();
 
@@ -161,6 +160,8 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     UserName = userRegistration.Email,
                     Email = userRegistration.Email,
                     EmailConfirmed = bool.Parse(userRegistration.EmailConfirmed),
+                    PhoneNumber = userRegistration.Phone,
+                    PhoneNumberConfirmed = bool.Parse(userRegistration.PhoneConfirmed),
                     Activated = bool.Parse(userRegistration.Activated),
                     AcceptedTermsAndConditions = bool.Parse(userRegistration.AcceptedTermsAndConditions),
                 };
@@ -213,6 +214,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         }
 
         #region Private Helper Methods
+
         private async Task<Microsoft.AspNetCore.Identity.SignInResult> PasswordSignInAsync(string userName, string password)
         {
             var result = new Microsoft.AspNetCore.Identity.SignInResult();
@@ -228,7 +230,6 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             return result;
         }
-
 
         private async Task<bool> SetTermsAndConditionsAsync(bool termsAndConditions)
         {

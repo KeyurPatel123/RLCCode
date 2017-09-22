@@ -4,26 +4,41 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Abiomed.DotNetCore.Storage;
+using System.Collections.Generic;
 
-namespace Abiomed.DotNetCore.MailQueueService
+namespace Abiomed.DotNetCore.OCRService
 {
     class Program
     {
         static int _pollingInterval = 0;
-        static IEmailManager _emailManager;
+        static IMediaManager _mediaManager;
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Starting Queue = Email");
-            Initialize().Wait();
+            MainAsync(args).GetAwaiter().GetResult();
+        }
+
+        private static async Task MainAsync(string[] args)
+        {
+            Console.WriteLine("Starting Image Stream Reader");
+            await Initialize();
 
             while (true)
             {
                 Task.Run(async () =>
                 {
-                    await _emailManager.ListenToQueueStorage();
+                    await Listen();
                 }).GetAwaiter().GetResult();
                 Thread.Sleep(_pollingInterval);
+            }
+        }
+
+        public static async Task Listen()
+        {
+            List<string> imageStreams = await _mediaManager.GetLiveStreamsAsync();
+            foreach (string serialNumber in imageStreams)
+            {
+                var thumbnail = await _mediaManager.GetImageTextAsync(serialNumber);
             }
         }
 
@@ -34,11 +49,8 @@ namespace Abiomed.DotNetCore.MailQueueService
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
             await configurationCache.LoadCache();
 
-            _pollingInterval = configurationCache.GetNumericConfigurationItem("smtpmanager", "pollinginterval");
-            configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());
-            configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());
-
-            _emailManager = new EmailManager(new AuditLogManager(tableStorage, configurationCache), configurationCache);
+            _mediaManager = new MediaManager(configurationCache);
+            _pollingInterval = configurationCache.GetNumericConfigurationItem("mediamanager", "pollinginterval");
         }
     }
 }

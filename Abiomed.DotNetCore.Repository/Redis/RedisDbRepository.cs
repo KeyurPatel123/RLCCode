@@ -24,7 +24,6 @@ namespace Abiomed.DotNetCore.Repository
         private readonly IDatabase _db;
         private readonly IServer _server;
         private readonly ISubscriber _subscriber;
-        private ConnectionMultiplexer _connectionMultiplexer;
         private IConfigurationCache _configurationCache;
         RedisDbContext redisDbContext;
 
@@ -35,8 +34,6 @@ namespace Abiomed.DotNetCore.Repository
             string redisConnect = _configurationCache.GetConfigurationItem("connectionmanager", "redisconnect");
 
             redisDbContext = new RedisDbContext(_configurationCache);
-            
-            //_connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnect);
 
             var endPoints = redisDbContext.Connection.GetEndPoints();
             _server = redisDbContext.Connection.GetServer(endPoints[0]);            

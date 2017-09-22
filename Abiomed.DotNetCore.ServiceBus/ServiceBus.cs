@@ -44,7 +44,7 @@ namespace Abiomed.DotNetCore.ServiceBus
             {
                 throw new ArgumentOutOfRangeException(_connectionStringCannotBeEmpty);
             }
-
+            //connection = "Endpoint=sb://remotelinkmessagebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=R9mtWNYmXF+4LtmZkrZAqFUT1U1FQxGkE5gvQGctntc=";
             _queueClient = new QueueClient(connection, queueName, ReceiveMode.PeekLock);
         }
 
@@ -75,6 +75,7 @@ namespace Abiomed.DotNetCore.ServiceBus
             {
                 // Create a new brokered message to send to the queue
                 var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(objectToAdd)));
+               
                 await _queueClient.SendAsync(message);
             }
             catch(Exception EX)

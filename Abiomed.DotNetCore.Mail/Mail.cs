@@ -2,7 +2,7 @@
 using MimeKit;
 using MailKit.Security;
 using System.Threading.Tasks;
-using Abiomed.Models;
+using Abiomed.DotNetCore.Models;
 using Newtonsoft.Json;
 using Abiomed.DotNetCore.Configuration;
 
@@ -14,12 +14,10 @@ namespace Abiomed.DotNetCore.Mail
 
         private MailboxAddress _fromMailboxAddress;
         private string _textPart = string.Empty;
-        private string _smtpClientName  = string.Empty;
+        private string _smtpClientName = string.Empty;
         private string _smtpHostName = string.Empty;
         private string _localDomain = string.Empty;
         private int _port = 25;
-
-        private IConfigurationCache _configurationCache;
 
         #endregion
 
@@ -69,7 +67,7 @@ namespace Abiomed.DotNetCore.Mail
 
             using (var client = new SmtpClient())
             {
-                client.LocalDomain = _localDomain; 
+                client.LocalDomain = _localDomain;
                 await client.ConnectAsync(_smtpHostName, _port, SecureSocketOptions.None).ConfigureAwait(false);
                 await client.SendAsync(emailMessage).ConfigureAwait(false);
                 await client.DisconnectAsync(true).ConfigureAwait(false);

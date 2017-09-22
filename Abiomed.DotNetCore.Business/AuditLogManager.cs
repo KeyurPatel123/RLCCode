@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Abiomed.DotNetCore.Storage;
-using Abiomed.Models;
+using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed.DotNetCore.Business

@@ -1,6 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Abiomed.Models
+namespace Abiomed.DotNetCore.Models
 {
     public class AuditLog : TableEntity
     {

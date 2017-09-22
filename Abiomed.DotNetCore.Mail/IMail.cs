@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Abiomed.Models;
+using Abiomed.DotNetCore.Models;
 
 namespace Abiomed.DotNetCore.Mail
 {

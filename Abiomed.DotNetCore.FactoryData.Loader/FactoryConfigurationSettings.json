@@ -12,7 +12,7 @@
   {
     "Category": "connectionmanager",
     "Name": "security",
-    "Value": "false"
+    "Value": "true"
   },
   {
     "Category": "optionsmanager",
@@ -95,8 +95,18 @@
     "Value": "administrator role"
   },
   {
-    "Category": "userrole",
-    "Name": "csc",
-    "Value": "csc staff role"
+    "Category": "mediamanager",
+    "Name": "livestreamurl",
+    "Value": "http://10.11.0.16:8087/v2/servers/_defaultServer_/vhosts/_defaultVHost_/applications/live/instances/_definst_"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "thumbnailurl",
+    "Value": "http://10.11.0.16:8086/thumbnail?application=live&streamname={0}&size=640x360&fitmode=letterbox"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "pollinginterval",
+    "Value": "10000"
   }
 ]

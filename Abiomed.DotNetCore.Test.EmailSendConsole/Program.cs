@@ -50,7 +50,7 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
             _configurationCache = new ConfigurationCache(configurationManager);
             await _configurationCache.LoadCache();
 
-            _configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());
+            _configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.ServiceBus.ToString());
             _configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Broadcaster.ToString());
 
             _emailManager = new EmailManager(new AuditLogManager(tableStorage, _configurationCache), _configurationCache);

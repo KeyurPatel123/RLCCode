@@ -267,20 +267,15 @@ namespace Abiomed.DotNetCore.Business
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 deviceSerialNumber = rlmDevice.SerialNo;
 
-                string traceMessage = string.Empty;
-                Definitions.LogType traceType = Definitions.LogType.NoTrace;
                 if (bearerPriorityConfirm.Status != Definitions.SuccessStats)
                 {
                     status.Status = RLMStatus.StatusEnum.Failure;
-                    traceType = Definitions.LogType.Error;
-                    traceMessage = string.Format(@"Bearer Priority Confirm Response Failure {0}", rlmDevice.SerialNo);
+                    _logger.LogError("Bearer Priority Confirm Response Failure {0}", rlmDevice.SerialNo);
                 }
                 else
                 {
-                    traceType = Definitions.LogType.Information;
-                    traceMessage = string.Format(@"Bearer Priority Confirm Response {0}", rlmDevice.SerialNo);
+                    _logger.LogInformation("Bearer Priority Confirm Response {0}", rlmDevice.SerialNo);
                 }
-                _logger.LogInformation(traceMessage);
             }
             catch (Exception e)
             {

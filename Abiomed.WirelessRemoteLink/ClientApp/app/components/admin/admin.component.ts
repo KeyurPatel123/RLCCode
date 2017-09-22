@@ -45,12 +45,13 @@ export class AdminComponent implements OnInit {
         var userRegistration = {
             FirstName: this.firstname,
             LastName: this.lastname,
-            Phone:this.phone,
+            Phone: this.phone,
             Email: this.email,
             Roles: roles,
             AcceptedTermsAndConditions: false,
             Activated: true,
-            EmailConfirmed: true
+            EmailConfirmed: true,
+            PhoneConfirmed: true
         }
         
         this.authenticationService.registerUser(userRegistration).subscribe(result => {

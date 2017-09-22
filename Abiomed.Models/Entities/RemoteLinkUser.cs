@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using ElCamino.AspNetCore.Identity.AzureTable;
-using ElCamino.AspNetCore.Identity.AzureTable.Model;
+﻿using ElCamino.AspNetCore.Identity.AzureTable.Model;
 
 namespace Abiomed.Models
 {
