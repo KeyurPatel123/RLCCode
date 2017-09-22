@@ -14,6 +14,9 @@
     background: url(../../assets/images/AbioLogo.svg);
     background-repeat:no-repeat;
 }
+*::-ms-backdrop, .AbiomedLogoNav {
+    background-position: -65px 0;
+}
 
 .CogDropdown {
     padding:5px 10px 0 10px;
@@ -86,14 +89,15 @@
 }
 
 .navbar-nav:last-child {
-    border-right: 0
+    border-right: 0;
 }
 .input-group {
     border-left: .5px solid #ccc;
-    height: 36px
+    height: 36px;
 }
 .navbar-form {
-    width:300px
+    width:300px;
+    display:none;
 }
 .btn-secondary {
     border: none;
