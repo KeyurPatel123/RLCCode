@@ -15,4 +15,13 @@
     <ProjectReference Include="..\Abiomed.DotNetCore.Mail\Abiomed.DotNetCore.Mail.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="OverrideAppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

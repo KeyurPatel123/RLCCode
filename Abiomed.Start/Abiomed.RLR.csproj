@@ -22,4 +22,13 @@
     <ProjectReference Include="..\Abiomed.DotNetCore.RLR.Communications\Abiomed.DotNetCore.RLR.Communications.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="overrideappsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
