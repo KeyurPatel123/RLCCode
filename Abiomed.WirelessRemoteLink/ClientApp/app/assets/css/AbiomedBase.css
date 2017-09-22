@@ -1,16 +1,18 @@
 ﻿button {
     cursor:pointer;
 }
-body {
-    background-color:red;
-}
+
 .AbiomedLogoModal {
-    height: 25px;
-    width: 150px;
-    background: url(../../assets/images/AbiomedLogo.svg);
+    height: 40px;
+    width: 175px;
+    background: url(../../assets/images/AbioLogo2.svg);
     background-repeat:no-repeat;
-    margin-left:10px;
+    margin-left:5px;
 }
+*::-ms-backdrop, .AbiomedLogoModal {
+    background-position: -22px 0;
+}
+
 .ModalBody {
     max-height: 450px;
     overflow-y: auto;

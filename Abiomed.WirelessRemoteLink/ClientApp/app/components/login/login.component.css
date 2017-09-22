@@ -1,4 +1,8 @@
 ﻿/* Base Overload - HTML Elements */
+html, body {
+    height:100%
+
+}
 h1 {
     color: white;
     font-size: 1.3em;
@@ -11,32 +15,32 @@ p {
 }
 
 ::-webkit-input-placeholder {
-    font-size: 1em;
-    color: #555;
+    font-size: .8em;
+    color: #ccc;
     text-transform: uppercase;
     text-transform: uppercase;
     text-align: center;
 }
 
 :-moz-placeholder { /* older Firefox*/
-    font-size: 1em;
-    color: #555;
+    font-size: .8em;
+    color: #ccc;
     text-transform: uppercase;
     text-transform: uppercase;
     text-align: center;
 }
 
 ::-moz-placeholder { /* Firefox 19+ */
-    font-size: 1em;
-    color: #555;
+    font-size: .8em;
+    color: #ccc;
     text-transform: uppercase;
     text-transform: uppercase;
     text-align: center;
 }
 
 :-ms-input-placeholder {
-    font-size: 1em;
-    color: #555;
+    font-size: .8em;
+    color: #ccc;
     text-transform: uppercase;
     text-transform: uppercase;
     text-align: center;
@@ -45,6 +49,9 @@ p {
 /* Bootstrap Overloads */
 input-group-lg {
     text-align: center;
+}
+input:focus {
+    text-align:center;
 }
 
 btn-info {
@@ -55,15 +62,17 @@ btn-info {
 }
 
 /* Custom CSS */
+
+
 .AbiomedLogoPadding {
-    padding: 50px 0 70px 0;
+    padding: 150px 0 0 0;
     background-color: white;
 }
 
 .container-fluid {
-    padding-right:0;
-    padding-left:0;
-    
+    padding-right: 0;
+    padding-left: 0;
+
 }
 
 .FlexLogo {
@@ -87,14 +96,15 @@ btn-info {
 }
 
 .AbiomedLogo {
-    width: 335px;
+    width: 300px;
     height:90px;
     background: url(../../assets/images/AbioLogoTagline.svg) no-repeat;
     padding-bottom: 20px;
     background-position: 0 0;
+    margin: 0 0 0 42px;
 }
 *::-ms-backdrop, .AbiomedLogo {
-    background-position: -33px 0;
+    background-position: -5px 0;
 }
 
 .NavBarLogin {
@@ -102,11 +112,17 @@ btn-info {
     height:40px;
 }
 
+
+
 .FillBackground {
     background-color: #0E355A;
-    height: calc(80vh - 70px);
+    /*height: calc(70vh - 70px);*/
     padding-top: 40px;
-    height: 100%;
+    min-height: 100%;
+    height:100%;
+    margin-bottom: -400px;
+    padding-bottom: 400px;
+    overflow: hidden;
 }
 
 .Input {

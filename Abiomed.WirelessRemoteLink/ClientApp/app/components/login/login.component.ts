@@ -24,14 +24,14 @@ export class LoginComponent implements OnInit, OnDestroy  {
     constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal, @Inject(DOCUMENT) private document: any) { }
 
     ngOnInit() {
-        this.document.querySelector('body').style.backgroundColor = '#0E355A';
+       // this.document.querySelector('body').style.backgroundColor = '#0E355A';
         this.loginError = false;
         this.authenticationService.logout();
         this.validateForm();        
     }
     
     ngOnDestroy() {
-        this.document.querySelector('body').style.backgroundColor = '';
+       // this.document.querySelector('body').style.backgroundColor = '';
     }
    
     private validateForm() {
