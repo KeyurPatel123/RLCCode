@@ -144,7 +144,7 @@ btn-info {
 .LoginFooter {
     background-color: #0E355A;
     color: #efefef;
-    font-size: .9em;
+    font-size: .8em;
     text-align:center;
 }
 
@@ -201,6 +201,7 @@ btn-info {
     padding: 10px;
     font-size: .9em;
 }
+
 
 a.footer {
     color: #efefef;

@@ -8,6 +8,7 @@ import { ForgotPasswordComponent } from "./components/forgotPassword/forgotPassw
 import { AdminComponent } from "./components/admin/admin.component";
 import { FooterMenuComponent } from "./components/footermenu/footermenu.component";
 import { SummaryComponent } from "./components/summary/summary.component";
+import { ResetPasswordComponent } from "./components/resetPassword/resetPassword.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [ AppComponent ],    
@@ -19,6 +20,7 @@ export const sharedConfig: NgModule = {
         EnrollmentComponent,
         SummaryComponent,
         ForgotPasswordComponent,
+        ResetPasswordComponent,
         AdminComponent
     ],
     imports: [
@@ -26,6 +28,7 @@ export const sharedConfig: NgModule = {
             { path: 'login', component: LoginComponent },
             { path: 'enrollment', component: EnrollmentComponent },
             { path: 'forgot-password', component: ForgotPasswordComponent },
+            { path: 'reset-password', component: ResetPasswordComponent },
             { path: 'admin', component: AdminComponent },
             { path: 'summary', component: SummaryComponent},
             { path: '', redirectTo: '/login', pathMatch: 'full' },
