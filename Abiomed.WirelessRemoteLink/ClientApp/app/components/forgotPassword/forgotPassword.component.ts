@@ -18,7 +18,7 @@ export class ForgotPasswordComponent implements OnInit {
 
     private validateForm() {
         this.loginForm = new FormGroup({
-            username: new FormControl('', [Validators.required, Validators.email]),
+            username: new FormControl('', [Validators.email]),
         });
     }
 }
