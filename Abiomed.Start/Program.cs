@@ -25,7 +25,7 @@ namespace Abiomed.Start
                 // Get the current settings.
                 int minWorker, minIOC;
                 ThreadPool.GetMinThreads(out minWorker, out minIOC);
-                ThreadPool.SetMinThreads(1000, minIOC);
+                ThreadPool.SetMinThreads(1000, 1000);
 
                 var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())

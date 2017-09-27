@@ -5,13 +5,11 @@ import 'rxjs/add/operator/map'
 import { AuthenticationInterface, UserRegistrationInterface } from "../../shared/authentication.interface";
 
 @Injectable()
-export class AuthenticationService {
-    public token: string;
-
+export class AuthenticationService {   
     constructor(
         private http: HttpClient,
         @Inject('ORIGIN_URL') private originUrl: string,
-    ) {
+    ) {        
         // set token if saved in local storage
      //   var currentUser = JSON.parse(localStorage.getItem('currentUser'));
   //      this.token = currentUser && currentUser.token;
@@ -19,15 +17,39 @@ export class AuthenticationService {
 
     login(username: string, password: string): Observable<AuthenticationInterface> {
         return this.http.post('/api/Authentication/Login', JSON.stringify({ Username: username, Password: password }))
-            .map((response: AuthenticationInterface) => {                
+            .map((response: AuthenticationInterface) => {
+                if (response.isSuccess)
+                {
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.setItem("loggedIn", "true");
+                        sessionStorage.setItem("role", response.role);
+                    }
+                }
                 return response;
             });
     }
 
     logout(): void {
-        // clear token remove user from local storage to log user out
-        this.token = null;
-        //localStorage.removeItem('currentUser');
+        if (typeof window !== 'undefined') {
+            // clear token remove user from local storage to log user out
+            sessionStorage.setItem("loggedIn", "false");
+        }
+    }
+
+    getLoggedIn(): boolean {
+        var isTrue = false;
+        if (typeof window !== 'undefined') {
+            isTrue = (sessionStorage.getItem("loggedIn") == 'true');
+        }
+        return isTrue;
+    }
+
+    getRole(): string {
+        var role = '';
+        if (typeof window !== 'undefined') {
+            role = sessionStorage.getItem("role");
+        }
+        return role;
     }
 
     acceptTAC(): Observable<boolean > {

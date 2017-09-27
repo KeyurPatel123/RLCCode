@@ -18,10 +18,11 @@
      <!--COG-->
             <div ngbDropdown class="d-inline-block">
                 <div class="CogDropdown" id="dropdownBasic1" ngbDropdownToggle><span class="fa fa-cog"></span></div>
-                <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
-                    <div class="dropdown-item DropdownCog">Action - 1</div>
-                    <div class="dropdown-item DropdownCog">Another Action</div>
-                    <div class="dropdown-item DropdownCog">Something else is here</div>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">                    
+                    <div class="dropdown-item DropdownCog" [routerLink]="['/summary']">Summary</div>
+                    <div class="dropdown-item DropdownCog" *ngFor="let link of links" (click)="openLink(link)">{{link.name}}</div>
+                    <div><hr></div>
+                    <div class="dropdown-item DropdownCog" [routerLink]="['/login']">Sign Out</div>
                 </div>
             </div>
       <!--COG-->  

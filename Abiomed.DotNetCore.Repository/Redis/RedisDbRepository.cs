@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 
 namespace Abiomed.DotNetCore.Repository
 {
@@ -42,12 +43,31 @@ namespace Abiomed.DotNetCore.Repository
         }
 
         #region Get Save Delete HASH
+        public async Task<T> GetHashAsync(string key)
+        {
+            key = GenerateKey(key);
+            var hash = await _db.HashGetAllAsync(key);
+
+            return MapFromHash(hash);
+        }
+
         public T GetHash(string key)
         {
             key = GenerateKey(key);
             var hash = _db.HashGetAll(key);
 
             return MapFromHash(hash);
+        }
+
+        public async Task SaveHashAsync(string key, T obj)
+        {
+            if (obj != null)
+            {
+                var hash = GenerateRedisHash(obj);
+                key = GenerateKey(key);
+
+                await _db.HashSetAsync(key, hash);
+            }
         }
 
         public void SaveHash(string key, T obj)
@@ -61,6 +81,15 @@ namespace Abiomed.DotNetCore.Repository
             }            
         }
 
+        public async Task DeleteHashAsync(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("invalid key");
+
+            key = GenerateKey(key);
+            await _db.KeyDeleteAsync(key);
+        }
+
         public void DeleteHash(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -72,16 +101,31 @@ namespace Abiomed.DotNetCore.Repository
         #endregion
 
         #region Get Save Delete SET
+        public async Task<string[]> GetSetAsync(string key)
+        {
+            var members = await _db.SetMembersAsync(key);            
+            return members.ToStringArray();
+        }
+
         public string[] GetSet(string key)
         {
-            var members = _db.SetMembers(key).ToStringArray();
-            
+            var members = _db.SetMembers(key).ToStringArray();            
             return members;
+        }
+
+        public async Task AddToSetAsync(string set, string value)
+        {
+            await _db.SetAddAsync(set, value);
         }
 
         public void AddToSet(string set, string value)
         {
             _db.SetAdd(set, value);            
+        }
+
+        public async Task RemoveFromSetAsync(string set, string value)
+        {
+            await _db.SetRemoveAsync(set, value);
         }
 
         public void RemoveFromSet(string set, string value)
@@ -92,6 +136,20 @@ namespace Abiomed.DotNetCore.Repository
         #endregion
 
         #region String
+
+        public async Task StringSetAsync(string key, T data)
+        {
+            key = GenerateKey(key);
+
+            byte[] bytes;
+            using (var stream = new MemoryStream())
+            {
+                new BinaryFormatter().Serialize(stream, data);
+                bytes = stream.ToArray();
+            }
+
+            await _db.StringSetAsync(key, bytes);
+        }
 
         public void StringSet(string key, T data)
         {
@@ -107,10 +165,33 @@ namespace Abiomed.DotNetCore.Repository
             _db.StringSet(key, bytes);
         }
 
+        public async Task StringSetAsync(string key, string JSON)
+        {
+            key = GenerateKey(key);
+            await _db.StringSetAsync(key, JSON);
+        }
+
         public void StringSet(string key, string JSON)
         {
             key = GenerateKey(key);
             _db.StringSet(key, JSON);
+        }
+
+        public async Task<T> StringGetAsync(string key)
+        {
+            T returnObject = default(T);
+            key = GenerateKey(key);
+            byte[] bytes = await _db.StringGetAsync(key);
+
+            if (bytes != null)
+            {
+                using (var stream = new MemoryStream(bytes))
+                {
+                    returnObject = (T)new BinaryFormatter().Deserialize(stream);
+                }
+            }
+
+            return returnObject;
         }
 
         public T StringGet(string key)
@@ -130,9 +211,29 @@ namespace Abiomed.DotNetCore.Repository
             return returnObject;
         }
 
+        public async Task StringDeleteAsync(string key)
+        {
+            key = GenerateKey(key);
+            // todo figure out!
+        }
+
         public void StringDelete(string key)
         {
             key = GenerateKey(key);
+            // todo figure out!
+        }
+
+        public async Task<bool> StringKeyExistAsync(string key)
+        {
+            var membersAsync = await _db.SetMembersAsync(Definitions.RLMDeviceSet);            
+            var members = membersAsync.ToStringArray();
+
+            bool keyExist = false;
+            if (members.Contains(key))
+            {
+                keyExist = true;
+            }
+            return keyExist;
         }
 
         public bool StringKeyExist(string key)
@@ -151,6 +252,11 @@ namespace Abiomed.DotNetCore.Repository
 
         #region Publish Subscribe
 
+        public async Task PublishAsync(RedisChannel channel, RedisValue msg)
+        {
+            await _subscriber.PublishAsync(channel, msg);            
+        }
+
         public void Publish(RedisChannel channel, RedisValue msg)
         {
             try
@@ -162,15 +268,21 @@ namespace Abiomed.DotNetCore.Repository
             }
         }
 
+        public async Task SubscribeAsync(RedisChannel channel, Action<RedisChannel, RedisValue> callback)
+        {
+            await _subscriber.SubscribeAsync(channel, callback);
+        }
+
         public void Subscribe(RedisChannel channel, Action<RedisChannel, RedisValue> callback)
         {
-            try
+            _subscriber.Subscribe(channel, callback);
+        }
+
+        public async Task SubscribeAsync(List<RedisChannel> channel, Action<RedisChannel, RedisValue> callback)
+        {
+            foreach (var c in channel)
             {
-                _subscriber.Subscribe(channel, callback);
-            } catch (Exception EX)
-            {
-                // Retry
-                _subscriber.Subscribe(channel, callback);
+                await _subscriber.SubscribeAsync(c, callback);
             }
         }
 
@@ -236,7 +348,7 @@ namespace Abiomed.DotNetCore.Repository
 
             return obj;
         }
-       
+
         Type TypeOfT { get { return typeof(T); } }
 
         string NameOfT { get { return TypeOfT.FullName; } }

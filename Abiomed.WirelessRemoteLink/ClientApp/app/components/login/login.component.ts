@@ -61,12 +61,12 @@ export class LoginComponent implements OnInit  {
     }
 
     public Enroll() {
-        this.router.navigate(['/admin']);
+        //this.router.navigate(['/admin']);
     }
 
     public Demo() {
         // Todo update!
-        this.router.navigate(['/summary']);
+        //this.router.navigate(['/summary']);
     }
 
     public OpenTermsAndConditionsModal(modal) {
@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit  {
 
     private routeUser()
     {
-        this.router.navigate(['/admin']);
+        this.router.navigate(['/summary']);
     }
 
     private getDismissReason(reason: any): string {

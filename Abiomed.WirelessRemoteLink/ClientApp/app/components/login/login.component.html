@@ -25,7 +25,7 @@
                     Username is required
                 </div>
 
-                <div class="ErrorArrowBox" *ngIf="loginForm.get('username').hasError('email') && loginForm.get('username').touched">
+                <div class="ErrorArrowBox" *ngIf="loginForm.get('username').hasError('email') && loginForm.get('username').touched && !loginForm.get('username').hasError('required')">
                     Username not formatted correctly
                 </div>
 
@@ -44,8 +44,9 @@
                 </div>
             </form>
             <div class="ForgotPassword">
-                <a  [routerLink]="['/forgot-password']">Forgot Password?</a>
-            </div>
+                <a [routerLink]="['/forgot-password']">Forgot Password?</a>
+    
+</div>
         </div>
 
         <div class="FlexIntro">
@@ -53,15 +54,15 @@
                 Welcome to Wireless Remote Link
             </h1>
             <p>
-                Mea essent gubergren cu. Per cu ponderum assueverit reprehendunt, ea aeterno lucilius reprimique eos. Inani simul torquatos id duo, has summo lobortis quaerendum ex, ex oratio dolorem reformidans duo. Cu has platonem expetenda qualisque. Homero integre deseruisse nec eu.
-            </p>
+                Mea essent gubergren cu. Per cu ponderum assueverit reprehendunt, ea aeterno lucilius reprimique eos. Inani simul torquatos id duo, has summo lobortis quaerendum ex, ex oratio dolorem reformidans duo. Cu has platonem expetenda qualisque. <a [routerLink]="['/reset-password']">RESET PASSWORD</a> deseruisse nec eu.
+</p>
             <p><button (click)="Enroll()" class="btn btn-outline-secondary">ENROLL</button>&nbsp;&nbsp;
             <button (click)="Demo()" class="btn btn-outline-secondary">DEMO</button> </p>
         </div>
 
     </div>
     <footer class="fixed-bottom LoginFooter">
-        Copyright 2017 &copy; Abiomed | <a class="footer" href="http://www.abiomed.com" target="_blank">www.abiomed.com</a> | Terms and Conditions
+        &copy; 2017 Abiomed. All rights reserved | <a class="footer" href="http://www.abiomed.com" target="_blank">www.abiomed.com</a> | Terms and Conditions
     </footer>
 </div>
 
@@ -91,3 +92,4 @@
         </div>
     </div>
 </ng-template>
+

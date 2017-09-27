@@ -3,6 +3,7 @@ import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserRegistrationInterface } from "../../shared/authentication.interface";
+import { AuthGuard } from "../../shared/authguard.service";
 
 @Component({
     selector: 'admin',

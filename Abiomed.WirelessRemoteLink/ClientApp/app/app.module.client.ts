@@ -9,6 +9,7 @@ import { GeneralInterceptor } from "./components/interceptor/general.interceptor
 import { AuthenticationService } from "./components/service/authentication.service";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import "./assets/css/AbiomedBase.css";
+import { AuthGuard } from "./shared/authguard.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -23,6 +24,7 @@ import "./assets/css/AbiomedBase.css";
     ],
     providers: [
         AuthenticationService,
+        AuthGuard,
         { provide: 'ORIGIN_URL', useValue: location.origin },
         {
             provide: HTTP_INTERCEPTORS,
