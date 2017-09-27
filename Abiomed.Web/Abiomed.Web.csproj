@@ -28,6 +28,7 @@
     <TypeScriptToolsVersion>2.2</TypeScriptToolsVersion>
     <ApplicationInsightsResourceId>/subscriptions/d737f537-7c27-4cc3-bb31-e2f0da8b6813/resourcegroups/ABMDResourceGroup/providers/microsoft.insights/components/RemoteLink</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/d737f537-7c27-4cc3-bb31-e2f0da8b6813/resourcegroups/ABMDResourceGroup/providers/microsoft.insights/components/RemoteLink</ApplicationInsightsAnnotationResourceId>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -114,9 +115,8 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StackExchange.Redis, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StackExchange.Redis.1.2.0\lib\net45\StackExchange.Redis.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net45\StackExchange.Redis.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
@@ -293,7 +293,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>51518</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

@@ -43,8 +43,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 var remoteLinkUser = new RemoteLinkUser();
                 bool isUserActivated = false;
                 bool hasUserAcceptedTermsAndConditions = false;
-                long accessFailedCount = 0;
-
+                long accessFailedCount = 0;                
 
                 remoteLinkUser = await _userManager.FindByNameAsync(credentials.Username);
 

@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
+    <Version>2.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ElCamino.AspNetCore.Identity.AzureTable" Version="1.7.0" />
