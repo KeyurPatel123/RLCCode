@@ -31,7 +31,7 @@ namespace Abiomed.DotNetCore.Configuration
         private const string _valueCannotBeNullEmptyOrWhitespace = "Value cannot be null, empty, or whitespace.";
 
         private ITableStorage _iTableStorage;
-        private string _tableContext = string.Empty;
+        public string TableContext { get; set; } = string.Empty;
 
         private IConfigurationRoot _configuration { get; set; }
 
@@ -47,7 +47,7 @@ namespace Abiomed.DotNetCore.Configuration
                 .AddJsonFile("appsettings.json");
 
             _configuration = builder.Build();
-            _tableContext = _configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value;
+            TableContext = _configuration.GetSection("AzureAbiomedCloud:ConfigurationTableName").Value;
         }
 
         #endregion
@@ -65,7 +65,7 @@ namespace Abiomed.DotNetCore.Configuration
                 throw new ArgumentOutOfRangeException(_configurationTableCannotBeNullEmptyOrWhitespace);
             }
 
-            _tableContext = tableName;
+            TableContext = tableName;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Abiomed.DotNetCore.Configuration
         /// <returns>ApplicationConfiguration Entry</returns>
         public async Task<ApplicationConfiguration> GetItemAsync(string featureKey, string itemKey)
         {
-            return await _iTableStorage.GetItemAsync<ApplicationConfiguration>(featureKey, itemKey, _tableContext);
+            return await _iTableStorage.GetItemAsync<ApplicationConfiguration>(featureKey, itemKey, TableContext);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Abiomed.DotNetCore.Configuration
         /// <returns>List of ApplicationConfiguration Entries</returns>
         public async Task<List<ApplicationConfiguration>> GetFeatureAsync(string featureKey)
         {
-           return await _iTableStorage.GetPartitionItemsAsync<ApplicationConfiguration>(featureKey, _tableContext);
+           return await _iTableStorage.GetPartitionItemsAsync<ApplicationConfiguration>(featureKey, TableContext);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Abiomed.DotNetCore.Configuration
         /// <returns>List of ApplicationConfiguration Entries</returns>
         public async Task<List<ApplicationConfiguration>> GetAllAsync()
         {
-            return await _iTableStorage.GetAllAsync<ApplicationConfiguration>(_tableContext);
+            return await _iTableStorage.GetAllAsync<ApplicationConfiguration>(TableContext);
         }
         
 
@@ -113,17 +113,17 @@ namespace Abiomed.DotNetCore.Configuration
 
             if (!string.IsNullOrWhiteSpace(configurationContext))
             {
-                _tableContext = configurationContext;
+                TableContext = configurationContext;
             }
 
-            if (string.IsNullOrWhiteSpace(_tableContext))
+            if (string.IsNullOrWhiteSpace(TableContext))
             {
                 throw new ArgumentOutOfRangeException(_configurationTableCannotBeNullEmptyOrWhitespace);
             }
 
             foreach (ApplicationConfiguration item in configurationItems)
             {
-                await _iTableStorage.InsertAsync(_tableContext, item);
+                await _iTableStorage.InsertAsync(TableContext, item);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Abiomed.DotNetCore.Configuration
                 Value = value
             };
 
-            await _iTableStorage.InsertOrMergeAsync(_tableContext, appConfig);
+            await _iTableStorage.InsertOrMergeAsync(TableContext, appConfig);
         }
 
         #endregion
