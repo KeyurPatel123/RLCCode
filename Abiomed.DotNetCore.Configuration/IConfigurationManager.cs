@@ -8,6 +8,7 @@ namespace Abiomed.DotNetCore.Configuration
 {
     public interface IConfigurationManager
     {
+        string TableContext { get; set; }
         void SetTableContext(string tableName);
         Task<ApplicationConfiguration> GetItemAsync(string featureKey, string itemKey);
         Task<List<ApplicationConfiguration>> GetFeatureAsync(string featureKey);

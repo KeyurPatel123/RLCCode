@@ -38,20 +38,10 @@ namespace Abiomed.DotNetCore.Configuration
         public async Task LoadCache()
         {
             _configurationSettings = new List<ConfigurationSetting>();
-            List<ApplicationConfiguration> applicationConfigurations =  await _configurationManager.GetAllAsync();
-            foreach(ApplicationConfiguration applicationConfiguration in applicationConfigurations)
-            {
-                if (applicationConfiguration.Active)
-                {
-                    ConfigurationSetting configurationSetting = new ConfigurationSetting
-                    {
-                        Category = applicationConfiguration.PartitionKey,
-                        Name = applicationConfiguration.RowKey,
-                        Value = applicationConfiguration.Value
-                    };
 
-                    _configurationSettings.Add(configurationSetting);
-                }
+            if (_configurationManager.TableContext != "LOCAL_ONLY")
+            { 
+                await LoadSettingsFromCloudAsync();
             }
 
             OverrideSettings();
@@ -149,6 +139,25 @@ namespace Abiomed.DotNetCore.Configuration
         #endregion
 
         #region Private Methods
+
+        private async Task LoadSettingsFromCloudAsync()
+        {
+            List<ApplicationConfiguration> applicationConfigurations = await _configurationManager.GetAllAsync();
+            foreach (ApplicationConfiguration applicationConfiguration in applicationConfigurations)
+            {
+                if (applicationConfiguration.Active)
+                {
+                    ConfigurationSetting configurationSetting = new ConfigurationSetting
+                    {
+                        Category = applicationConfiguration.PartitionKey,
+                        Name = applicationConfiguration.RowKey,
+                        Value = applicationConfiguration.Value
+                    };
+
+                    _configurationSettings.Add(configurationSetting);
+                }
+            }
+        }
 
         private void OverrideSettings()
         {

@@ -33,8 +33,6 @@ namespace Abiomed.Start
 
                 _configuration = builder.Build();
 
-                string storageConnection = _configuration.GetSection("AzureAbiomedCloud:StorageConnection").Value;
-
                 //setup our DI
                 var serviceProvider = new ServiceCollection()
                 .AddLogging()
