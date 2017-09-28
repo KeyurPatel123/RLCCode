@@ -35,7 +35,7 @@ namespace Abiomed.DotNetCore.Configuration
 
         #region Public Methods
 
-        public async Task LoadCache()
+        public async Task LoadCacheAsync()
         {
             _configurationSettings = new List<ConfigurationSetting>();
 

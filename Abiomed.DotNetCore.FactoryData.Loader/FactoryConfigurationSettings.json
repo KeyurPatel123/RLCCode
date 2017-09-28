@@ -102,11 +102,36 @@
   {
     "Category": "mediamanager",
     "Name": "thumbnailurl",
-    "Value": "http://10.11.0.16:8086/thumbnail?application=live&streamname={0}&size=640x360&fitmode=letterbox"
+    "Value": "http://10.11.0.16:8086/thumbnail?application=live&streamname={0}&size=800x600&fitmode=letterbox"
   },
   {
     "Category": "mediamanager",
     "Name": "pollinginterval",
     "Value": "10000"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "imagemaskpath",
+    "Value": "\\images\\Mask.png"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrdatabasename",
+    "Value": "RemoteLink"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrcollectionname",
+    "Value": "OCR"
+  },
+  {
+    "Category": "azurecosmosdb",
+    "Name": "endpointuri",
+    "Value": "https://abmd.documents.azure.com:443/"
+  },
+  {
+    "Category": "azurecosmosdb",
+    "Name": "primarykey",
+    "Value": "7KA3x3At9kGf8ZGo98xHx7d3h1G3nZw7HqxY3FhQKnZdZayrkal7gIPMK9FKf39UisSUxcWdLAfkjtDRZhlXtQ=="
   }
 ]

@@ -18,6 +18,7 @@ namespace Abiomed.DotNetCore.Business
     public class EmailManager : IEmailManager
     {
         #region Member Variables
+
         private const string _invalidListenerOperation = "Listener cannot add to service bus.";
         private const string _invalidBroadcasterOperation = "Broadcaster cannot read from service bus.";
         private const string _serviceActorMustBeListenerOrBroadcaster = "Service Actor must be either broadcaster or listener";
@@ -115,7 +116,7 @@ namespace Abiomed.DotNetCore.Business
 
             try
             {
-                var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+                var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandlerAsync)
                 {
                     // Maximum number of Concurrent calls to the callback `ProcessMessagesAsync`, set to 1 for simplicity.
                     // Set it according to how many messages the application wants to process in parallel.
@@ -135,7 +136,7 @@ namespace Abiomed.DotNetCore.Business
             }
         }
 
-        public async Task ListenToQueueStorage()
+        public async Task ListenToQueueStorageAsync()
         {
             if (_isServiceBusMode)
             {
@@ -166,7 +167,7 @@ namespace Abiomed.DotNetCore.Business
         #endregion
 
         #region Broadcasters 
-        public async Task BroadcastToQueueStorage(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "")
+        public async Task BroadcastToQueueStorageAsync(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "")
         {
             if (_isServiceBusMode)
             {
@@ -188,7 +189,7 @@ namespace Abiomed.DotNetCore.Business
             await _auditLogManager.AuditAsync(to, DateTime.UtcNow, "", "Email queued through message queue", subject);
         }
 
-        public async Task Broadcast(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "")
+        public async Task BroadcastAsync(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "")
         {
             if (_runningAs != EmailServiceActor.Broadcaster)
             {
@@ -218,7 +219,7 @@ namespace Abiomed.DotNetCore.Business
         #endregion
 
         #region misc
-        public async Task Stop()
+        public async Task StopAsync()
         {
             if (!_isServiceBusMode)
             {
@@ -237,7 +238,7 @@ namespace Abiomed.DotNetCore.Business
         /// Handler ro process the exception when listening, Service Bus
         /// </summary>
         /// <param name="exceptionReceivedEventArgs"></param>
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        private Task ExceptionReceivedHandlerAsync(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
             //TODO: Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
             return Task.CompletedTask;

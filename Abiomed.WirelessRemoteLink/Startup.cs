@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
@@ -10,10 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ElCamino.AspNetCore.Identity.AzureTable;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
-using Abiomed.Storage;
+using Abiomed.DotNetCore.Storage;
 using Abiomed.Models;
 using Abiomed.DotNetCore.Business;
-using Abiomed.DotNetCore.Storage;
 using Abiomed.DotNetCore.Configuration;
 
 namespace Abiomed_WirelessRemoteLink
@@ -42,7 +39,7 @@ namespace Abiomed_WirelessRemoteLink
             string emailQueueConnectionString = Configuration.GetSection("Email:ServiceQueue:QueueStorageConnectionString").Value;
 
             // Add Elcamino Azure Table Identity services.
-            services.AddIdentity<RemoteLinkUser, IdentityRole>((options) =>
+            services.AddIdentity<RemoteLinkUser, ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityRole>((options) =>
             {
                 options.User.RequireUniqueEmail = GetBooleanConfigurationItem("Authentication:UserRequireUniqueEmail");
                 options.SignIn.RequireConfirmedEmail = GetBooleanConfigurationItem("Authentication:SignInRequireConfirmedEmail");
@@ -68,8 +65,8 @@ namespace Abiomed_WirelessRemoteLink
                     idconfig.LocationMode = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:LocationMode").Value;
                     return idconfig;
                 }))
-                .AddDefaultTokenProviders();
-               // .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
+                .AddDefaultTokenProviders()
+                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
 
             services.AddMvc();
 
@@ -78,7 +75,7 @@ namespace Abiomed_WirelessRemoteLink
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
             services.AddSingleton<IConfigurationManager>(configurationManager);
             ConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
-            configurationCache.LoadCache().Wait();
+            configurationCache.LoadCacheAsync().Wait();
             services.AddSingleton<IConfigurationCache>(configurationCache);
 
             string auditLogTableName = !string.IsNullOrEmpty(tablePrefix) ? (tablePrefix + auditTableName) : auditTableName;
@@ -117,8 +114,7 @@ namespace Abiomed_WirelessRemoteLink
             }
 
             app.UseStaticFiles();
-
-            app.UseIdentity();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

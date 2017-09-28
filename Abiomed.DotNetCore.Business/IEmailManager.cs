@@ -8,9 +8,9 @@ namespace Abiomed.DotNetCore.Business
     public interface IEmailManager
     {
         void Listen();
-        Task ListenToQueueStorage();
-        Task Broadcast(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "");
-        Task BroadcastToQueueStorage(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "");
-        Task Stop();
+        Task ListenToQueueStorageAsync();
+        Task BroadcastAsync(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "");
+        Task BroadcastToQueueStorageAsync(string to, string subject, string body, string toFriendlyName = "", string from = "", string fromFriendlyName = "");
+        Task StopAsync();
     }
 }

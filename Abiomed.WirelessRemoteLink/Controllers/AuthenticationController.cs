@@ -15,12 +15,12 @@ namespace Abiomed_WirelessRemoteLink.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : Controller
     {
-        private readonly UserManager<RemoteLinkUser> _userManager;
-        private readonly SignInManager<RemoteLinkUser> _signInManager;
+        private readonly UserManager<Abiomed.Models.RemoteLinkUser> _userManager;
+        private readonly SignInManager<Abiomed.Models.RemoteLinkUser> _signInManager;
         private readonly IAuditLogManager _auditLogManager;
         private readonly IEmailManager _emailManager;
 
-        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager auditLogManager, IEmailManager emailManager)
+        public AuthenticationController(UserManager<Abiomed.Models.RemoteLinkUser> userManager, SignInManager<Abiomed.Models.RemoteLinkUser> signInManager, IAuditLogManager auditLogManager, IEmailManager emailManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,7 +31,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<Abiomed.DotNetCore.Models.UserResponse> Post([FromBody]Credentials credentials)
+        public async Task<Abiomed.DotNetCore.Models.UserResponse> Post([FromBody]Abiomed.Models.Credentials credentials)
         {
             string resultMessage = "Invalid Username/password combination";
             bool isLoginSuccess = false;
@@ -40,7 +40,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             try
             {
                 var result = await PasswordSignInAsync(credentials.Username, credentials.Password);
-                var remoteLinkUser = new RemoteLinkUser();
+                var remoteLinkUser = new Abiomed.Models.RemoteLinkUser();
                 bool isUserActivated = false;
                 bool hasUserAcceptedTermsAndConditions = false;
                 long accessFailedCount = 0;                
@@ -66,7 +66,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                 switch(DetermineLoginResult(result, isUserActivated, hasUserAcceptedTermsAndConditions))
                 {
-                    case LoginResult.Succeeded:
+                    case Abiomed.Models.LoginResult.Succeeded:
                         resultMessage = "Success";
                         isLoginSuccess = true;
                         if (accessFailedCount > 0)
@@ -74,24 +74,24 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                             await ResetUserAccountAsync(remoteLinkUser);
                         }
                         break;
-                    case LoginResult.EmailNotValidated:
+                    case Abiomed.Models.LoginResult.EmailNotValidated:
                         resultMessage = "Email Address not verified";
                         break;
-                    case LoginResult.IsLockedOut:
+                    case Abiomed.Models.LoginResult.IsLockedOut:
                         resultMessage = "Account locked";
                         break;
-                    case LoginResult.NotActivated:
+                    case Abiomed.Models.LoginResult.NotActivated:
                         resultMessage = "Account not activated by Abiomed";
                         break;
-                    case LoginResult.RequiresTwoFactorAuthentication:
+                    case Abiomed.Models.LoginResult.RequiresTwoFactorAuthentication:
                         resultMessage = "Not authorized: Multi factor authentication";
                         break;
-                    case LoginResult.UserNotAcceptedTermsAndConditions:
+                    case Abiomed.Models.LoginResult.UserNotAcceptedTermsAndConditions:
                         isLoginSuccess = true;
                         resultMessage = "User has not accepted Terms and Conditions";
                         break;
-                    case LoginResult.BadUsernamePasswordCombination:
-                    case LoginResult.Unknown:
+                    case Abiomed.Models.LoginResult.BadUsernamePasswordCombination:
+                    case Abiomed.Models.LoginResult.Unknown:
                     default:
                         if (remoteLinkUser != null)
                         {
@@ -150,7 +150,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             try
             {
-                var remoteLinkUser = new RemoteLinkUser
+                var remoteLinkUser = new Abiomed.Models.RemoteLinkUser
                 {
                     FirstName = userRegistration.FirstName,
                     LastName = userRegistration.LastName,
@@ -175,7 +175,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                     if (updateActionResult.Succeeded)
                     {
-                        await _emailManager.BroadcastToQueueStorage(userRegistration.Email, "Remote Link Cloud Account Creation", "Your Remote Link Cloud Account has been created ... Some More Text here - Instructions/welcome message is an open task.", userRegistration.FirstName + " " + userRegistration.LastName);
+                        await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Remote Link Cloud Account Creation", "Your Remote Link Cloud Account has been created ... Some More Text here - Instructions/welcome message is an open task.", userRegistration.FirstName + " " + userRegistration.LastName);
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                         // Send an email with this link
                         //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -259,7 +259,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             return result;
         }
-        private LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated, bool hasUserAcceptedTermsAndConditions)
+        private Abiomed.Models.LoginResult DetermineLoginResult(Microsoft.AspNetCore.Identity.SignInResult signInResult, bool isUserActivated, bool hasUserAcceptedTermsAndConditions)
         { 
             if (signInResult == null || signInResult.Succeeded)
             {
@@ -267,38 +267,38 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 {
                     if (hasUserAcceptedTermsAndConditions)
                     {
-                        return LoginResult.Succeeded;
+                        return Abiomed.Models.LoginResult.Succeeded;
                     }
                     else
                     {
-                        return LoginResult.UserNotAcceptedTermsAndConditions;
+                        return Abiomed.Models.LoginResult.UserNotAcceptedTermsAndConditions;
                     }
                 }
                 else
                 {
-                    return LoginResult.NotActivated;
+                    return Abiomed.Models.LoginResult.NotActivated;
                 }
             }
 
             if (signInResult.IsLockedOut)
             {
-                return LoginResult.IsLockedOut;
+                return Abiomed.Models.LoginResult.IsLockedOut;
             }
 
             if (signInResult.IsNotAllowed)
             {
-                return LoginResult.EmailNotValidated;
+                return Abiomed.Models.LoginResult.EmailNotValidated;
             }
 
             if (signInResult.RequiresTwoFactor)
             {
-                return LoginResult.RequiresTwoFactorAuthentication;
+                return Abiomed.Models.LoginResult.RequiresTwoFactorAuthentication;
             }
 
-            return LoginResult.BadUsernamePasswordCombination;
+            return Abiomed.Models.LoginResult.BadUsernamePasswordCombination;
         }
 
-        private async Task ResetUserAccountAsync(RemoteLinkUser remoteLinkUser)
+        private async Task ResetUserAccountAsync(Abiomed.Models.RemoteLinkUser remoteLinkUser)
         {
             if (_userManager.SupportsUserLockout)
             {
@@ -307,7 +307,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             }
         }
 
-        private async Task AccessFailedAsync(RemoteLinkUser remoteLinkUser)
+        private async Task AccessFailedAsync(Abiomed.Models.RemoteLinkUser remoteLinkUser)
         {
             if (_userManager.SupportsUserLockout)
             {

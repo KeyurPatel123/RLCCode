@@ -15,24 +15,24 @@ namespace Abiomed.DotNetCore.MailQueueService
         static void Main(string[] args)
         {
             Console.WriteLine("Starting Queue = Email");
-            Initialize().Wait();
+            InitializeAsync().Wait();
 
             while (true)
             {
                 Task.Run(async () =>
                 {
-                    await _emailManager.ListenToQueueStorage();
+                    await _emailManager.ListenToQueueStorageAsync();
                 }).GetAwaiter().GetResult();
                 Thread.Sleep(_pollingInterval);
             }
         }
 
-        static private async Task Initialize()
+        static private async Task InitializeAsync()
         {
             ITableStorage tableStorage = new TableStorage();
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
-            await configurationCache.LoadCache();
+            await configurationCache.LoadCacheAsync();
 
             _pollingInterval = configurationCache.GetNumericConfigurationItem("smtpmanager", "pollinginterval");
             configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.Queue.ToString());

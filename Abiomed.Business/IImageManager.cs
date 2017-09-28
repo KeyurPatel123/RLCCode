@@ -15,7 +15,7 @@ namespace Abiomed.Business
         /// <param name="imageFormat">The Format of the Image (i.e. Jpg, Png, Gif, Etc.)</param>
         /// <param name="metadata">Matadata to associate with the Image</param>
         /// <param name="containerName">The Name of the Storage Container the Image is to be stored</param>
-        Task UploadImage(string deviceName, Image image, System.Drawing.Imaging.ImageFormat imageFormat, List<KeyValuePair<string, string>> metadata, string containerName = null);
+        Task UploadImageAsync(string deviceName, Image image, System.Drawing.Imaging.ImageFormat imageFormat, List<KeyValuePair<string, string>> metadata, string containerName = null);
 
         /// <summary>
         /// This method will upload an image from a File Path/Name to Azure Blob Storage

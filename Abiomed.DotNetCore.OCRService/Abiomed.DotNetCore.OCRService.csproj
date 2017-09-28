@@ -14,15 +14,25 @@
     <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Repository\Abiomed.DotNetCore.Repository.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\Mask.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="OverrideAppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Images\">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Folder>
   </ItemGroup>
 
 </Project>

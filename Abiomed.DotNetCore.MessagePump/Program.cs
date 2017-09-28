@@ -20,21 +20,21 @@ namespace Abiomed.DotNetCore.MessagePump
         static private async Task MainAsync(string[] args)
         {
             Console.WriteLine("Starting Email Message Pump");
-            await Initialize();
+            await InitializeAsync();
             _emailManager.Listen();
 
             Console.WriteLine("Press any key to exit after receiving all the messages.");
             Console.ReadKey();
 
-            await _emailManager.Stop();
+            await _emailManager.StopAsync();
         }
 
-        static private async Task Initialize()
+        static private async Task InitializeAsync()
         {
             ITableStorage tableStorage = new TableStorage();
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
             IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
-            await configurationCache.LoadCache();
+            await configurationCache.LoadCacheAsync();
 
             configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.ServiceBus.ToString());
             configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Listener.ToString());

@@ -18,24 +18,24 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
 
         static async Task MainAsync(string[] args)
         {
-            await Initialize();
+            await InitializeAsync();
 
             if (Enum.TryParse(_configurationCache.GetConfigurationItem("smtpmanager", "emailservicetype"), out EmailServiceType emailServiceType))
             {
 
                 if (emailServiceType == EmailServiceType.ServiceBus)
                 {
-                    await _emailManager.Broadcast("plemay@abiomed.com", "this is a test", "Some text Goes Here", "Test Using Service Bus", "easterbunny_abiomed@outlook.com", "Abiomed Admin");
+                    await _emailManager.BroadcastAsync("plemay@abiomed.com", "this is a test", "Some text Goes Here", "Test Using Service Bus", "easterbunny_abiomed@outlook.com", "Abiomed Admin");
                 }
                 else
                 {
-                    await _emailManager.BroadcastToQueueStorage("plemay@abiomed.com", "this is a test", "Some text Goes Here", "Lemay, Paolo");
+                    await _emailManager.BroadcastToQueueStorageAsync("plemay@abiomed.com", "this is a test", "Some text Goes Here", "Lemay, Paolo");
                 }
 
                 Console.WriteLine("Press any key to exit after receiving all the messages.");
                 Console.ReadKey();
 
-                await _emailManager.Stop();
+                await _emailManager.StopAsync();
             }
             else
             {
@@ -43,12 +43,12 @@ namespace Abiomed.DotNetCore.Test.EmailSendConsole
             }
         }
 
-        private static async Task Initialize()
+        private static async Task InitializeAsync()
         {
             ITableStorage tableStorage = new TableStorage();
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
             _configurationCache = new ConfigurationCache(configurationManager);
-            await _configurationCache.LoadCache();
+            await _configurationCache.LoadCacheAsync();
 
             _configurationCache.AddItemToCache("smtpmanager", "emailservicetype", EmailServiceType.ServiceBus.ToString());
             _configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Broadcaster.ToString());

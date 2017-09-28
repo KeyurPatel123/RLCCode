@@ -61,7 +61,7 @@ namespace Abiomed.Start
                 _logger.LogInformation("Starting RLR");
 
                 var configurationCache = serviceProvider.GetService<IConfigurationCache>();
-                configurationCache.LoadCache().Wait();
+                configurationCache.LoadCacheAsync().Wait();
 
                 var security = configurationCache.GetBooleanConfigurationItem("connectionmanager", "security");
 

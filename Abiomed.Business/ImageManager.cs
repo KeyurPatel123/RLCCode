@@ -38,7 +38,7 @@ namespace Abiomed.Business
         /// <param name="imageFormat">The Format of the Image (i.e. Jpg, Png, Gif, Etc.)</param>
         /// <param name="metadata">Matadata to associate with the Image</param>
         /// <param name="containerName">The Name of the Storage Container the Image is to be stored</param>
-        public async Task UploadImage(string deviceName, Image image, System.Drawing.Imaging.ImageFormat imageFormat, List<KeyValuePair<string, string>> metadata, string containerName = null)
+        public async Task UploadImageAsync(string deviceName, Image image, System.Drawing.Imaging.ImageFormat imageFormat, List<KeyValuePair<string, string>> metadata, string containerName = null)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
             {
@@ -67,7 +67,7 @@ namespace Abiomed.Business
             {
                 throw new ArgumentNullException("Image Path cannot be null, empty, or whitespace.");
             }
-            await UploadImage(deviceName, Image.FromFile(imagePath), imageFormat, metadata, containerName);
+            await UploadImageAsync(deviceName, Image.FromFile(imagePath), imageFormat, metadata, containerName);
         }
 
         #endregion
