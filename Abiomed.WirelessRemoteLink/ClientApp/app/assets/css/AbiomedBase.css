@@ -1,4 +1,5 @@
-﻿button {
+﻿
+button {
     cursor:pointer;
 }
 
@@ -22,4 +23,18 @@ input[type=text]::-ms-clear {
 }
 input[password]::-ms-reveal {
     display: none;
+}
+.LoginFooter {
+    background-color: #0E355A;
+    color: #efefef;
+    font-size: .8em;
+    text-align: center;
+}
+.AbiomedLogoFooter {
+    width: 20px;
+    height: auto;
+    padding: 0 0 25px 30px;
+    margin-left: 20px;
+    background: url(../../assets/images/AbioQuadsWhite.svg);
+    background-repeat: no-repeat;
 }

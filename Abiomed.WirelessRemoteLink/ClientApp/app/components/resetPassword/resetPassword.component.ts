@@ -1,5 +1,7 @@
-import { Component} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { AuthenticationService } from "../service/authentication.service";
+import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+
 
 @Component({
     selector: 'resetPassword',
@@ -8,6 +10,19 @@ import { AuthenticationService } from "../service/authentication.service";
     providers: [AuthenticationService]
 })
 
-export class ResetPasswordComponent{        
-    
+export class ResetPasswordComponent implements OnInit {        
+    loginForm: FormGroup;
+
+    ngOnInit(): void {
+        this.validateForm();
+    }
+
+    private validateForm() {
+        this.loginForm = new FormGroup({
+            password: new FormControl('', [Validators.required, Validators.email]),
+            passwordVerify: new FormControl('', [Validators.required, Validators.email]),
+        });
+    }
+
 }
+
