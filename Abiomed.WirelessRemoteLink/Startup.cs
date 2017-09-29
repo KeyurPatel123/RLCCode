@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ElCamino.AspNetCore.Identity.AzureTable;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
-using Abiomed.DotNetCore.Storage;
-using Abiomed.Models;
+using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Business;
 using Abiomed.DotNetCore.Configuration;
+using Abiomed.DotNetCore.Storage;
 
 namespace Abiomed_WirelessRemoteLink
 {
@@ -70,8 +69,8 @@ namespace Abiomed_WirelessRemoteLink
 
             services.AddMvc();
 
-            Abiomed.DotNetCore.Storage.TableStorage tableStorage = new Abiomed.DotNetCore.Storage.TableStorage();
-            services.AddSingleton<Abiomed.DotNetCore.Storage.ITableStorage>(tableStorage);
+            TableStorage tableStorage = new TableStorage();
+            services.AddSingleton<ITableStorage>(tableStorage);
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
             services.AddSingleton<IConfigurationManager>(configurationManager);
             ConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
@@ -93,7 +92,7 @@ namespace Abiomed_WirelessRemoteLink
                                 ILoggerFactory loggerFactory, 
                                 IAuditLogManager auditLogManager, 
                                 IEmailManager emailManager, 
-                                Abiomed.DotNetCore.Storage.ITableStorage tableStorage,
+                                ITableStorage tableStorage,
                                 IConfigurationManager configurationManager,
                                 IConfigurationCache configurationCache)
         {

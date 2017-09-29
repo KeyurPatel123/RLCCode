@@ -29,10 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
-    <ProjectReference Include="..\Abiomed.Business\Abiomed.Business.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
-    <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
-    <ProjectReference Include="..\Abiomed.Storage\Abiomed.Storage.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
