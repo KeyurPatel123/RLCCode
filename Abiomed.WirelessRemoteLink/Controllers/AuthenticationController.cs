@@ -147,21 +147,19 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         public async Task<bool> ForgotPassword([FromBody]Credentials credentials)
         {            
             // Check if user exist, if so generate password reset token and email off
-            RemoteLinkUser remoteLinkUser = new RemoteLinkUser();
-            remoteLinkUser.UserName = credentials.Username;           
-            
-            var user = await _userManager.FindByEmailAsync(remoteLinkUser.UserName);
+
+            var user = await _userManager.FindByEmailAsync(credentials.Username);
 
             string auditMessage = string.Empty;
             if (!String.IsNullOrEmpty(user.Id))
             {
-                auditMessage = string.Format("Found username {0}", remoteLinkUser.UserName);
-                var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(remoteLinkUser);
-                await _emailManager.BroadcastToQueueStorageAsync(remoteLinkUser.UserName, "Remote Link Cloud Password Reset", string.Format("Add Token here http://localhost/reset-password/{0}/{1}", user.Id, passwordToken));
+                auditMessage = string.Format("Found username {0}", user.UserName);
+                var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Remote Link Cloud Password Reset", string.Format("Add Token here http://localhost/reset-password/{0}/{1}", user.Id, passwordToken));
             }
             else 
             {
-                auditMessage = string.Format("Could not find username {0}", remoteLinkUser.UserName);
+                auditMessage = string.Format("Could not find username {0}", user.UserName);
             }
 
             await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);
