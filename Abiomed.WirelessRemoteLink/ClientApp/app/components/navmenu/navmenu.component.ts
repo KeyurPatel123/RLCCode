@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from "../service/authentication.service";
 import { Router } from "@angular/router";
+import { AuthenticationService } from "../../shared/authentication.service";
 
 @Component({
     selector: 'nav-menu',

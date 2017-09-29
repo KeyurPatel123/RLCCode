@@ -1,6 +1,6 @@
 import { Component, OnInit} from '@angular/core';
-import { AuthenticationService } from "../service/authentication.service";
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AuthenticationService } from "../../shared/authentication.service";
 
 @Component({
     selector: 'forgotPassword',
@@ -10,15 +10,36 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 
 export class ForgotPasswordComponent implements OnInit {
-    loginForm: FormGroup;
+    forgotForm: FormGroup;
+    username: string;
+    showForgotMessage: boolean;
+    forgotMessage: string;
+    messageCSS: string;
+
+    constructor(private authenticationService: AuthenticationService) { }
 
     ngOnInit(): void {
         this.validateForm();        
     }
 
     private validateForm() {
-        this.loginForm = new FormGroup({
+        this.forgotForm = new FormGroup({
             username: new FormControl('', [Validators.email]),
         });
+    }
+
+    private ForgotPassword()
+    {
+        this.authenticationService.forgotPassword(this.username).subscribe(result => {
+            this.showForgotMessage = true;
+            if (result) {
+                this.forgotMessage = "An email will be sent to you shortly.";
+                this.messageCSS = "ServerSuccess";
+            }
+            else {
+                this.forgotMessage = "Error processing, please try again.";
+                this.messageCSS = "ServerError";
+            }
+        });                
     }
 }

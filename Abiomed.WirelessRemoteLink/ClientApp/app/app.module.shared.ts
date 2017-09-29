@@ -10,7 +10,8 @@ import { FooterMenuComponent } from "./components/footermenu/footermenu.componen
 import { SummaryComponent } from "./components/summary/summary.component";
 import { AuthGuard } from "./shared/authguard.service";
 import { ResetPasswordComponent } from "./components/resetPassword/resetPassword.component";
-import { AuthenticationService } from "./components/service/authentication.service";
+import { AuthenticationService } from "./shared/authentication.service";
+import { MapComponent } from "./components/map/map.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [AppComponent],    
@@ -23,20 +24,19 @@ export const sharedConfig: NgModule = {
         SummaryComponent,
         ForgotPasswordComponent,
         ResetPasswordComponent,
-        AdminComponent
+        AdminComponent,
+        MapComponent
     ],
-    //providers: [
-    //    AuthGuard, AuthenticationService
-    //],
     imports: [
         RouterModule.forRoot([
-            { path: '', component: LoginComponent },
+            { path: 'login', component: LoginComponent },
             { path: 'enrollment', component: EnrollmentComponent, canActivate:[AuthGuard]},
             { path: 'forgot-password', component: ForgotPasswordComponent },
             { path: 'reset-password', component: ResetPasswordComponent },
             { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
             { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
-            //{ path: '', redirectTo: '/login', pathMatch: 'full' },
+            { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
+            { path: '', redirectTo: '/login', pathMatch: 'full' },
             { path: '**', redirectTo: '' }
         ])
     ]

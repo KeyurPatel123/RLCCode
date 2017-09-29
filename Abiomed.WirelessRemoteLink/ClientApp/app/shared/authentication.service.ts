@@ -2,13 +2,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from "rxjs/Observable";
 import 'rxjs/add/operator/map'
-import { AuthenticationInterface, UserRegistrationInterface } from "../../shared/authentication.interface";
+import { AuthenticationInterface, UserRegistrationInterface } from "./authentication.interface";
+import { StorageService } from "./storage.service";
 
 @Injectable()
 export class AuthenticationService {   
     constructor(
         private http: HttpClient,
         @Inject('ORIGIN_URL') private originUrl: string,
+        private storageService: StorageService
     ) {        
         // set token if saved in local storage
      //   var currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -20,36 +22,25 @@ export class AuthenticationService {
             .map((response: AuthenticationInterface) => {
                 if (response.isSuccess)
                 {
-                    if (typeof window !== 'undefined') {
-                        sessionStorage.setItem("loggedIn", "true");
-                        sessionStorage.setItem("role", response.role);
-                    }
+                    this.storageService.SessionSetItem("loggedIn", "true");
+                    this.storageService.SessionSetItem("role", response.role);
                 }
                 return response;
             });
     }
 
     logout(): void {
-        if (typeof window !== 'undefined') {
-            // clear token remove user from local storage to log user out
-            sessionStorage.setItem("loggedIn", "false");
-        }
+        this.storageService.SessionSetItem("loggedIn", "false");
     }
 
     getLoggedIn(): boolean {
-        var isTrue = false;
-        if (typeof window !== 'undefined') {
-            isTrue = (sessionStorage.getItem("loggedIn") == 'true');
-        }
+        var isTrue = false;        
+        isTrue = (this.storageService.SessionGetItem("loggedIn") == 'true');
         return isTrue;
     }
 
-    getRole(): string {
-        var role = '';
-        if (typeof window !== 'undefined') {
-            role = sessionStorage.getItem("role");
-        }
-        return role;
+    getRole(): string {        
+        return this.storageService.SessionGetItem("role");
     }
 
     acceptTAC(): Observable<boolean > {
@@ -63,6 +54,20 @@ export class AuthenticationService {
         var json = JSON.stringify(userRegistration);
         return this.http.post('/api/Authentication/Register', userRegistration)            
             .map((response: any) => {
+                return response;
+            });
+    }
+
+    forgotPassword(username: string): Observable<boolean> {
+        return this.http.post('/api/Authentication/ForgotPassword', JSON.stringify({ Username: username, Password: '' }))
+            .map((response: boolean) => {
+                return response;
+            });
+    }
+
+    resetPassword(id: string, token: string, password: string): Observable<boolean> {
+        return this.http.post('/api/Authentication/ResetPassword', JSON.stringify({Id: id, Token: token, Password: password }))
+            .map((response: boolean) => {
                 return response;
             });
     }

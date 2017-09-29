@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, Inject} from '@angular/core';
-import { AuthenticationService } from "../service/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, ModalDismissReasons, NgbTooltip, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import { DOCUMENT } from "@angular/common";
+import { AuthenticationService } from "../../shared/authentication.service";
 
 @Component({
     selector: 'login',
@@ -21,10 +21,9 @@ export class LoginComponent implements OnInit  {
     loginError: boolean;
     modalRef: NgbModalRef;
 
-    constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal, @Inject(DOCUMENT) private document: any) { }
+    constructor(private authenticationService: AuthenticationService, private router: Router, private modalService: NgbModal) { }
 
     ngOnInit() {
-        //this.document.querySelector('body').style.backgroundColor = '#0E355A';
         this.loginError = false;
         this.authenticationService.logout();
         this.validateForm();        

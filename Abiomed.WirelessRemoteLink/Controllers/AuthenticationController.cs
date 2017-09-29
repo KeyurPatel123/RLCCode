@@ -39,6 +39,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
             try
             {
+                
                 var result = await PasswordSignInAsync(credentials.Username, credentials.Password);
                 var remoteLinkUser = new Abiomed.Models.RemoteLinkUser();
                 bool isUserActivated = false;
@@ -140,6 +141,51 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             await _auditLogManager.AuditAsync(User.Identity.Name, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "TermsAndConditions", auditMessage);
             return result;
         }
+
+        [HttpPost]
+        [Route("ForgotPassword")]
+        [AllowAnonymous]
+        public async Task<bool> ForgotPassword([FromBody]Abiomed.DotNetCore.Models.Credentials credentials)
+        {            
+            // Check if user exist, if so generate password reset token and email off
+            Abiomed.Models.RemoteLinkUser remoteLinkUser = new Abiomed.Models.RemoteLinkUser();
+            remoteLinkUser.UserName = credentials.Username;           
+            
+            var user = await _userManager.FindByEmailAsync(remoteLinkUser.UserName);
+
+            string auditMessage = string.Empty;
+            if (!String.IsNullOrEmpty(user.Id))
+            {
+                auditMessage = string.Format("Found username {0}", remoteLinkUser.UserName);
+                var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(remoteLinkUser);
+                await _emailManager.BroadcastToQueueStorageAsync(remoteLinkUser.UserName, "Remote Link Cloud Password Reset", string.Format("Add Token here http://localhost/reset-password/{0}/{1}", user.Id, passwordToken));
+            }
+            else 
+            {
+                auditMessage = string.Format("Could not find username {0}", remoteLinkUser.UserName);
+            }
+
+            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);
+            // Always return true? Maybe void
+            return true;
+        }
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        [AllowAnonymous]
+        public async Task<bool> ResetPassword([FromBody]ResetPassword resetPassword)
+        {
+            // todo add error handling!
+            bool result = false;
+            string auditMessage = "Reset Password";
+
+            var user = await _userManager.FindByIdAsync(resetPassword.Id);
+
+            var resultPassword = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
+            await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
+            return result;
+        }
+
 
         [HttpPost]
         [Route("Register")]

@@ -28,16 +28,16 @@ namespace Abiomed.Repository
         private readonly IServer _server;
         private readonly ISubscriber _subscriber;
 //        private ConnectionMultiplexer _connectionMultiplexer;
-        private Configuration _configuration;
+        
         private Lazy<ConnectionMultiplexer> lazyConnection;
 
 
-        public RedisDbRepository(Configuration configuration)
+        public RedisDbRepository()
         {
             //_connectionMultiplexer = ConnectionMultiplexer.Connect(configuration.RedisConnect);
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
             {
-                return ConnectionMultiplexer.Connect(configuration.RedisConnect);
+                return ConnectionMultiplexer.Connect("localhost");
             });
 
             var endPoints = lazyConnection.Value.GetEndPoints();
