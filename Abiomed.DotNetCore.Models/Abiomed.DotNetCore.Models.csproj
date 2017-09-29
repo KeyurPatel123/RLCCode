@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="ElCamino.AspNetCore.Identity.AzureTable" Version="2.0.0" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>

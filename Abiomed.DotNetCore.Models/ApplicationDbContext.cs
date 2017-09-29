@@ -1,7 +1,7 @@
 ﻿using ElCamino.AspNetCore.Identity.AzureTable;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 
-namespace Abiomed.DotNetCore.Storage
+namespace Abiomed.DotNetCore.Models
 {
 
     public class ApplicationDbContext : IdentityCloudContext
