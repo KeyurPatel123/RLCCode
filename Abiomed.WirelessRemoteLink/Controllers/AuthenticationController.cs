@@ -175,19 +175,13 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         public async Task<bool> ResetPassword([FromBody]ResetPassword resetPassword)
         {
             // todo add error handling!
-            bool result = false;
             string auditMessage = "Reset Password";
 
             var user = await _userManager.FindByIdAsync(resetPassword.Id);
+            var resultPassword = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
 
-            RemoteLinkUser remoteLinkUser = new RemoteLinkUser();
-            remoteLinkUser.UserName = user.UserName;
-            var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(remoteLinkUser);
-            //var xxx = await _userManager.ResetPasswordAsync()
-            //var resultPassword = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
-            var resultPassword = await _userManager.ResetPasswordAsync(user, passwordToken, resetPassword.Password);
             await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
-            return result;
+            return resultPassword.Succeeded;
         }
 
 
