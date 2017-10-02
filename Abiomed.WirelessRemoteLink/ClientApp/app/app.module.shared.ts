@@ -32,7 +32,7 @@ export const sharedConfig: NgModule = {
             { path: 'login', component: LoginComponent },
             { path: 'enrollment', component: EnrollmentComponent, canActivate:[AuthGuard]},
             { path: 'forgot-password', component: ForgotPasswordComponent },
-            { path: 'reset-password', component: ResetPasswordComponent },
+            { path: 'reset-password/:id/:token', component: ResetPasswordComponent },
             { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
             { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
             { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
