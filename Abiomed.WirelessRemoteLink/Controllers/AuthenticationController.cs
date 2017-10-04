@@ -155,6 +155,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             {
                 auditMessage = string.Format("Found username {0}", user.UserName);
                 var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
                 await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Remote Link Cloud Password Reset", string.Format("Add Token here http://localhost/reset-password/{0}/{1}", user.Id, passwordToken));
             }
             else 
@@ -178,6 +179,15 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             var user = await _userManager.FindByIdAsync(resetPassword.Id);
             var resultPassword = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
 
+            if (resultPassword.Succeeded)
+            {
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    await _userManager.SetLockoutEnabledAsync(user, false);
+                    await _userManager.ResetAccessFailedCountAsync(user);
+                }
+            }
+            
             await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
             return resultPassword.Succeeded;
         }
