@@ -185,6 +185,14 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             passwordTokenEncode = WebUtility.UrlDecode(passwordTokenEncode);
             
             var resultPassword = await _userManager.ResetPasswordAsync(user, passwordTokenEncode, resetPassword.Password);
+            if (resultPassword.Succeeded)
+            {
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    await _userManager.SetLockoutEnabledAsync(user, false);
+                    await _userManager.ResetAccessFailedCountAsync(user);
+                }
+            }
 
             await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
 
