@@ -1,11 +1,8 @@
-<div class="container-fluid">
-    <div class="row RemoteLinkNav ">
-
-    <div class="col" style="padding:5px 0 0 30px; ">
+<div class="row RemoteLinkNav">
+<div class="col" style="padding:5px 0 0 30px;">
         <div class="AbiomedLogoNav"></div>
     </div>
-
-       <!--Search--> 
+<!--Search--> 
         <form class="navbar-form form-inline" role="search" style="float:right;">
             <div class="input-group add-on">
                 <input class="form-control" placeholder="Search case number" name="srch-term" id="srch-term" type="text">
@@ -28,27 +25,24 @@
             </div>
       <!--COG-->  
 
-    </div>
-    <!-- SubNav -->
-    <div class="row RemoteLinkSubNav">
-
-        <div class="col d-flex justify-content-start">
-
-            <div class="EnterpriseName"><span class="fa  fa-caret-right Chevron"></span>ABC Healthcare</div>
-
-            <ul>
-                <li><a [routerLink]="['/map']">Map</a></li>
-                <li><a [routerLink]="['/summary']">Summary</a></li>
-                <!--<li><a [routerLink]="['/list']">List</a></li>-->
-            </ul>
-
-            <!--<div class="NavItem">Map</div>
-              <div class="NavItem">Summary</div>
-              <div class="NavItem">Case</div>-->
-
-            <div class="AbiomedSupport ml-auto"><p class="AbiomedSupportCopy">Abiomed Clinical Support Center</p>1-800-422-8666</div>
-
-        </div>
-    </div>
-    <!-- /SubNav -->
 </div>
+  
+ <!-- SubNav -->
+<div class="row RemoteLinkSubNav">
+
+    <div class="col d-flex justify-content-start">
+
+        <div class="EnterpriseName"><span class="fa  fa-caret-right Chevron"></span>ABC Healthcare</div>
+
+        <ul>
+            <li><a [routerLink]="['/map']">Map</a></li>
+            <li><a [routerLink]="['/summary']">Summary</a></li>
+            <!--<li><a [routerLink]="['/list']">List</a></li>-->
+        </ul>
+
+
+        <div class="AbiomedSupport ml-auto"><p class="AbiomedSupportCopy">Abiomed Clinical Support Center</p>1-800-422-8666</div>
+
+    </div>
+</div>
+<!-- /SubNav -->
