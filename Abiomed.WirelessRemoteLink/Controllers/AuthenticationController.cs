@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System;
 using System.Security.Claims;
 using System.Linq;
+using System.Net;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
 {
@@ -144,7 +145,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("ForgotPassword")]
         [AllowAnonymous]
-        public async Task<bool> ForgotPassword([FromBody]Credentials credentials)
+        public async Task ForgotPassword([FromBody]Credentials credentials)
         {            
             // Check if user exist, if so generate password reset token and email off
 
@@ -156,16 +157,17 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                 auditMessage = string.Format("Found username {0}", user.UserName);
                 var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Remote Link Cloud Password Reset", string.Format("Add Token here http://localhost/reset-password/{0}/{1}", user.Id, passwordToken));
+                // Encode and Replace % with $ in token
+                 var passwordTokenEncode = WebUtility.UrlEncode(passwordToken).Replace('%','$');
+                
+                await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Remote Link Cloud Password Reset", string.Format("Click here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1}", user.Id, passwordTokenEncode));
             }
             else 
             {
                 auditMessage = string.Format("Could not find username {0}", user.UserName);
             }
 
-            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);
-            // Always return true? Maybe void
-            return true;
+            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);                        
         }
 
         [HttpPost]
@@ -177,19 +179,16 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             string auditMessage = "Reset Password";
 
             var user = await _userManager.FindByIdAsync(resetPassword.Id);
-            var resultPassword = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
 
-            if (resultPassword.Succeeded)
-            {
-                if (await _userManager.IsLockedOutAsync(user))
-                {
-                    await _userManager.SetLockoutEnabledAsync(user, false);
-                    await _userManager.ResetAccessFailedCountAsync(user);
-                }
-            }
+            // Replace $ with %, then decode
+            var passwordTokenEncode = resetPassword.Token.Replace('$', '%');
+            passwordTokenEncode = WebUtility.UrlDecode(passwordTokenEncode);
             
+            var resultPassword = await _userManager.ResetPasswordAsync(user, passwordTokenEncode, resetPassword.Password);
+
             await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
-            return resultPassword.Succeeded;
+
+            return resultPassword.Succeeded;                        
         }
 
 
@@ -227,7 +226,10 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                     if (updateActionResult.Succeeded)
                     {
-                        await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Remote Link Cloud Account Creation", "Your Remote Link Cloud Account has been created ... Some More Text here - Instructions/welcome message is an open task.", userRegistration.FirstName + " " + userRegistration.LastName);
+                        var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(remoteLinkUser);
+                        var passwordTokenEncode = WebUtility.UrlEncode(passwordToken).Replace('%', '$');
+
+                        await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Remote Link Cloud Account Creation", string.Format("Your Remote Link Cloud Account has been created ... Click Here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1} - Instructions/welcome message is an open task.", remoteLinkUser.Id, passwordTokenEncode), userRegistration.FirstName + " " + userRegistration.LastName);
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                         // Send an email with this link
                         //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

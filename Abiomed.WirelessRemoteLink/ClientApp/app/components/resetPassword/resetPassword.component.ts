@@ -1,7 +1,7 @@
 import { Component, OnInit} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { AuthenticationService } from "../../shared/authentication.service";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Params } from "@angular/router";
 import { Observable } from "rxjs/Observable";
 
 @Component({
@@ -15,16 +15,19 @@ export class ResetPasswordComponent implements OnInit {
     id: string;
     token: string;
     password: string;
-    passwordForm: FormGroup;    
+    passwordForm: FormGroup; 
+    showResetMessage: boolean;
+    resetMessage: string;
+    messageCSS: string;
     
     constructor(private authenticationService: AuthenticationService, private route: ActivatedRoute) { }
 
     ngOnInit(): void {
-        //this.route.params.subscribe(params => {
-        //    this.id = params['id'];
-        //    this.token = params['token'];
-        //    console.log(this.token);
-        //});        
+        
+        this.route.paramMap.subscribe((paramMap: Params) => {
+            this.id = paramMap.params.id;
+            this.token = paramMap.params.token;
+        });        
         this.validateForm();
     }
 
@@ -43,11 +46,17 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     private ResetPasswordForm() {
-        this.id = "U_AAGNELLO_40ABIOMED.COM";
-        this.token = "CfDJ8GnGsS+kgw1Kksy/YWg2WMZXHPH6TgtxLPF0Fb+fwYi1dDm/1RJAQwbrc1AtcykShX17B9/ioUKTCoLXTyXGyZQU7sjWgrtvc4KyQUlP7ea5ajBvgp06Ge+ZqL04GpLTylxgadj2O1UjrBJz/r7gIIw="
         this.authenticationService.resetPassword(this.id, this.token, this.password).subscribe(result => {
-            // todo display message
-            console.log(result);
+            this.showResetMessage = true;
+            this.messageCSS = "ServerSuccess";
+            if (result) {
+                this.resetMessage = "Your password has been updated.";
+                this.messageCSS = "ServerSuccess";
+            }
+            else {
+                this.resetMessage = "Error processing, please try again.";
+                this.messageCSS = "ServerError";
+            }
         });                
     }
 

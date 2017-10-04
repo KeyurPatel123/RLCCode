@@ -11,6 +11,7 @@ using Abiomed.DotNetCore.Models;
 using Abiomed.DotNetCore.Business;
 using Abiomed.DotNetCore.Configuration;
 using Abiomed.DotNetCore.Storage;
+using System.IO;
 
 namespace Abiomed_WirelessRemoteLink
 {
@@ -115,15 +116,18 @@ namespace Abiomed_WirelessRemoteLink
             app.UseStaticFiles();
             app.UseAuthentication();
 
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
+                routes.MapSpaFallbackRoute("spa-fallback", new { controller = "Home", action = "Index" });
+                /*
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                    defaults: new { controller = "Home", action = "Index" });*/
             });
         }
 
