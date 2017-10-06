@@ -1,5 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import { Router} from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'summary',
@@ -8,12 +8,11 @@ import { Router} from '@angular/router';
 })
 export class SummaryComponent implements OnInit {
     
-    constructor() { }
+    constructor(private router: Router) { }
+
 
     ngOnInit() {
-        
-    }
-   
+           }  
 }
 
 

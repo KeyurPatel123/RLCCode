@@ -71,33 +71,34 @@ namespace Abiomed.SignalRSelfHost
         {
             #region RLM AUD Events
             _redisDbRepository.Subscribe(Definitions.AddRLMDevice, (channel, message) =>
-            {
-                RLMDevice device = _redisDbRepository.StringGet(message);
+            {                
+                RLMDevice device = _redisDbRepository.RLMModelGet(message);                
                 var deviceStatus = ConvertRLMDevice(device);
-
+                Console.WriteLine("Added device");
                 AddedRemoteLink(deviceStatus);
             });
 
             _redisDbRepository.Subscribe(Definitions.UpdateRLMDevice, (channel, message) =>
             {
-                RLMDevice device = _redisDbRepository.StringGet(message);
+                RLMDevice device = _redisDbRepository.RLMModelGet(message);
                 var deviceStatus = ConvertRLMDevice(device);
-
+                Console.WriteLine("Updated device");
                 UpdatedRemoteLink(deviceStatus);
             });
 
             _redisDbRepository.Subscribe(Definitions.DeleteRLMDevice, (channel, message) =>
             {
-                RLMDevice device = _redisDbRepository.StringGet(message);
+                RLMDevice device = _redisDbRepository.RLMModelGet(message);
                 var deviceStatus = ConvertRLMDevice(device);
-
+                Console.WriteLine("Deleted device");
                 DeletedRemoteLink(deviceStatus);
             });
             #endregion
 
             _redisDbRepository.Subscribe(Definitions.BearerInfoRLMDevice, (channel, message) =>
             {
-                RLMDevice device = _redisDbRepository.StringGet(message);                
+                Console.WriteLine("Bearer Info");
+                RLMDevice device = _redisDbRepository.RLMModelGet(message);
                 BearerSettings(device.SerialNo, device.BearerAuthInformationList);
             });
         }

@@ -53,7 +53,12 @@ module.exports = (env) => {
                 {
                     to: 'shim.min.js',
                     from: 'node_modules/core-js/client/shim.min.js' }
-            ])
+            ]),
+            new copyWebpackPlugin([
+                {
+                    to: 'jwplayer.min.js',
+                    from: 'JWPlayer/jwplayer.min.js' }
+            ])                    
         ]
     };
 

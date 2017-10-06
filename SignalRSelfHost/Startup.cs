@@ -25,7 +25,7 @@ namespace Abiomed.SignalRSelfHost
             // for more information.
             using (WebApp.Start<Startup>("http://*:8080"))
             {
-                Console.WriteLine("Server running on 8088");
+                Console.WriteLine("Server running on 8080");
                 Console.ReadLine();
             }
         }
@@ -35,6 +35,5 @@ namespace Abiomed.SignalRSelfHost
             app.UseCors(CorsOptions.AllowAll);
             app.MapSignalR();
         }
-
     }
 }

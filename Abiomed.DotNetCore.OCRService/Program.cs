@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Abiomed.DotNetCore.Repository;
 using Abiomed.DotNetCore.Models;
+using StackExchange.Redis;
 
 namespace Abiomed.DotNetCore.OCRService
 {
@@ -17,6 +18,7 @@ namespace Abiomed.DotNetCore.OCRService
         static DateTime _batchStartTimeUtc;
         static IMediaManager _mediaManager;
         static IAzureCosmosDB _azureCosmosDB;
+        static IRedisDbRepository<OcrResponse> _redisDbRepository;
 
         static void Main(string[] args)
         {
@@ -28,6 +30,9 @@ namespace Abiomed.DotNetCore.OCRService
             {
                 imageStreams = _mediaManager.GetLiveStreamsAsync().GetAwaiter().GetResult();
                 ListenInParallel(imageStreams);
+
+                //RedisValue redisValue = imageStreams;
+                _redisDbRepository.Publish(Definitions.UpdatedRLMDevices, "");
                 Thread.Sleep(_pollingInterval);
             }
         }
@@ -64,6 +69,8 @@ namespace Abiomed.DotNetCore.OCRService
             _azureCosmosDB = new AzureCosmosDB(configurationCache);
             _azureCosmosDB.SetContext(configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
                 configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
+
+            _redisDbRepository = new RedisDbRepository<OcrResponse>(configurationCache);
         }
     }
 }

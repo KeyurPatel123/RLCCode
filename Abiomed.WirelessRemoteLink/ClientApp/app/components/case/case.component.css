@@ -23,8 +23,6 @@ p {
 .VideoContainer {
     width:600px;
     height:450px;
-    background: url(../../assets/images/VideoPlaceholder.png);
-    background-repeat: no-repeat;
 }
 
 .CaseInfoBar {

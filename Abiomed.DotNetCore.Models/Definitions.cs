@@ -8,6 +8,9 @@ namespace Abiomed.DotNetCore.Models
         public static string RemoveRLMDeviceRLR = @"RemoveRLMDeviceRLR";
         public static string ImageCapture = @"ImageCapture";
         public static string RLMDeviceSet = @"RLMDeviceSet";
+        public static string RLMDeviceSetWOWZA = @"RLMDeviceSetWOWZA";
+        public static string UpdatedRLMDevices = @"UpdatedRLMDevices";
+
         public static string AddRLMDevice = @"AddRLMDevice";
         public static string UpdateRLMDevice = @"UpdateRLMDevice";
         public static string DeleteRLMDevice = @"DeleteRLMDevice";

@@ -18,7 +18,9 @@ p {
     font-size: .8em;
 }
 
-
+.red {
+    color:red;
+}
 .FormContainer 
 {
     padding:10px;

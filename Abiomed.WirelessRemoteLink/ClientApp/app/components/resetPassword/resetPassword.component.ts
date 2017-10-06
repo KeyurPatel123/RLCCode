@@ -32,9 +32,9 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     private validateForm() {
-        this.passwordForm = new FormGroup({
-            password: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/)]),
-            passwordVerify: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/)]),
+        this.passwordForm = new FormGroup({                                     
+            password: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*#^&])[A-Za-z\d$@$!%*#^&]{8,}/)]),
+            passwordVerify: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*#^&])[A-Za-z\d$@$!%*#^&]{8,}/)]),
         }, this.areEqual);
     }
 

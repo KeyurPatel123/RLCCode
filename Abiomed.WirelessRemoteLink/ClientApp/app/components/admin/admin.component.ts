@@ -14,8 +14,10 @@ import { AuthGuard } from "../../shared/authguard.service";
 export class AdminComponent implements OnInit {
     createForm: FormGroup;
     firstname: string;
-    lastname: string
-    phone: string
+    lastname: string;
+    phone1: string;
+    phone2: string;
+    phone3: string;
     email: string;
     role: string;
     created: boolean;
@@ -34,7 +36,6 @@ export class AdminComponent implements OnInit {
         this.createForm = new FormGroup({
             firstname: new FormControl('', [Validators.required]),
             lastname: new FormControl('', [Validators.required]),
-            phone: new FormControl(''),
             email: new FormControl('', [Validators.required, Validators.email]),
             role: new FormControl('', [Validators.required]),
         });
@@ -47,7 +48,7 @@ export class AdminComponent implements OnInit {
         var userRegistration = {
             FirstName: this.firstname,
             LastName: this.lastname,
-            Phone: this.phone,
+            Phone: this.phone1 + this.phone2 + this.phone3,
             Email: this.email,
             Roles: roles,
             AcceptedTermsAndConditions: false,
