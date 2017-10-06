@@ -1,8 +1,8 @@
-<div class="container-fluid">
+<div class="container-fluid flex-grow">
    <nav-menu></nav-menu>
  <!--Top InfoBar-->
     <div class="row justify-content-center">
-        <div class="col-10 CaseInfoBar">
+        <div class="col-10 CaseInfoBar" style="height:auto;">
 
             <div class="d-flex flex-wrap justify-content-between align-self-center ">
                 <div class="CaseInfo"><span class="CaseInfoTitle">Impella SN:</span> 123456</div>
@@ -15,89 +15,108 @@
         </div>
     </div>
 <!-- MainContent -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" style="min-height:400px;margin-top:20px;">
         <!--Video Player-->
-        <div id="playerElement" class="col-5" style="margin-top:20px;border-radius:0 0 5px 5px" >
-            
+        <div class="col-md-5">
+            <div style="padding:8px;border-radius:3px;background-color:#fff;border:solid thin #ccc;">
+                <div id="playerElement">
+
+                </div>
+            </div>
         </div>
        
         <!--Accordion Group-->
-        <div class="col-5" style="margin-top:20px;">
-            <ngb-accordion [closeOthers]="true" #acc="ngbAccordion"  activeIds="ngb-panel-0">
-     <ngb-panel title="ALERT SUMMARY">
-         <ng-template ngbPanelContent>
-             <div class="AlertSummary">
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertRed"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertRed"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertRed"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertWhite"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertYellow"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertWhite"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertRed"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertRed"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
-                 <!--Alert Instance-->
-                 <div class="AlertInstance d-flex flex-wrap justify-content-left">
-                     <div class="AlertYellow"></div>
-                     <div class="AlertCopy"><span class="align-middle">[timestamp] [alert info] plevel change, etc.]</span></div>
-                 </div>
+        <div class="col-md-5">
+            <div style="padding:8px;border-radius:3px;background-color:#fff;border:solid thin #ccc;">
+    <ngb-accordion [closeOthers]="true" #acc="ngbAccordion" activeIds="ngb-panel-0">
+        <ngb-panel title="ALERT SUMMARY" class="HeaderLink">
+            <ng-template ngbPanelContent>
+                <div class="AlertSummary">
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer"><div class="AlertRed"></div></div>
+                        <div class="AlertCopy"><div>[timestamp] [alert info] [plevel change, etc.]</div>
+                    </div>
+                    </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer"><div class="AlertRed"></div></div>
+                        <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                    </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertRed"></div>
+                        </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer"><div class="AlertWhite"></div></div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertYellow"></div>
+                        </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertWhite"></div>
+                        </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertRed"></div>
+                        </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertRed"></div>
+                        </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
+                    <!--Alert Instance-->
+                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer">
+                            <div class="AlertYellow"></div>
+                            </div>
+                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
+                        </div>
 
-                 
-             </div>
-          </ng-template>
-     </ngb-panel>
-    <ngb-panel id="toggle-notes" title="NOTES" [disabled]="true" >
-        <ng-template ngbPanelContent>
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia
-            aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-            sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica,
-            craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings
-            occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
-            labore sustainable VHS.
-        </ng-template>
-    </ngb-panel>
-    <ngb-panel id="toggle-reports" title="REPORTS"  [disabled]="true">
-        <ng-template ngbPanelContent>
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia
-            aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-            sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica,
-            craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings
-            occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
-            labore sustainable VHS.
-        </ng-template>
-    </ngb-panel>
+
+                </div>
+            </ng-template>
+        </ngb-panel>
+        <ngb-panel id="toggle-notes" title="NOTES" [disabled]="true">
+            <ng-template ngbPanelContent>
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia
+                aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
+                sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica,
+                craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings
+                occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
+                labore sustainable VHS.
+            </ng-template>
+        </ngb-panel>
+        <ngb-panel id="toggle-reports" title="REPORTS" [disabled]="true">
+            <ng-template ngbPanelContent>
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia
+                aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
+                sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica,
+                craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings
+                occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
+                labore sustainable VHS.
+            </ng-template>
+        </ngb-panel>
     </ngb-accordion>
+</div>
 
         </div>
     </div>

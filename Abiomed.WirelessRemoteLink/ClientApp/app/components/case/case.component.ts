@@ -34,26 +34,7 @@ export class CaseComponent implements OnInit {
                 bufferlength: 1
             }
         });
-        /*
-        var playerInstance = this.jwplayer("playerElement");
-        playerInstance.setup({
-            playlist: [{
-                sources: [
-                    { file: "rtmps://rlv.abiomed.com:443/live/RL00017" },
-                    { file: "https://rlv.abiomed.com:443/live/RL00017/playlist.m3u8" },
-                ],
-            }],
-            width: "100%",
-            aspectratio: "4:3",
-            autostart: true,
-            stretching: 'exactfit',
-            preload: "none",
-            androidhls: true,
-            primary: "flash",
-            rtmp: {
-                bufferlength: 1
-            }
-        });*/
+       
     }
 }
 
