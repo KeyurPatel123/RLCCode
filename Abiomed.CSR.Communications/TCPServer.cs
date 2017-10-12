@@ -15,13 +15,14 @@ using Abiomed.Business;
 using System.Linq;
 using System.Collections.Concurrent;
 using Abiomed.Models;
+
+using Abiomed.Repository;
+using System.Collections.Generic;
+using StackExchange.Redis;
+
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Net.Security;
-using Abiomed.Repository;
-using System.Diagnostics;
-using System.Collections.Generic;
-using StackExchange.Redis;
 
 namespace Abiomed.RLR.Communications
 {
@@ -73,7 +74,8 @@ namespace Abiomed.RLR.Communications
 
                 if (msg.Contains("^^^"))
                 {
-                    msgSplit = msg.Split("^^^");
+                    // not used in .net45 remove project 
+                    //msgSplit = msg.Split("^^^");
                     deviceIpAddress = msgSplit[0];
                     msgSplit = msgSplit.Skip(1).ToArray();
                 }

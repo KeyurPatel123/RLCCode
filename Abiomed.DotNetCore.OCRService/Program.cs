@@ -19,6 +19,7 @@ namespace Abiomed.DotNetCore.OCRService
         static DateTime _batchStartTimeUtc;
         static IMediaManager _mediaManager;
         static IAzureCosmosDB _azureCosmosDB;
+        static IConfigurationCache _configurationCache;
         static IRedisDbRepository<OcrResponse> _redisDbRepository;
 
         static void Main(string[] args)
@@ -32,8 +33,7 @@ namespace Abiomed.DotNetCore.OCRService
                 imageStreams = _mediaManager.GetLiveStreamsAsync().GetAwaiter().GetResult();
                 ListenInParallel(imageStreams);
                 PublishResults(imageStreams);                
-                Thread.Sleep(int.MaxValue);
-
+                Thread.Sleep(_pollingInterval);
             }
         }
 
@@ -49,35 +49,41 @@ namespace Abiomed.DotNetCore.OCRService
             return Task.WhenAll(tasks);
         }
 
-        private static async Task<OcrResponse> ProcessStreams(string serialNumber)
+        private static async Task ProcessStreams(string serialNumber)
         {
             var ocrRetrievedText = await _mediaManager.GetImageTextAsync(serialNumber, _batchStartTimeUtc);
             _redisDbRepository.StringSet(serialNumber, ocrRetrievedText);
-            await _azureCosmosDB.AddAsync(ocrRetrievedText);
-            return ocrRetrievedText;
+
+            if (ocrRetrievedText.ScreenName != ScreenName.Unknown.ToString())
+            {
+                await _azureCosmosDB.AddAsync(ocrRetrievedText);
+            }
         }
 
         private static async Task InitializeAsync()
         {
             ITableStorage tableStorage = new TableStorage();
             ConfigurationManager configurationManager = new ConfigurationManager(tableStorage);
-            IConfigurationCache configurationCache = new ConfigurationCache(configurationManager);
-            await configurationCache.LoadCacheAsync();
+            _configurationCache = new ConfigurationCache(configurationManager);
+            await _configurationCache.LoadCacheAsync();
 
-            _mediaManager = new MediaManager(configurationCache);
-            _pollingInterval = configurationCache.GetNumericConfigurationItem("mediamanager", "pollinginterval");
+            _mediaManager = new MediaManager(_configurationCache);
+            _pollingInterval = _configurationCache.GetNumericConfigurationItem("mediamanager", "pollinginterval");
 
-            _azureCosmosDB = new AzureCosmosDB(configurationCache);
-            _azureCosmosDB.SetContext(configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
-                configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
+            _azureCosmosDB = new AzureCosmosDB(_configurationCache);
+            _azureCosmosDB.SetContext(_configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
+                _configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
 
-            _redisDbRepository = new RedisDbRepository<OcrResponse>(configurationCache);
+            _redisDbRepository = new RedisDbRepository<OcrResponse>(_configurationCache);
         }
 
         private static void PublishResults(List<string> imageStreams)
         {
             string activeStreams = JsonConvert.SerializeObject(imageStreams);            
             _redisDbRepository.PublishAsync(Definitions.UpdatedRLMDevices, activeStreams);
+            _azureCosmosDB = new AzureCosmosDB(_configurationCache);
+            _azureCosmosDB.SetContext(_configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
+                _configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
         }
     }
 }

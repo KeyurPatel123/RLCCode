@@ -102,7 +102,7 @@
   {
     "Category": "mediamanager",
     "Name": "thumbnailurl",
-    "Value": "http://10.11.0.16:8086/thumbnail?application=live&streamname={0}&size=800x600&fitmode=letterbox"
+    "Value": "http://10.11.0.16:8086/thumbnail?application=live&streamname={0}&size=1200x800"
   },
   {
     "Category": "mediamanager",
@@ -112,7 +112,7 @@
   {
     "Category": "mediamanager",
     "Name": "imagemaskpath",
-    "Value": "\\images\\Mask.png"
+    "Value": "\\images\\OCRMask.png"
   },
   {
     "Category": "mediamanager",
@@ -133,5 +133,85 @@
     "Category": "azurecosmosdb",
     "Name": "primarykey",
     "Value": "7KA3x3At9kGf8ZGo98xHx7d3h1G3nZw7HqxY3FhQKnZdZayrkal7gIPMK9FKf39UisSUxcWdLAfkjtDRZhlXtQ=="
+  },
+  {
+    "Category": "smtpmanager",
+    "Name": "rerouteexternaltointernal",
+    "Value": "true"
+  },
+  {
+    "Category": "smtpmanager",
+    "Name": "rerouteexternalemailsto",
+    "Value": "vmedina@abiomed.com"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "impellapumptypes",
+    "Value": "5.0|LD|2.5|CP|RP|5.5|ECP"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementsgeneral",
+    "Value": "\n^ |SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementsheader",
+    "Value": "AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:|SN:"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementsplacement",
+    "Value": " / ^/|P.^P-| ) .^|).^|(^|)^|,^/"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementsmotor",
+    "Value": " / ^/| ) .^|).^|(^|)^|,^/|.^"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementspurgepressure",
+    "Value": "point,^|10on %^100%| U.^|88 Max^0.0 Max|Omn,^0 mmHg|Omn.^0 mmHg|Omothe,^0 mmHg|10on^100%|look^100%|1oon^100%|Moon^100%"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrreplacementsimpellaflow",
+    "Value": "ml/hr^|Ming^Min|U.^"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarm1coordinates",
+    "Value": "305,35"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarm2coordinates",
+    "Value": "305,105"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarm3coordinates",
+    "Value": "305,170"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarmalarmcodewhite",
+    "Value": "#FEFEFFFFFAFAFFFF|#FEFEFDFDFBFBFFFF|#FFFFFFFFFDFDFFFF"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarmalarmcodeyellow",
+    "Value": "#FFFFFDFD0000FFFF|#FDFDFCFC0101FFFF|#FFFFFAFA0000FFFF"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarmalarmcodered",
+    "Value": "#DCDC02021313FFFF|#939300001010FFFF|#929201011212FFFF"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocrdebug",
+    "Value": "false"
   }
 ]

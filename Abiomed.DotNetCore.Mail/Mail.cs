@@ -19,6 +19,9 @@ namespace Abiomed.DotNetCore.Mail
         private string _localDomain = string.Empty;
         private int _port = 25;
 
+        private bool _rerouteTests = false;
+        private string _rerouteEmail = string.Empty;
+
         #endregion
 
         #region Constructors
@@ -32,6 +35,13 @@ namespace Abiomed.DotNetCore.Mail
             _textPart = configurationCache.GetConfigurationItem("smtpmanager", "bodytexttype");
             _smtpHostName = configurationCache.GetConfigurationItem("smtpmanager", "host");
             _port = configurationCache.GetNumericConfigurationItem("smtpmanager", "portnumber");
+
+            _rerouteTests = configurationCache.GetBooleanConfigurationItem("smtpmanager", "rerouteexternaltointernal");
+            if (_rerouteTests)
+            {
+                _rerouteEmail = configurationCache.GetConfigurationItem("smtpmanager", "rerouteexternalemailsto");
+            }
+
         }
 
         #endregion
@@ -57,6 +67,15 @@ namespace Abiomed.DotNetCore.Mail
             if (!string.IsNullOrWhiteSpace(fromEmail))
             {
                 fromMailBoxAddress = new MailboxAddress(fromFriendlyName, fromEmail);
+            }
+
+            if (_rerouteTests)
+            {
+                string domain = to.Substring(to.IndexOf('@'), 7);
+                if (domain.ToLower() != "abiomed")
+                {
+                    to = _rerouteEmail;
+                }
             }
 
             MailboxAddress toMailBoxAddress = new MailboxAddress(toFriendlyName, to);
