@@ -71,9 +71,9 @@ namespace Abiomed.RLR.Communications
                 string deviceIpAddress;
                 string[] msgSplit = new string[0];
 
-                if (msg.Contains("-"))
+                if (msg.Contains("^^^"))
                 {
-                    msgSplit = msg.Split('-');
+                    msgSplit = msg.Split("^^^");
                     deviceIpAddress = msgSplit[0];
                     msgSplit = msgSplit.Skip(1).ToArray();
                 }

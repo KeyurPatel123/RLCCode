@@ -160,7 +160,7 @@ namespace Abiomed.DotNetCore.Business
             try
             {                
                 // Split up messages via token '-'
-                var splitMessage = message.Split('-');
+                var splitMessage = message.Split("-");
 
                 processMessageFuncEvent<string, byte[]> messageToProcess;
                 var validMessage = processMessageEvent.TryGetValue(splitMessage[0], out messageToProcess);

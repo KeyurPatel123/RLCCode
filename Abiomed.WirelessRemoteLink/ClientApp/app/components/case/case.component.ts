@@ -1,6 +1,6 @@
 /// <reference path="../../../../node_modules/@types/jwplayer/index.d.ts" />
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'case',
@@ -8,19 +8,26 @@ import { Router } from '@angular/router';
     styleUrls: ['./case.component.css'],    
 })
 export class CaseComponent implements OnInit {
-    constructor() { }
+    serial: string;
+
+    constructor(private route: ActivatedRoute) { }
     ngOnInit() {
-        this.startVideo();           
+        this.route.paramMap.subscribe((paramMap: Params) => {
+            this.serial = paramMap.params.serial;
+            this.startVideo(this.serial);
+        });        
+           
     }
 
-    startVideo()
+    startVideo(serial:string)
     {        
         var playerInstance = jwplayer("playerElement");
         playerInstance.setup({
             playlist: [{
                 sources: [
-                    { file: "rtmps://rlv.abiomed.com:443/live/RL00015" },
-                    { file: "https://rlv.abiomed.com:443/live/RL00015/playlist.m3u8" },
+                    { file: "rtsp://rlv.abiomed.com:443/live/" +  serial},
+                    { file: "rtmps://rlv.abiomed.com:443/live/" + serial },
+                    { file: "https://rlv.abiomed.com:443/live/" + serial + "/playlist.m3u8" },
                 ],
             }],
             width: "100%",
@@ -31,7 +38,7 @@ export class CaseComponent implements OnInit {
             androidhls: true,
             primary: "flash",
             rtmp: {
-                bufferlength: 1
+                bufferlength: 0
             }
         });
        

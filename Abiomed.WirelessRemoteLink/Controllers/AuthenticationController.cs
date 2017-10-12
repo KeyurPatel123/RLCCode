@@ -33,7 +33,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [AllowAnonymous]
         public async Task<UserResponse> Post([FromBody]Credentials credentials)
         {
-            string resultMessage = "Invalid Username/password combination";
+            string resultMessage = "Invalid username/password combination";
             bool isLoginSuccess = false;
             UserResponse userResponse = new UserResponse();
 
@@ -159,8 +159,11 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                 // Encode and Replace % with $ in token
                  var passwordTokenEncode = WebUtility.UrlEncode(passwordToken).Replace('%','$');
-                
-                await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Remote Link Cloud Password Reset", string.Format("Click here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1}", user.Id, passwordTokenEncode));
+
+                await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Abiomed Wireless Remote Link - Reset Password",
+                    string.Format("Dear {0} {1}, <BR><BR> Please click the link below to reset your Wireless Remote Link password. <BR> <a href=\"http://wirelessremotelink.azurewebsites.net/reset-password/{2}/{3} \">Reset Abiomed Wireless Remote Link Password</a> <BR><BR> Thank you, <BR> Abiomed Wireless Remote Link Administration", user.FirstName, user.LastName, user.Id, passwordTokenEncode));
+
+                //string.Format("Click here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1}", user.Id, passwordTokenEncode));
             }
             else 
             {
@@ -237,7 +240,19 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                         var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(remoteLinkUser);
                         var passwordTokenEncode = WebUtility.UrlEncode(passwordToken).Replace('%', '$');
 
-                        await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Remote Link Cloud Account Creation", string.Format("Your Remote Link Cloud Account has been created ... Click Here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1} - Instructions/welcome message is an open task.", remoteLinkUser.Id, passwordTokenEncode), userRegistration.FirstName + " " + userRegistration.LastName);
+                        //await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Remote Link Cloud Account Creation", string.Format("Your Remote Link Cloud Account has been created ... Click Here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1} - Instructions/welcome message is an open task.", remoteLinkUser.Id, passwordTokenEncode), userRegistration.FirstName + " " + userRegistration.LastName);
+
+                        await _emailManager.BroadcastToQueueStorageAsync(userRegistration.Email, "Abiomed Wireless Remote Link Enrollment Notification",
+                            string.Format(@"Dear {0} {1}, <BR><BR> 
+                            Welcome to Abiomed Wireless Remote Link, a secure web portal designed to enhance access to Abiomed Clinical Support Center. <BR><BR>
+                            To complete your registration, you must create a password. <BR>
+                            Please click the link below to create your Wireless Remote Link password. <BR>
+                            <a href='http://wirelessremotelink.azurewebsites.net/reset-password/{2}/{3}'>Abiomed Wireless Remote Link Password</a> <BR><BR> 
+                            Thank you, <BR> 
+                            Abiomed Wireless Remote Link Administration", remoteLinkUser.FirstName, remoteLinkUser.LastName, remoteLinkUser.Id, passwordTokenEncode), 
+                            userRegistration.FirstName + " " + userRegistration.LastName);
+
+
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                         // Send an email with this link
                         //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

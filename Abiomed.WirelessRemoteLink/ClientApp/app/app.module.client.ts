@@ -12,6 +12,7 @@ import "./assets/css/AbiomedBase.css";
 import { AuthGuard } from "./shared/authguard.service";
 import { StorageService } from "./shared/storage.service";
 import { AgmCoreModule } from "@agm/core";
+import { DeviceService } from "./shared/device.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -31,6 +32,7 @@ import { AgmCoreModule } from "@agm/core";
         AuthenticationService,
         AuthGuard,
         StorageService,
+        DeviceService,
         { provide: 'ORIGIN_URL', useValue: location.origin },
         {
             provide: HTTP_INTERCEPTORS,

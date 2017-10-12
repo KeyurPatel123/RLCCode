@@ -21,17 +21,15 @@ namespace Abiomed.DotNetCore.Business
         private IKeepAliveManager _keepAliveManager;
         private ILogger<IDigitiserCommunication> _logger;
         private RLMDeviceList _rlmDeviceList;
-        private IRedisDbRepository<RLMDevice> _redisDbRepository;
         private IConfigurationCache _configurationCache;
         private bool _isSecurity;
 
-        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogger<IDigitiserCommunication> logger, RLMDeviceList rlmDeviceList, IRedisDbRepository<RLMDevice> redisDbRepository, IConfigurationCache configurationCache)
+        public DigitiserCommunication(IKeepAliveManager keepAliveManager, ILogger<IDigitiserCommunication> logger, RLMDeviceList rlmDeviceList, IConfigurationCache configurationCache)
         {            
             _keepAliveManager = keepAliveManager;
             _logger = logger;
             _rlmDeviceList = rlmDeviceList;
             _configurationCache = configurationCache;
-            _redisDbRepository = redisDbRepository;
 
             _isSecurity = _configurationCache.GetBooleanConfigurationItem("connectionmanager", "security");
         }
@@ -154,9 +152,6 @@ namespace Abiomed.DotNetCore.Business
             {
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
             }
-
-            // Temp
-            secureStream = Definitions.StreamVideoControlIndication;
 
             // Remove Image Capture Timer
             _keepAliveManager.ImageTimerDelete(deviceIpAddress);

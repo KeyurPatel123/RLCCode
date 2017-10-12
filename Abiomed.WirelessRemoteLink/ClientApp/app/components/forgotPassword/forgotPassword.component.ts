@@ -32,7 +32,7 @@ export class ForgotPasswordComponent implements OnInit {
     {
         this.authenticationService.forgotPassword(this.username).subscribe(result => {
             this.showForgotMessage = true;
-            this.forgotMessage = "An email will be sent to you shortly.";
+            this.forgotMessage = "An email will be sent to you shortly";
             this.messageCSS = "ServerSuccess";
             this.forgotForm.reset();
         });                

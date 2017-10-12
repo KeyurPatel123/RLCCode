@@ -7,6 +7,7 @@ using Abiomed.DotNetCore.Repository;
 using Abiomed.DotNetCore.Models;
 using StackExchange.Redis;
 using System.Collections.Concurrent;
+using Newtonsoft.Json;
 
 namespace Abiomed.WirelessRemoteLink
 {
@@ -14,14 +15,14 @@ namespace Abiomed.WirelessRemoteLink
     {
         private ConfigurationCache _configurationCache;
         private IRedisDbRepository<OcrResponse> _redisDbRepository;
-        private string[] _activeDevices;
+        private List<string> _activeDevices;
         private RLMDevices _rlmDevices = new RLMDevices();
 
         public DeviceManager(ConfigurationCache configurationCache, IRedisDbRepository<OcrResponse> redisDbRepository)
         {
             _configurationCache = configurationCache;
             _redisDbRepository = redisDbRepository;
-            Init();
+            InitAsync().Wait();
         }
     
         private Task GetDevices()
@@ -39,25 +40,23 @@ namespace Abiomed.WirelessRemoteLink
             _rlmDevices.Devices[serialNumber] = rlmData;
         }
 
-        private void UpdatedDevices(RedisValue message)
+        private async Task UpdatedDevicesAsync(List<string> devices)
         {
             // Ensure list is current. todo look at RedisValue
-            
+            _activeDevices = devices;
 
-            // Updated devices
-            GetDevices();
+            // Update devices
+            await GetDevices();
+
+            // Todo - verify what devices are still in the list, if they have expired
         }
 
-        private async void Init()
+        private async Task InitAsync()
         {
-            // Get Current Active List of RLM's, Get all devices in store into local storage and subscribe to updates
-            //_activeDevices = await _redisDbRepository.GetSetAsync(Definitions.RLMDeviceSetWOWZA);
-
-            //await GetDevices();
-
-            await _redisDbRepository.SubscribeAsync(Definitions.UpdatedRLMDevices, (channel, message) =>
+            await _redisDbRepository.SubscribeAsync(Definitions.UpdatedRLMDevices, async (channel, message) =>
             {
-                UpdatedDevices(message);
+                var devices = (List<string>)JsonConvert.DeserializeObject<List<string>>(message);                
+                await UpdatedDevicesAsync(devices);
             });
         }
 

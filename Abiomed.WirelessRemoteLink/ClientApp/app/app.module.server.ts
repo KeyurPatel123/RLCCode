@@ -8,11 +8,12 @@ import { AuthGuard } from "./shared/authguard.service";
 import { AuthenticationService } from "./shared/authentication.service";
 import { StorageService } from "./shared/storage.service";
 import { AgmCoreModule } from '@agm/core';
+import { DeviceService } from "./shared/device.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
     declarations: sharedConfig.declarations,
-    providers: [AuthGuard, AuthenticationService, StorageService],
+    providers: [AuthGuard, AuthenticationService, StorageService, DeviceService],
     imports: [
         ServerModule,
         FormsModule,

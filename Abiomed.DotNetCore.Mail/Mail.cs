@@ -65,6 +65,7 @@ namespace Abiomed.DotNetCore.Mail
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(_textPart) { Text = body };
 
+
             using (var client = new SmtpClient())
             {
                 client.LocalDomain = _localDomain;

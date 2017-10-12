@@ -21,7 +21,7 @@
     <None Update="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Mask.png">
+    <None Update="Images\OcrMask.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="OverrideAppSettings.json">
