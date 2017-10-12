@@ -13,12 +13,14 @@ import { ResetPasswordComponent } from "./components/resetPassword/resetPassword
 import { AuthenticationService } from "./shared/authentication.service";
 import { MapComponent } from "./components/map/map.component";
 import { CaseComponent } from "./components/case/case.component";
+import { SubNavMenuComponent } from "./components/subnavmenu/subnavmenu.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [AppComponent],    
     declarations: [
         AppComponent,
         NavMenuComponent,
+        SubNavMenuComponent,
         FooterMenuComponent,
         LoginComponent,
         EnrollmentComponent,
@@ -37,7 +39,7 @@ export const sharedConfig: NgModule = {
             { path: 'reset-password/:id/:token', component: ResetPasswordComponent },
             { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
             { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard] },
-            { path: 'case', component: CaseComponent, canActivate: [AuthGuard] },
+            { path: 'case/:serial', component: CaseComponent, canActivate: [AuthGuard] },
             { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
             { path: '', redirectTo: '/login', pathMatch: 'full' },
             { path: '**', redirectTo: '' }

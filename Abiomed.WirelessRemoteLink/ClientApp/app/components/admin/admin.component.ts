@@ -38,8 +38,26 @@ export class AdminComponent implements OnInit {
             lastname: new FormControl('', [Validators.required]),
             email: new FormControl('', [Validators.required, Validators.email]),
             role: new FormControl('', [Validators.required]),
+            phone1: new FormControl(''),
+            phone2: new FormControl(''),
+            phone3: new FormControl('')
         });
     }   
+
+    _drop(event: any) {
+        event.preventDefault();
+    }
+
+    _keyPress(event: any) {
+        console.log(event);
+        const pattern = /[0-9\+\-\ ]/;
+        let inputChar = String.fromCharCode(event.charCode);
+
+        if (!pattern.test(inputChar)) {
+            // invalid character, prevent input
+            event.preventDefault();
+        }
+    }
 
     private Register() {
         var roles = Array<string>();
@@ -64,11 +82,11 @@ export class AdminComponent implements OnInit {
             this.creationResponse = result.response;
             this.created = true;
 
-            //Put message up for 3 seconds
+            //Put message up for 5 seconds
             setTimeout(() => {    //<<<---    using ()=> syntax
                 this.created = false;
                 this.createForm.reset();
-            }, 3000);
+            }, 5000);
         });                     
     }
 }

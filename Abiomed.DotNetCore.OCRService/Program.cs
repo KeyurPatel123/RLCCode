@@ -9,6 +9,7 @@ using System.Linq;
 using Abiomed.DotNetCore.Repository;
 using Abiomed.DotNetCore.Models;
 using StackExchange.Redis;
+using Newtonsoft.Json;
 
 namespace Abiomed.DotNetCore.OCRService
 {
@@ -30,10 +31,9 @@ namespace Abiomed.DotNetCore.OCRService
             {
                 imageStreams = _mediaManager.GetLiveStreamsAsync().GetAwaiter().GetResult();
                 ListenInParallel(imageStreams);
+                PublishResults(imageStreams);                
+                Thread.Sleep(int.MaxValue);
 
-                //RedisValue redisValue = imageStreams;
-                _redisDbRepository.Publish(Definitions.UpdatedRLMDevices, "");
-                Thread.Sleep(_pollingInterval);
             }
         }
 
@@ -52,6 +52,7 @@ namespace Abiomed.DotNetCore.OCRService
         private static async Task<OcrResponse> ProcessStreams(string serialNumber)
         {
             var ocrRetrievedText = await _mediaManager.GetImageTextAsync(serialNumber, _batchStartTimeUtc);
+            _redisDbRepository.StringSet(serialNumber, ocrRetrievedText);
             await _azureCosmosDB.AddAsync(ocrRetrievedText);
             return ocrRetrievedText;
         }
@@ -71,6 +72,12 @@ namespace Abiomed.DotNetCore.OCRService
                 configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
 
             _redisDbRepository = new RedisDbRepository<OcrResponse>(configurationCache);
+        }
+
+        private static void PublishResults(List<string> imageStreams)
+        {
+            string activeStreams = JsonConvert.SerializeObject(imageStreams);            
+            _redisDbRepository.PublishAsync(Definitions.UpdatedRLMDevices, activeStreams);
         }
     }
 }

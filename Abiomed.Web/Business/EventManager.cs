@@ -132,7 +132,7 @@ namespace Abiomed.Web
             var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == serialNumber);
 
             StringBuilder build = new StringBuilder(device.DeviceIpAddress);
-            build.Append("-");
+            build.Append("^^^");
             build.Append(bearer);
             _redisDbRepository.Publish(Definitions.BearerChangeIndicationEvent, build.ToString());
         }
@@ -155,13 +155,13 @@ namespace Abiomed.Web
 
                 // Build string - Serial#, slot, bearer, authentication type, SSID, PSK
                 StringBuilder build = new StringBuilder(device.DeviceIpAddress);                
-                build.Append("-");
+                build.Append("^^^");
                 build.Append(wifiCredentials.Slot);                                
-                build.Append("-");
+                build.Append("^^^");
                 build.Append(wifiCredentials.AuthType);
-                build.Append("-");
+                build.Append("^^^");
                 build.Append(wifiCredentials.SSID);
-                build.Append("-");
+                build.Append("^^^");
                 build.Append(wifiCredentials.PSK);
                 _redisDbRepository.Publish(Definitions.BearerAuthenticationUpdateIndicationEvent, build.ToString());
         }
@@ -172,7 +172,7 @@ namespace Abiomed.Web
 
           
                 StringBuilder build = new StringBuilder(device.DeviceIpAddress);
-                build.Append("-");
+                build.Append("^^^");
                 build.Append(authorization.Slot);
 
                 _redisDbRepository.Publish(Definitions.BearerDeleteEvent, build.ToString());
@@ -183,11 +183,11 @@ namespace Abiomed.Web
         {
             var device = _deviceStatusManager.Devices.Find(x => x.SerialNumber == bearerPriorityUpdate.SerialNumber);
             StringBuilder build = new StringBuilder(device.DeviceIpAddress);
-            build.Append("-");
+            build.Append("^^^");
             build.Append(bearerPriorityUpdate.BearerPriority.Ethernet);
-            build.Append("-");
+            build.Append("^^^");
             build.Append(bearerPriorityUpdate.BearerPriority.WiFi);
-            build.Append("-");
+            build.Append("^^^");
             build.Append(bearerPriorityUpdate.BearerPriority.Cellular);
 
             _redisDbRepository.Publish(Definitions.BearerPriorityIndicationEvent, build.ToString());

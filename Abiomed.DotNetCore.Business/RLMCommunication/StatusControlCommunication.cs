@@ -12,6 +12,7 @@ using System.Linq;
 using Abiomed.DotNetCore.Repository;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -155,7 +156,11 @@ namespace Abiomed.DotNetCore.Business
                 if (rlmDevice.BearerSlotNumber >= Definitions.MaxBearerSlot)
                 {
                     // Add bearer info into REDIS, clean up RLMDevice, and PUB Message 
-                    _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmDevice);
+                    // Temp go from object to JSON. In future need to move back!
+                    string rlmJson = JsonConvert.SerializeObject(rlmDevice);
+
+                    // Add/Update set and publish message
+                    _redisDbRepository.StringSet(rlmDevice.SerialNo, rlmJson);
                     rlmDevice.BearerSlotNumber = 0;
                     rlmDevice.BearerAuthInformationList.Clear();
                     _redisDbRepository.Publish(Definitions.BearerInfoRLMDevice, rlmDevice.SerialNo);
@@ -344,7 +349,7 @@ namespace Abiomed.DotNetCore.Business
                 
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
 
-                _logger.LogInformation("Bearer Authentication Update Indication {0}", rlmDevice.SerialNo);
+                _logger.LogInformation("Bearer Authentication Update Indication {0} - SSID {1} - PSK {2}", rlmDevice.SerialNo);
             }
             catch (Exception e)
             {
