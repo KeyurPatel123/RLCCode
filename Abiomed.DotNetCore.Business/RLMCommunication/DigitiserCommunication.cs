@@ -153,9 +153,6 @@ namespace Abiomed.DotNetCore.Business
                 secureStream = Definitions.StreamVideoControlIndicationRTMPS;
             }
 
-            // Temp
-            secureStream = Definitions.StreamVideoControlIndication;
-
             // Remove Image Capture Timer
             _keepAliveManager.ImageTimerDelete(deviceIpAddress);
 
