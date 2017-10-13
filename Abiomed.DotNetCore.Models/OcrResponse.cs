@@ -53,7 +53,7 @@ namespace Abiomed.DotNetCore.Models
 
     public enum AlarmCodes
     {
-        None = -1,
+        Blank = -1,
         White = 0,
         Yellow = 1,
         Red = 2

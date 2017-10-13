@@ -55,11 +55,11 @@ namespace Abiomed.DotNetCore.Business
         private Point _alarm3Point;
         private MagickImage _imageMask;
         private HttpClient _httpClient;
-        private List<string> _alarmCodesWhite;
-        private List<string> _alarmCodesYellow;
-        private List<string> _alarmCodesRed;
+        private MagickColor _alarmCodeWhite;
+        private MagickColor _alarmCodeYellow;
+        private MagickColor _alarmCodeRed;
+        private Percentage _alarmCodeColorMatchTolerance;
         private bool _ocrDebugMode;
-
         #endregion
 
         #region Constructors
@@ -124,23 +124,23 @@ namespace Abiomed.DotNetCore.Business
 
         private string DetermineAlarmCode(MagickImage image, Point point)
         {
-            string alarmColor = image.GetPixels().GetPixel(point.X, point.Y).ToColor().ToString();
-            if (_alarmCodesRed.Contains(alarmColor))
+            var alarmColor = new MagickColor(image.GetPixels().GetPixel(point.X, point.Y).ToColor().ToString());
+            if (_alarmCodeRed.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.Red.ToString();
             }
 
-            if (_alarmCodesYellow.Contains(alarmColor))
+            if (_alarmCodeYellow.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.Yellow.ToString();
             }
 
-            if (_alarmCodesWhite.Contains(alarmColor))
+            if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.White.ToString();
             }
 
-            return alarmColor;
+            return AlarmCodes.Blank.ToString();
         }
 
         private byte[] ApplyMaskToImage(byte[] thumbnail)
@@ -159,7 +159,7 @@ namespace Abiomed.DotNetCore.Business
             {
                 byte[] rawImage = await _httpClient.GetByteArrayAsync(string.Format(_thumbnailUrl, serialNumber));
                 imageToOcr = new MagickImage(applyMaskToImage ? ApplyMaskToImage(rawImage) : rawImage);
-
+ 
                 if (_ocrDebugMode)
                 {
                     var raw = new MagickImage(rawImage);
@@ -280,7 +280,7 @@ namespace Abiomed.DotNetCore.Business
                 int messageLengthBuffer = ocrResponse.RawMessage.Length * 2;
                 StringBuilder message = new StringBuilder(ocrResponse.RawMessage, messageLengthBuffer);
 
-                string plainMessage = StandardizeMessageFormat(message);
+                string plainMessage = StandardizeMessageFormat(message, _generalReplacements);
                 placementSignalTextStartPosition = plainMessage.IndexOf(PlacementSignalKeyword);
 
                 ocrResponse.ScreenName = ScreenName.PlacementSignal.ToString();
@@ -340,11 +340,11 @@ namespace Abiomed.DotNetCore.Business
             return processPlacementSignalScreen;
         }
 
-        private string StandardizeMessageFormat(StringBuilder ocrText)
+        private string StandardizeMessageFormat(StringBuilder ocrText, Dictionary<string,string> replacements)
         {
-            foreach (string key in _generalReplacements.Keys)
+            foreach (string key in replacements.Keys)
             {
-                ocrText.Replace(key, _generalReplacements[key]);
+                ocrText.Replace(key, replacements[key]);
             }
 
             RegexOptions options = RegexOptions.None;
@@ -352,57 +352,6 @@ namespace Abiomed.DotNetCore.Business
             return regex.Replace(ocrText.ToString(), " ").Trim();
         }
 
-        private string StandardizeFormatHeader(StringBuilder ocrText)
-        {
-            foreach (string key in _headerReplacements.Keys)
-            {
-                ocrText.Replace(key, _headerReplacements[key]);
-            }
-
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex("[ ]{2,}", options);
-            return regex.Replace(ocrText.ToString(), " ").Trim();
-        }
-
-        private string StandardizeFormatPlacement(StringBuilder ocrText)
-        {
-            foreach (string key in _placementReplacements.Keys)
-            {
-                ocrText.Replace(key, _placementReplacements[key]);
-            }
-
-            return ocrText.ToString().Trim();
-        }
-
-        private string StandardizeFormatMotor(StringBuilder ocrText)
-        {
-            foreach (string key in _motorReplacements.Keys)
-            {
-                ocrText.Replace(key, _motorReplacements[key]);
-            }
-
-            return ocrText.ToString().Trim();
-        }
-
-        private string StandardizeFormatPurgePressure(StringBuilder ocrText)
-        {
-            foreach (string key in _purgePressureReplacements.Keys)
-            {
-                ocrText.Replace(key, _purgePressureReplacements[key]);
-            }
-
-            return ocrText.ToString().Trim();
-        }
-
-        private string StandardizeFormatImpellaFlow(StringBuilder ocrText)
-        {
-            foreach (string key in _impellaFlowReplacements.Keys)
-            {
-                ocrText.Replace(key, _impellaFlowReplacements[key]);
-            }
-
-            return ocrText.ToString().Trim();
-        }
 
         private void Initialize()
         {
@@ -426,9 +375,10 @@ namespace Abiomed.DotNetCore.Business
             _alarm1Point = LoadAlarmPoint("ocralarm1coordinates");
             _alarm2Point = LoadAlarmPoint("ocralarm2coordinates");
             _alarm3Point = LoadAlarmPoint("ocralarm3coordinates");
-            _alarmCodesRed = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmalarmcodered").Split('|').ToList();
-            _alarmCodesYellow = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmalarmcodeyellow").Split('|').ToList();
-            _alarmCodesWhite = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmalarmcodewhite").Split('|').ToList();
+            _alarmCodeRed = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodered"));
+            _alarmCodeYellow = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodeyellow"));
+            _alarmCodeWhite = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodewhite"));
+            _alarmCodeColorMatchTolerance = new Percentage(int.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodematchtolerance")));
             _ocrDebugMode = bool.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrdebug"));
         }
 
@@ -483,19 +433,28 @@ namespace Abiomed.DotNetCore.Business
 
         private Tuple<string, string, string, string> GetHeaderSection(StringBuilder section)
         {
-            string ocrText = StandardizeFormatHeader(section);
-
+            string ocrText = StandardizeMessageFormat(section, _headerReplacements);
             string pumpType = GetPumpType(ocrText);
-            string aicSoftwareVersion = GetAicSoftwareVersion(ocrText);
-            string pumpSerialNumber = GetPumpSerialNumber(ocrText.Substring(pumpType.Length+1));
+            string pumpSerialNumber = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(pumpType))
+            {
+                pumpSerialNumber = GetPumpSerialNumber(ocrText.Substring(pumpType.Length + 1));
+            }
+
             string aicSerialNumber = GetAicSerialNumber(ocrText);
+            if (aicSerialNumber == pumpSerialNumber)
+            {
+                aicSerialNumber = string.Empty;
+            }
+            string aicSoftwareVersion = GetAicSoftwareVersion(ocrText);
 
             return new Tuple<string, string, string, string>(pumpType, pumpSerialNumber, aicSerialNumber, aicSoftwareVersion);
         }
 
         private Tuple<string, string, string> GetImpellaFlowSection(StringBuilder section, out bool foundMinValue)
         {
-            string ocrText = StandardizeFormatImpellaFlow(section);
+            string ocrText = StandardizeMessageFormat(section, _impellaFlowReplacements);
             foundMinValue = false;
             string flowMax = string.Empty;
             string flowMin = string.Empty;
@@ -532,7 +491,7 @@ namespace Abiomed.DotNetCore.Business
 
         private Tuple<string, string, string> GetPurgePressureToEndSection(StringBuilder section, bool hasFlowMinBeenFound)
         {
-            string ocrText = StandardizeFormatPurgePressure(section);
+            string ocrText = StandardizeMessageFormat(section, _purgePressureReplacements);
             string flowMin = string.Empty;
             string purgePressure = string.Empty;
             string battery = GetBattery(ocrText);
@@ -581,10 +540,23 @@ namespace Abiomed.DotNetCore.Business
 
             if (startPos > 1)
             {
-                int endPos = ocrText.Substring(startPos).IndexOf(AicKeyword);
+                string workString = ocrText.Substring(startPos).Trim();
+                int endPos = workString.IndexOf(AicKeyword);
                 if (endPos > 0)
                 {
                     result = ocrText.Substring(startPos, endPos).Trim();
+                }
+                else
+                {
+                    endPos = workString.IndexOf(' ');
+                    if (endPos > 0)
+                    {
+                        result = workString.Substring(0, endPos);
+                    }
+                    else
+                    {
+                        result = new string(ocrText.Where(c => char.IsDigit(c)).ToArray());
+                    }
                 }
             }
             else
@@ -593,6 +565,10 @@ namespace Abiomed.DotNetCore.Business
                 if (spacePos > 0)
                 {
                     result = ocrText.Substring(0, startPos).Trim();
+                }
+                else // There are no other strings...
+                {
+                    result = new string(ocrText.Where(c => char.IsDigit(c)).ToArray());
                 }
             }
 
@@ -636,7 +612,7 @@ namespace Abiomed.DotNetCore.Business
             string average = string.Empty;
             string pLevel = string.Empty;
 
-            string ocrText = StandardizeFormatPlacement(section);
+            string ocrText = StandardizeMessageFormat(section, _placementReplacements);
 
             // Get the string between 'Placement Signal' And 'Motor Current'
             // This may Contain (in any order - well for the p-n) and may be missing average
@@ -679,13 +655,11 @@ namespace Abiomed.DotNetCore.Business
             string systole = string.Empty;
             string distole = string.Empty;
             string average = string.Empty;
-
-            string ocrText = StandardizeFormatMotor(section);
+            string ocrText = StandardizeMessageFormat(section, _motorReplacements);
 
             // Get the string between 'Motor Current' and 'Impella'
             // This may Contain:
             //   - systole/distole (average)
-
             string[] pieces = ocrText.Trim().Split();
             foreach (string piece in pieces)
             {
