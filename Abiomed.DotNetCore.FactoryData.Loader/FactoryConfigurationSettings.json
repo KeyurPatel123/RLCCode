@@ -157,7 +157,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": "AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:|SN:"
+    "Value": "AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:"
   },
   {
     "Category": "mediamanager",
@@ -196,22 +196,27 @@
   },
   {
     "Category": "mediamanager",
-    "Name": "ocralarmalarmcodewhite",
-    "Value": "#FEFEFFFFFAFAFFFF|#FEFEFDFDFBFBFFFF|#FFFFFFFFFDFDFFFF"
+    "Name": "ocralarmcodered",
+    "Value": "#FF0000"
   },
   {
     "Category": "mediamanager",
-    "Name": "ocralarmalarmcodeyellow",
-    "Value": "#FFFFFDFD0000FFFF|#FDFDFCFC0101FFFF|#FFFFFAFA0000FFFF"
+    "Name": "ocralarmcodeyellow",
+    "Value": "#FFFF00"
   },
   {
     "Category": "mediamanager",
-    "Name": "ocralarmalarmcodered",
-    "Value": "#DCDC02021313FFFF|#939300001010FFFF|#929201011212FFFF"
+    "Name": "ocralarmcodewhite",
+    "Value": "#FFFFFF"
+  },
+  {
+    "Category": "mediamanager",
+    "Name": "ocralarmcodematchtolerance",
+    "Value": "30"
   },
   {
     "Category": "mediamanager",
     "Name": "ocrdebug",
-    "Value": "false"
+    "Value": "true"
   }
 ]
