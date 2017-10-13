@@ -32,9 +32,9 @@ namespace Abiomed.DotNetCore.Models
         public string Battery { get; set; } = string.Empty;
         public string RawMessage { get; set; } = string.Empty;
         public string ResultStatusNote { get; set; } = string.Empty;
-        public string Alarm1 { get; set; } = AlarmCodes.None.ToString();
-        public string Alarm2 { get; set; } = AlarmCodes.None.ToString();
-        public string Alarm3 { get; set; } = AlarmCodes.None.ToString();
+        public string Alarm1 { get; set; } = AlarmCodes.Blank.ToString();
+        public string Alarm2 { get; set; } = AlarmCodes.Blank.ToString();
+        public string Alarm3 { get; set; } = AlarmCodes.Blank.ToString();
         public string Alarm1Message { get; set; } = string.Empty;
         public string Alarm2Message { get; set; } = string.Empty;
         public string Alarm3Message { get; set; } = string.Empty;
