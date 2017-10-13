@@ -51,7 +51,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.MailQueu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.RLR.Communications", "Abiomed.DotNetCore.RLR.Communications\Abiomed.DotNetCore.RLR.Communications.csproj", "{98CBC798-7FB7-4240-BFDC-A7CD7CE8E9FF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.RLR", "Abiomed.Start\Abiomed.RLR.csproj", "{9FBF5978-4077-417D-9F27-1952785C1349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.RLR", "Abiomed.RLR\Abiomed.RLR.csproj", "{9FBF5978-4077-417D-9F27-1952785C1349}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abiomed.DotNetCore.DependencyInjection", "Abiomed.DotNetCore.DependencyInjection\Abiomed.DotNetCore.DependencyInjection.csproj", "{A2721302-68A3-4716-866C-92E7FE58CA29}"
 EndProject

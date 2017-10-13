@@ -37,7 +37,7 @@ namespace Abiomed.Repository
             //_connectionMultiplexer = ConnectionMultiplexer.Connect(configuration.RedisConnect);
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
             {
-                return ConnectionMultiplexer.Connect("localhost");
+                return ConnectionMultiplexer.Connect("abmd.redis.cache.windows.net, abortConnect=false,ssl=true,password=6sfN8jGyo0al+dMDdML4KMt0f59lCuqX0Wk9FJfxwPw=");
             });
 
             var endPoints = lazyConnection.Value.GetEndPoints();

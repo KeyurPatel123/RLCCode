@@ -13,12 +13,12 @@
                                     <!-- Impella SN -->
                                     <div class="ImpellaSN">
                                         <p class="InfoTitle">Impella SN</p>
-                                        <p class="InfoData">{{device.key}}</p>
+                                        <p class="InfoData">{{device.value.pumpSerialNumber}}</p>
                                     </div>
                                     <!-- Pump Type -->
                                     <div class="PumpType">
                                         <p class="InfoTitle">Pump Type</p>
-                                        <p class="InfoData">CP</p>
+                                        <p class="InfoData">{{device.value.pumpType}}</p>
                                     </div>
                                     <!-- Bed Number -->
                                     <div class="UserInput">
@@ -44,17 +44,17 @@
                                     <div class="InfoTitle">Impella Flow</div>
                                     <div class=" d-flex justify-content-between">
                                         <div class="MaxMinCell">
-                                            <div class="MaxMinValues">0.0 <span class="MaxMinSmall">Max</span></div>
-                                            <div class="MaxMinValues">0.0 <span class="MaxMinSmall">Min</span></div>
+                                            <div class="MaxMinValues">{{device.value.flowRateMax}} <span class="MaxMinSmall">Max</span></div>
+                                            <div class="MaxMinValues">{{device.value.flowRateMin}} <span class="MaxMinSmall">Min</span></div>
                                         </div>
                                         <div>
-                                            <div class="LMin">0.0<span class="MaxMinSmall">L/min</span></div>
+                                            <div class="LMin">{{device.value.flowRateAverage}}<span class="MaxMinSmall">L/min</span></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="PLevel">
                                     <div class="InfoTitle">P-Level</div>
-                                    <div class="LMin">P-0</div>
+                                    <div class="LMin">{{device.value.performanceLevel}}</div>
                                 </div>
                             </div>
                             <div class="LastUpdate">Last updated: 5 minutes ago | (No past alerts. No active alerts.)</div>

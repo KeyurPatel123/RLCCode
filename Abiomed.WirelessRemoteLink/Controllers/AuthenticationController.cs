@@ -145,14 +145,14 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("ForgotPassword")]
         [AllowAnonymous]
-        public async Task ForgotPassword([FromBody]Credentials credentials)
+        public async Task<bool> ForgotPassword([FromBody]Credentials credentials)
         {            
             // Check if user exist, if so generate password reset token and email off
 
             var user = await _userManager.FindByEmailAsync(credentials.Username);
 
             string auditMessage = string.Empty;
-            if (!String.IsNullOrEmpty(user.Id))
+            if (user != null)
             {
                 auditMessage = string.Format("Found username {0}", user.UserName);
                 var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -167,10 +167,12 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             }
             else 
             {
-                auditMessage = string.Format("Could not find username {0}", user.UserName);
+                auditMessage = string.Format("Could not find username {0}", credentials.Username);
             }
 
-            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);                        
+            await _auditLogManager.AuditAsync(credentials.Username, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ForgotPassword", auditMessage);
+
+            return true;
         }
 
         [HttpPost]
@@ -191,8 +193,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             if (resultPassword.Succeeded)
             {
                 if (await _userManager.IsLockedOutAsync(user))
-                {
-                    await _userManager.SetLockoutEnabledAsync(user, false);
+                {                   
                     await _userManager.ResetAccessFailedCountAsync(user);
                 }
             }

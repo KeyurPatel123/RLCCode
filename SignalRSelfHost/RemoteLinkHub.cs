@@ -19,6 +19,8 @@ namespace Abiomed.SignalRSelfHost
 
         public RemoteLinkHub(ILifetimeScope lifetimeScope)
         {
+            Console.WriteLine("HUB Started");
+
             _hubLifetimeScope = lifetimeScope.BeginLifetimeScope();
 
             // Resolve dependencies from the hub lifetime scope.
