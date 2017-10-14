@@ -1,9 +1,0 @@
-#version: '2.1'
-
-#services:
-#  abiomed.console:
-#    image: abiomed.console
-#    build:
-#      context: .\Abiomed.Console
-#      dockerfile: Dockerfile
-#

@@ -28,7 +28,7 @@
     <Content Remove="ClientApp\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Storage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
   </ItemGroup>
   <ItemGroup>

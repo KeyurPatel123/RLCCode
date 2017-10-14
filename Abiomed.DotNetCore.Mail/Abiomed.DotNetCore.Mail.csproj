@@ -11,8 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
-    <ProjectReference Include="..\Abiomed.Models\Abiomed.Models.csproj" />
-    <ProjectReference Include="..\Configuration\Abiomed.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

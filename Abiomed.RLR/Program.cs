@@ -1,18 +1,16 @@
-﻿using Abiomed.DotNetCore.RLR.Communications;
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Abiomed.DotNetCore.Business;
 using Abiomed.DotNetCore.Models;
-using Abiomed.DotNetCore.Repository;
 using Abiomed.DotNetCore.Configuration;
 using Abiomed.DotNetCore.Storage;
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using Abiomed.RLR.DotNetCore.Communications;
 using System.Threading;
+using Abiomed.DotNetCore.Business;
+using Abiomed.DotNetCore.Repository;
 
-namespace Abiomed.Start
+namespace Abiomed.RLR
 {
     class Program
     {

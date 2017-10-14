@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Abiomed.AzureStorage\Abiomed.DotNetCore.Storage.csproj" />
+    <ProjectReference Include="..\Abiomed.DotNetCore.Storage\Abiomed.DotNetCore.Storage.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Business\Abiomed.DotNetCore.Business.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Configuration\Abiomed.DotNetCore.Configuration.csproj" />
     <ProjectReference Include="..\Abiomed.DotNetCore.Repository\Abiomed.DotNetCore.Repository.csproj" />

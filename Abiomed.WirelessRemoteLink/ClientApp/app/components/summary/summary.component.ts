@@ -12,10 +12,21 @@ export class SummaryComponent implements OnInit {
     constructor(private router: Router, private deviceService: DeviceService) { }
 
     ngOnInit() {
-        this.deviceService.GetDevices().subscribe(result => {
-            this.deviceList = Array.from(result);    
-        });           
+        setInterval(() => {    //<<<---    using ()=> syntax
+            this.getDevices();
+        }, 10000);
+
+        this.getDevices();        
     }  
+
+    getDevices() {
+        this.deviceService.GetDevices().subscribe(result => {
+            var devices:any = Array.from(result); 
+            this.deviceList = devices.filter(function (element) {
+                return element.value.pumpSerialNumber !== ""; 
+            });            
+        });      
+    }
 }
 
 
