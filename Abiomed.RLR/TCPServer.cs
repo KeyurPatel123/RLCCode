@@ -81,9 +81,9 @@ namespace Abiomed.RLR
                 string deviceIpAddress;
                 string[] msgSplit = new string[0];
 
-                if (msg.Contains("-"))
+                if (msg.Contains("^^^"))
                 {
-                    msgSplit = msg.Split('-');
+                    msgSplit = msg.Split("^^^");
                     deviceIpAddress = msgSplit[0];
                     msgSplit = msgSplit.Skip(1).ToArray();
                 }
@@ -282,8 +282,10 @@ namespace Abiomed.RLR
         {
             TCPStateObject tcpState;
             _tcpStateObjectList.TryGetValue(deviceIpAddress, out tcpState);
+            
+            _logger.LogInformation("Process user event {0} from TCP valid {1}", message, tcpState != null);
 
-            if(tcpState != null)
+            if (tcpState != null)
             {
                 byte[] returnMessage = _RLMCommunication.ProcessEvent(deviceIpAddress, message, options);
                 // Send off Client
@@ -298,6 +300,7 @@ namespace Abiomed.RLR
             }
             else // Kill Connection if not active
             {
+                _logger.LogInformation("RLM {0} not found for request {1}", tcpState.DeviceIpAddress, message);
                 RemoveConnection(deviceIpAddress);
             }
         }

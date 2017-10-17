@@ -278,6 +278,7 @@ namespace Abiomed.RLR
             }
             else // Kill Connection if not active
             {
+                _logger.LogInformation("RLM {0} not found for request {1}", tcpState.DeviceIpAddress, message);
                 RemoveConnection(deviceIpAddress);
             }
         }

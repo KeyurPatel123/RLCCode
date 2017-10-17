@@ -349,11 +349,11 @@ namespace Abiomed.DotNetCore.Business
                 
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
 
-                _logger.LogInformation("Bearer Authentication Update Indication {0} - SSID {1} - PSK {2}", rlmDevice.SerialNo);
+                _logger.LogInformation("Bearer Authentication Update Indication Slot - {0} - SSID {1} - PSK {2}", wifiCredentials.Slot, wifiCredentials.SSID, wifiCredentials.PSK);
             }
             catch (Exception e)
             {
-                _logger.LogDebug("Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
+                _logger.LogError("Bearer Authentication Update Indication Failure {0} Exception {1}", deviceIpAddress, e.ToString());
             }
 
             return returnMessage;
