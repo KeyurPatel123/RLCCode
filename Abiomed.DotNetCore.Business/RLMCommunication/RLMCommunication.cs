@@ -187,12 +187,13 @@ namespace Abiomed.DotNetCore.Business
                     }
                     else if (message.Equals(Definitions.BearerAuthenticationUpdateIndicationEvent))
                     {
+                        try
+                        {
                             WifiCredentials wifiCredentials = new WifiCredentials();
 
                             //  slot, authentication type, SSID, PSK                        
                             wifiCredentials.Slot = Convert.ToUInt16(options[0]);
-                            
-                            // Fix up
+
                             Definitions.AuthenicationType authenicationType;
                             Enum.TryParse(options[1], out authenicationType);
                             wifiCredentials.AuthType = authenicationType;
@@ -202,7 +203,11 @@ namespace Abiomed.DotNetCore.Business
                             wifiCredentials.PSK = options[3];
 
                             returnMessage = _statusControlCommunication.BearerAuthenticationUpdateIndication(deviceIpAddress, wifiCredentials);
-                        
+                        }
+                        catch(Exception e)
+                        {
+                            _logger.LogError(e.ToString());
+                        }
                     }
                     else if(message.Equals(Definitions.BearerPriorityIndicationEvent))
                     {
