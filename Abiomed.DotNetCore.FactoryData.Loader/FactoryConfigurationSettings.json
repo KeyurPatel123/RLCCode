@@ -152,7 +152,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsgeneral",
-    "Value": "\n^ |SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella"
+    "Value": "\n^ |SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella|Flow.^Flow:|.CP ^CP "
   },
   {
     "Category": "mediamanager",
@@ -177,7 +177,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsimpellaflow",
-    "Value": "ml/hr^|Ming^Min|U.^"
+    "Value": "ml/hr^|Ming^Min|U.^| Mar ^ Max "
   },
   {
     "Category": "mediamanager",

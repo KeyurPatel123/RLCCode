@@ -69,7 +69,7 @@ namespace Abiomed.DotNetCore.Business
                 deviceSerialNumber = rlmDevice.SerialNo;
 
                 // Check if already online, 
-                bool deviceOnline = _redisDbRepository.StringKeyExist(rlmDevice.SerialNo);
+                bool deviceOnline = _redisDbRepository.StringKeyExist(rlmDevice.SerialNo, Definitions.RLMDeviceSet);
 
                 // If device online, update device
                 string addedOrUpdatedDevice = deviceOnline ? Definitions.UpdateRLMDevice : Definitions.AddRLMDevice;

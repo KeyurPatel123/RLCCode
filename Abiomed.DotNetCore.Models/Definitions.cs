@@ -10,6 +10,9 @@ namespace Abiomed.DotNetCore.Models
         public static string RLMDeviceSet = @"RLMDeviceSet";
         public static string RLMDeviceSetWOWZA = @"RLMDeviceSetWOWZA";
         public static string UpdatedRLMDevices = @"UpdatedRLMDevices";
+        public static string UpdatedRemoteLinkCases = @"UpdatedRemoteLinkCases";
+        public static string UpdatedRemoteLinkCase = @"UpdatedRemoteLinkCase";
+        public static string CleanupRemoteLinkCases = @"CleanupRemoteLinkCases";
 
         public static string AddRLMDevice = @"AddRLMDevice";
         public static string UpdateRLMDevice = @"UpdateRLMDevice";

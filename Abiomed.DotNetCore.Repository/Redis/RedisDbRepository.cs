@@ -171,6 +171,11 @@ namespace Abiomed.DotNetCore.Repository
             await _db.StringSetAsync(key, JSON);
         }
 
+        public IEnumerable<RedisKey> GetKeys()
+        {
+            return _server.Keys();
+        }
+
         public void StringSet(string key, string JSON)
         {
             key = GenerateKey(key);
@@ -223,9 +228,9 @@ namespace Abiomed.DotNetCore.Repository
             // todo figure out!
         }
 
-        public async Task<bool> StringKeyExistAsync(string key)
+        public async Task<bool> StringKeyExistAsync(string key, string memberGroup)
         {
-            var membersAsync = await _db.SetMembersAsync(Definitions.RLMDeviceSet);            
+            var membersAsync = await _db.SetMembersAsync(memberGroup); // Definitions.RLMDeviceSet          
             var members = membersAsync.ToStringArray();
 
             bool keyExist = false;
@@ -236,9 +241,9 @@ namespace Abiomed.DotNetCore.Repository
             return keyExist;
         }
 
-        public bool StringKeyExist(string key)
+        public bool StringKeyExist(string key, string memberGroup)
         {
-            var members = _db.SetMembers(Definitions.RLMDeviceSet).ToStringArray();
+            var members = _db.SetMembers(memberGroup).ToStringArray(); // Definitions.RLMDeviceSet
 
             bool keyExist = false;
             if (members.Contains(key))
