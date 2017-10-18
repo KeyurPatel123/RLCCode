@@ -1,11 +1,11 @@
 try {
 	node('Windows') {
 		stage 'Checkout'
+			deleteDir()
 			checkout scm
 
 		stage 'Build'
 			
-			deleteDir()
 			bat '''
 				nuget restore .
 
