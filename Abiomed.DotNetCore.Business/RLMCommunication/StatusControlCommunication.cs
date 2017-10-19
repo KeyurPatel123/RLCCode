@@ -379,6 +379,7 @@ namespace Abiomed.DotNetCore.Business
                 returnList.AddRange(Definitions.EmptySSIDPSK);
                 
                 returnMessage = General.GenerateRequest(returnList.ToArray(), rlmDevice);
+                _logger.LogInformation("Bearer Delete Success Slot {0}", wifiDelete.Slot);
             }
             catch (Exception e)
             {

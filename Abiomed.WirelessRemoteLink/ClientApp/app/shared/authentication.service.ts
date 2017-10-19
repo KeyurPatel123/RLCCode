@@ -22,6 +22,7 @@ export class AuthenticationService {
             .map((response: AuthenticationInterface) => {
                 if (response.isSuccess)
                 {
+                    this.storageService.SessionSetItem("token", response.token);
                     this.storageService.SessionSetItem("loggedIn", "true");
                     this.storageService.SessionSetItem("role", response.role);
                 }
