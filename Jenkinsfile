@@ -30,14 +30,16 @@ try {
 
 	}
 	mail ( 
-        to: 'ppamidi@abiomed.com',
+        to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com',
         subject: "RemoteLinkCloud Multi-Branch Pipeline -  Build Notification - SUCCESS - New Code Pushed to Git", 
-        body: """RemoteLinkCloud Multi-Branch Pipeline - SUCCESS"""
+        body: """RemoteLinkCloud Multi-Branch Pipeline - SUCCESS
+Download the artifacts from the below link:
+http://rlmbuild.abiomed.com/job/RLCloudMultibranchPipeline/job/${BRANCH_NAME}/${BUILD_NUMBER}/artifact/"""
     
     )
 } catch(e) {
     echo e.message
-    mail( to: 'ppamidi@abiomed.com',
+    mail( to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com',
           subject: 'RemoteLinkCloud Multi-Branch Pipeline -  Build Notification - FAILED - New Code Pushed to Git', 
           body: "See buildlog at ${env.BUILD_URL}/console")
     error e.message
