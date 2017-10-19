@@ -1,6 +1,7 @@
 /// <reference path="../../../../node_modules/@types/jwplayer/index.d.ts" />
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { CaseService } from "../../shared/case.service";
 
 @Component({
     selector: 'case',
@@ -9,14 +10,19 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 })
 export class CaseComponent implements OnInit {
     serial: string;
+    device: any;
 
-    constructor(private route: ActivatedRoute) { }
+    constructor(private route: ActivatedRoute, private caseService: CaseService) { }
     ngOnInit() {
         this.route.paramMap.subscribe((paramMap: Params) => {
             this.serial = paramMap.params.serial;
+            this.getDevice();
             this.startVideo(this.serial);
-        });        
-           
+        });                   
+    }
+
+    getDevice() {
+               
     }
 
     startVideo(serial:string)
@@ -38,7 +44,7 @@ export class CaseComponent implements OnInit {
             androidhls: true,
             primary: "flash",
             rtmp: {
-                bufferlength: 0
+                bufferlength: 1
             }
         });
        

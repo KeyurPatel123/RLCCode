@@ -6,6 +6,7 @@
     viewedTermsAndConditions: boolean
     response: string;
     role: string;
+    token: string;
 }
 
 export interface UserRegistrationInterface {
