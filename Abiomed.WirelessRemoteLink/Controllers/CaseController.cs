@@ -17,37 +17,25 @@ namespace Abiomed_WirelessRemoteLink.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class DeviceController : Controller
+    public class CaseController : Controller
     {
-        private readonly IAuditLogManager _auditLogManager;        
+        private readonly IAuditLogManager _auditLogManager;
+        private readonly ICaseManager _caseManager;
 
-        public DeviceController(IAuditLogManager auditLogManager)
+        public CaseController(IAuditLogManager auditLogManager, ICaseManager caseManager)
         {
             _auditLogManager = auditLogManager;
-        }
-
-        [HttpPost]
-        [Route("CreateDevice")]
-        [Authorize(Roles = "ADMIN")]
-        public bool CreateDevice()
-        {
-            return true;
-        }
-
-        [HttpPost]
-        [Route("UpdateDevice")]
-        [Authorize(Roles = "ADMIN")]
-        public bool UpdateDevice()
-        {
-            return true;
+            _caseManager = caseManager;
         }
 
         [HttpGet]
-        [Route("GetDevice")]
-        [Authorize(Roles = "ADMIN")]
-        public bool GetDevice()
+        [Route("GetCases")]
+        [Authorize(Roles = "ADMIN, STAFF")]
+        public KeyValuePair<string, Case>[] GetCases()
         {
-            return true;
-        }
+            var cases = _caseManager.GetAll();
+            var caseArray = cases.Cases.ToArray();
+            return caseArray;
+        }       
     }
 }

@@ -29,7 +29,7 @@ namespace Abiomed.DotNetCore.Repository
         /// <param name="obj">The object to store</param>
         Task SaveHashAsync(string key, T obj);
         void SaveHash(string key, T obj);
-
+        IEnumerable<RedisKey> GetKeys();
         /// <summary>
         /// Delete an object from redis using a key
         /// </summary>
@@ -89,8 +89,8 @@ namespace Abiomed.DotNetCore.Repository
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        Task<bool> StringKeyExistAsync(string key);
-        bool StringKeyExist(string key);
+        Task<bool> StringKeyExistAsync(string key, string memberGrouo);
+        bool StringKeyExist(string key, string memberGrouo);
         /// <summary>
         /// Publish to a channel
         /// </summary>

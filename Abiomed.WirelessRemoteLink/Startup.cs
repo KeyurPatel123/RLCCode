@@ -14,6 +14,8 @@ using Abiomed.DotNetCore.Storage;
 using System.IO;
 using Abiomed.WirelessRemoteLink;
 using Abiomed.DotNetCore.Repository;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Abiomed_WirelessRemoteLink
 {
@@ -68,9 +70,23 @@ namespace Abiomed_WirelessRemoteLink
                     return idconfig;
                 }))
                 .AddDefaultTokenProviders()
-                .CreateAzureTablesIfNotExists<ApplicationDbContext>(); 
+                .CreateAzureTablesIfNotExists<ApplicationDbContext>();
 
-            services.AddMvc();
+            services.AddMvc();            
+
+            services.AddAuthentication()
+            .AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+
+                cfg.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = Configuration["Tokens:Issuer"],
+                    ValidAudience = Configuration["Tokens:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+                };
+            });
 
             TableStorage tableStorage = new TableStorage();
             services.AddSingleton<ITableStorage>(tableStorage);
@@ -88,16 +104,16 @@ namespace Abiomed_WirelessRemoteLink
             configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Broadcaster.ToString());
             services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, configurationCache));
 
-            RedisDbRepository<OcrResponse> redisDbRepository = new RedisDbRepository<OcrResponse>(configurationCache);
-            services.AddSingleton<IDeviceManager>(new DeviceManager(configurationCache, redisDbRepository));
+            RedisDbRepository<Case> redisDbRepository = new RedisDbRepository<Case>(configurationCache);
+            services.AddSingleton<ICaseManager>(new CaseManager(configurationCache, redisDbRepository));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, 
-                                IHostingEnvironment env, 
-                                ILoggerFactory loggerFactory, 
-                                IAuditLogManager auditLogManager, 
-                                IEmailManager emailManager, 
+        public void Configure(IApplicationBuilder app,
+                                IHostingEnvironment env,
+                                ILoggerFactory loggerFactory,
+                                IAuditLogManager auditLogManager,
+                                IEmailManager emailManager,
                                 ITableStorage tableStorage,
                                 IConfigurationManager configurationManager,
                                 IConfigurationCache configurationCache)
@@ -128,11 +144,7 @@ namespace Abiomed_WirelessRemoteLink
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
-                routes.MapSpaFallbackRoute("spa-fallback", new { controller = "Home", action = "Index" });
-                /*
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });*/
+                routes.MapSpaFallbackRoute("spa-fallback", new { controller = "Home", action = "Index" });               
             });
         }
 

@@ -74,7 +74,10 @@ export class AdminComponent implements OnInit {
             EmailConfirmed: true,
             PhoneConfirmed: true
         }
-        
+
+        // Clear form prior to submitting
+        this.createForm.reset();
+
         this.authenticationService.registerUser(userRegistration).subscribe(result => {
 
             // Set message and show div
@@ -85,7 +88,6 @@ export class AdminComponent implements OnInit {
             //Put message up for 5 seconds
             setTimeout(() => {    //<<<---    using ()=> syntax
                 this.created = false;
-                this.createForm.reset();
             }, 5000);
         });                     
     }

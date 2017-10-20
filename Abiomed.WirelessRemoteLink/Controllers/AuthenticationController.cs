@@ -8,24 +8,33 @@ using System;
 using System.Security.Claims;
 using System.Linq;
 using System.Net;
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Abiomed_WirelessRemoteLink.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthenticationController : Controller
     {
         private readonly UserManager<RemoteLinkUser> _userManager;
         private readonly SignInManager<RemoteLinkUser> _signInManager;
         private readonly IAuditLogManager _auditLogManager;
         private readonly IEmailManager _emailManager;
+        private IConfiguration _config;
 
-        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager auditLogManager, IEmailManager emailManager)
+        public AuthenticationController(UserManager<RemoteLinkUser> userManager, SignInManager<RemoteLinkUser> signInManager, IAuditLogManager auditLogManager, IEmailManager emailManager, IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _auditLogManager = auditLogManager;
             _emailManager = emailManager;
+            _config = config;
         }
 
         [HttpPost]
@@ -58,11 +67,34 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                     accessFailedCount = remoteLinkUser.AccessFailedCount;
                     userResponse.FullName = userResponse.LastName + ", " + userResponse.FirstName;
 
-                    foreach(var role in remoteLinkUser.Roles)
+                    List<Claim> roleClaims = new List<Claim>();
+                    foreach (var role in remoteLinkUser.Roles)
                     {
                         userResponse.Role = role.RoleName;
+                        roleClaims.Add(new Claim(ClaimTypes.Role, userResponse.Role));
                         break;
                     }
+
+                    //  Build Token
+                    var claims = new List<Claim>
+                        {
+                          new Claim(JwtRegisteredClaimNames.Sub, remoteLinkUser.Email),
+                          new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                          new Claim(ClaimTypes.Name, remoteLinkUser.Email),
+                    };
+                    
+                    claims.AddRange(roleClaims);
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                    var token = new JwtSecurityToken(_config["Tokens:Issuer"],
+                        _config["Tokens:Issuer"],
+                        claims, 
+                        expires: DateTime.Now.AddDays(30),
+                        signingCredentials: creds);
+
+                    userResponse.Token = new JwtSecurityTokenHandler().WriteToken(token);                                     
                 }
 
                 switch(DetermineLoginResult(result, isUserActivated, hasUserAcceptedTermsAndConditions))
@@ -73,7 +105,7 @@ namespace Abiomed_WirelessRemoteLink.Controllers
                         if (accessFailedCount > 0)
                         {
                             await ResetUserAccountAsync(remoteLinkUser);
-                        }
+                        }                        
                         break;
                     case LoginResult.EmailNotValidated:
                         resultMessage = "Email Address not verified";
@@ -124,7 +156,6 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             string auditMessage = "Accepted Terms and Conditions";
 
             ClaimsPrincipal currentUser = User;
-
             if (currentUser.Identity.IsAuthenticated)
             {
                 result = await SetTermsAndConditionsAsync(true);
@@ -148,7 +179,6 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         public async Task<bool> ForgotPassword([FromBody]Credentials credentials)
         {            
             // Check if user exist, if so generate password reset token and email off
-
             var user = await _userManager.FindByEmailAsync(credentials.Username);
 
             string auditMessage = string.Empty;
@@ -162,8 +192,6 @@ namespace Abiomed_WirelessRemoteLink.Controllers
 
                 await _emailManager.BroadcastToQueueStorageAsync(user.UserName, "Abiomed Wireless Remote Link - Reset Password",
                     string.Format("Dear {0} {1}, <BR><BR> Please click the link below to reset your Wireless Remote Link password. <BR> <a href=\"http://wirelessremotelink.azurewebsites.net/reset-password/{2}/{3} \">Reset Abiomed Wireless Remote Link Password</a> <BR><BR> Thank you, <BR> Abiomed Wireless Remote Link Administration", user.FirstName, user.LastName, user.Id, passwordTokenEncode));
-
-                //string.Format("Click here to reset your password http://wirelessremotelink.azurewebsites.net/reset-password/{0}/{1}", user.Id, passwordTokenEncode));
             }
             else 
             {
@@ -181,21 +209,25 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         public async Task<bool> ResetPassword([FromBody]ResetPassword resetPassword)
         {
             // todo add error handling!
-            string auditMessage = "Reset Password";
+            string auditMessage = string.Empty;
 
             var user = await _userManager.FindByIdAsync(resetPassword.Id);
 
             // Replace $ with %, then decode
             var passwordTokenEncode = resetPassword.Token.Replace('$', '%');
             passwordTokenEncode = WebUtility.UrlDecode(passwordTokenEncode);
-            
-            var resultPassword = await _userManager.ResetPasswordAsync(user, passwordTokenEncode, resetPassword.Password);
+            var resultPassword = await _userManager.ResetPasswordAsync(user, passwordTokenEncode, resetPassword.Password);            
             if (resultPassword.Succeeded)
             {
                 if (await _userManager.IsLockedOutAsync(user))
                 {                   
                     await _userManager.ResetAccessFailedCountAsync(user);
                 }
+                auditMessage = "Successful Reset Password";
+            }
+            else
+            {
+                auditMessage = resultPassword.Errors.ToString();
             }
 
             await _auditLogManager.AuditAsync(user.UserName, DateTime.UtcNow, Request.HttpContext.Connection.RemoteIpAddress.ToString(), "ResetPassword", auditMessage);
@@ -203,14 +235,13 @@ namespace Abiomed_WirelessRemoteLink.Controllers
             return resultPassword.Succeeded;                        
         }
 
-
         [HttpPost]
         [Route("Register")]
-        [AllowAnonymous]
+        [Authorize(Roles = "ADMIN")]
         public async Task<RegisterResponse> Post([FromBody] UserRegistration userRegistration)
         {
             RegisterResponse registerResponse = new RegisterResponse();
-
+            
             try
             {
                 var remoteLinkUser = new RemoteLinkUser
@@ -312,8 +343,9 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         {
             bool result = false;
             try
-            {
-                var remoteLinkUser = await _userManager.GetUserAsync(User);
+            {               
+                var remoteLinkUser = await _userManager.FindByEmailAsync(User.Identity.Name.ToString());
+                
                 remoteLinkUser.AcceptedTermsAndConditions = termsAndConditions;
                 if (termsAndConditions)
                 {
