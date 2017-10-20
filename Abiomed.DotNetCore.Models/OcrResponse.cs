@@ -56,6 +56,7 @@ namespace Abiomed.DotNetCore.Models
         Blank = -1,
         White = 0,
         Yellow = 1,
-        Red = 2
+        Red = 2,
+        Gray = 3
     }
 }

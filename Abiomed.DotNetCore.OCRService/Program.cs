@@ -48,7 +48,7 @@ namespace Abiomed.DotNetCore.OCRService
                 ListenInParallel(imageStreams);
                 PublishResults(imageStreams);  
 
-                Thread.Sleep(_pollingInterval);
+                Thread.Sleep(int.MaxValue);
             }
         }
 

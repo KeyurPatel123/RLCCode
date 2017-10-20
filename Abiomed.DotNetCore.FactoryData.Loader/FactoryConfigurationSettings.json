@@ -211,8 +211,13 @@
   },
   {
     "Category": "mediamanager",
+    "Name": "ocralarmcodegray",
+    "Value": "#808080"
+  },
+  {
+    "Category": "mediamanager",
     "Name": "ocralarmcodematchtolerance",
-    "Value": "30"
+    "Value": "10"
   },
   {
     "Category": "mediamanager",
