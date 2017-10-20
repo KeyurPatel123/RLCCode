@@ -13,6 +13,7 @@ import { AuthGuard } from "./shared/authguard.service";
 import { StorageService } from "./shared/storage.service";
 import { AgmCoreModule } from "@agm/core";
 import { CaseService } from "./shared/case.service";
+import { InstitutionService } from "./shared/institution.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -33,6 +34,7 @@ import { CaseService } from "./shared/case.service";
         AuthGuard,
         StorageService,
         CaseService,
+        InstitutionService,
         { provide: 'ORIGIN_URL', useValue: location.origin },
         {
             provide: HTTP_INTERCEPTORS,

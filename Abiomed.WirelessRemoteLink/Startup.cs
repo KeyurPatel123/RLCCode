@@ -104,8 +104,8 @@ namespace Abiomed_WirelessRemoteLink
             configurationCache.AddItemToCache("smtpmanager", "emailserviceactor", EmailServiceActor.Broadcaster.ToString());
             services.AddSingleton<IEmailManager>(new EmailManager(auditLogManager, configurationCache));
 
-            RedisDbRepository<OcrResponse> redisDbRepository = new RedisDbRepository<OcrResponse>(configurationCache);
-            services.AddSingleton<IDeviceManager>(new DeviceManager(configurationCache, redisDbRepository));
+            RedisDbRepository<Case> redisDbRepository = new RedisDbRepository<Case>(configurationCache);
+            services.AddSingleton<ICaseManager>(new CaseManager(configurationCache, redisDbRepository));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
