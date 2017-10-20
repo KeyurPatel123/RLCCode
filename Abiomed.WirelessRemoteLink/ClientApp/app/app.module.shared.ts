@@ -14,6 +14,7 @@ import { AuthenticationService } from "./shared/authentication.service";
 import { MapComponent } from "./components/map/map.component";
 import { CaseComponent } from "./components/case/case.component";
 import { SubNavMenuComponent } from "./components/subnavmenu/subnavmenu.component";
+import { DeviceManagementComponent } from "./components/deviceManagement/devicemanagement.component";
 
 export const sharedConfig: NgModule = {
     bootstrap: [AppComponent],    
@@ -29,7 +30,8 @@ export const sharedConfig: NgModule = {
         ResetPasswordComponent,
         AdminComponent,
         MapComponent,
-        CaseComponent
+        CaseComponent,
+        DeviceManagementComponent
     ],
     imports: [
         RouterModule.forRoot([
@@ -38,6 +40,7 @@ export const sharedConfig: NgModule = {
             { path: 'forgot-password', component: ForgotPasswordComponent },
             { path: 'reset-password/:id/:token', component: ResetPasswordComponent },
             { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
+            { path: 'devicemanagement', component: DeviceManagementComponent, canActivate: [AuthGuard] },
             { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard] },
             { path: 'case/:serial', component: CaseComponent, canActivate: [AuthGuard] },
             { path: 'map', component: MapComponent, canActivate: [AuthGuard] },

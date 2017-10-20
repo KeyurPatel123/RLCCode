@@ -245,3 +245,8 @@ color: #ccc;
     color: #fff;
     border-bottom: 3px solid #005daa;
 }
+.active {
+    background-color: #005daa;
+    color: #fff !important;
+    border-bottom: 3px solid #005daa;
+}

@@ -1,0 +1,121 @@
+<div class="container-fluid">
+    <nav-menu></nav-menu>
+    <div class="container">
+        <div class="col-sm-12 MainContent">
+            <h1>Device Management</h1>
+            <!--Intro -->
+            <div class="row">
+                <div class="col-md-8">
+                </div>
+            </div>
+            <!--Add New User Panel-->
+            <div class="row">
+                <div class="col-md-12">
+                    <div *ngIf="created" class="row ResponseUserWell {{creationStatus}}">
+                        <div class="col-md-12">
+                            <div class="UserCreated">{{creationResponse}}</div>
+                        </div>
+                    </div>
+                    <!--Add User-->
+                    <div class="row NewUserWell">
+                        <div class="col-md-4 NewUserIntro">
+                            <h2>Add a new Device</h2>
+                            <p>Morbi sit amet enim vel erat molestie luctus. In porttitor sagittis tincidunt. Morbi non enim blandit, cursus ligula a, cursus neque. Nullam blandit et purus nec consequat. Nunc faucibus euismod eros, eu aliquam nunc rutrum vitae. Ut dignissim eros vel gravida aliquet. Quisque eget enim pretium, commodo leo aliquam, aliquet arcu.</p>
+                        </div>
+                        <div class="col-md-8 AddAbioUserForm">
+                            <form novalidate class="FormContainer form-group" (ngSubmit)="Register()" [formGroup]="createForm">
+                                <!-- RLM Serial Number -->
+                                <div class="form-group row justify-content-between">
+                                    <label for="example-text-input" class="col-3 col-form-label">RLM Serial Number: <span class="red">*</span></label>
+                                    <span style="margin-right:10px;font-size:1.2em;font-weight:bold;">RL</span><input class="form-control col-8" (keypress)="_keyPress($event)" maxlength="5" type="text" value="" (drop)="_drop($event)" [(ngModel)]="rlmsn" formControlName="rlmsn">
+                                </div>
+                                <!-- RLM Serial Number Errors -->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('rlmsn').hasError('required') && createForm.get('rlmsn').touched">
+                                    RLM Serial Number is required.
+                                </div>
+                                <!-- RLM Password -->
+                                <div class="form-group row justify-content-between">
+                                    <label for="example-text-input" class="col-3 col-form-label">RLM Password: <span class="red">*</span></label>
+                                    <input class="form-control col-9" (keypress)="_keyPress($event)" maxlength="5" type="text" value="" (drop)="_drop($event)" [(ngModel)]="rlmsn" formControlName="rlmsn">
+                                </div>
+                                <!-- RLM Password -->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('rlmsn').hasError('required') && createForm.get('rlmsn').touched">
+                                    RLM PasswordS is required.
+                                </div>
+
+                                <!-- Institution -->
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-3 col-form-label">Institution:<span class="red">*</span></label>
+                                    <select class="form-control col-9" [(ngModel)]="institution" formControlName="institution">
+                                        <option>Select an Institution... </option>
+                                        <option>A select</option>
+                                        <option>AB select</option>
+                                        <option>ABC select</option>
+                                    </select>
+                                </div>
+                                <!-- Institution Errors -->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('institution').hasError('required') && createForm.get('institution').touched">
+                                    You must select an Institution.
+                                </div>
+                                <!-- AIC Serial Number -->
+                                <div class="form-group row">
+                                    <label for="example-email-input" class="col-3 col-form-label">AIC Serial Number: <span class="red">*</span></label>
+                                    <input class="form-control col-9" maxlength="5" type="text" [(ngModel)]="aicserialnumber" formControlName="aicserialnumber">
+                                </div>
+                                <!-- AIC Serial Number Errors -->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('aicserialnumber').hasError('required') && createForm.get('aicserialnumber').touched">
+                                    AIC Serial Number is required.
+                                </div>
+                                <!-- AIC Software Number -->
+                                <div class="form-group row">
+                                    <label for="example-email-input" class="col-3 col-form-label">AIC Software Number: <span class="red">*</span></label>
+                                    <input class="form-control col-9" maxlength="5" type="text" [(ngModel)]="aicsoftwarenumber" formControlName="aicsoftwarenumber">
+                                </div>
+                                <!-- AIC Software Number Errors -->
+                                <div class="ErrorArrowBox offset-3 col-9" *ngIf="createForm.get('aicsoftwarenumber').hasError('required') && createForm.get('aicsoftwarenumber').touched">
+                                    AIC Software Number is required.
+                                </div>
+                               
+                                <div class="row">
+                                    <div class="col-md-12 d-flex flex-row-reverse">
+                                        <input type="submit" class="btn btn-primary btn-sm align-self-end" value="ADD DEVICE" [disabled]="!createForm.valid" [ngClass]="{'cursor':createForm.valid}">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+            <!--Device Table -->
+           
+            <div class="col-md-12">
+                <table class="table table-striped table-bordered table-hover">
+                    <tr>
+                        <th>RLM Serial Number
+                            </th>
+                        <th>
+                            RLM Password
+                        </th>
+                        <th>Institution
+                            </th>
+                        <th>AIC Serial Number
+                            </th>
+                        <th>AIC Software Number
+                            </th>
+                    </tr>
+                    <tr *ngFor="let item of records">
+                        <td>{{item.RLMSerialNo}}</td>
+                        <td>{{item.RLMPassWord}}</td>
+                        <td>{{item.Institution}}</td>
+                        <td>{{item.AICSerialNo}}</td>
+                        <td>{{item.AICSoftwareNo}}</td>
+                    </tr>
+                </table>
+            </div>
+                
+            </div> 
+        </div>
+    <footer-menu></footer-menu>
+</div>
