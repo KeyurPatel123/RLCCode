@@ -90,6 +90,7 @@ namespace Abiomed.DotNetCore.Business
                     {
                         if (!serialNumbers.Contains(incommingStream.Name))
                         {
+                            //if (incommingStream.Name == "RL00015")
                                 serialNumbers.Add(incommingStream.Name);
                         }
                     }
@@ -137,14 +138,14 @@ namespace Abiomed.DotNetCore.Business
                 return AlarmCodes.Yellow.ToString();
             }
 
+            if (_alarmCodeGray.FuzzyEquals(alarmColor, new Percentage(5)))
+            {
+                return AlarmCodes.Gray.ToString();
+            }
+
             if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.White.ToString();
-            }
-
-            if (_alarmCodeGray.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
-            {
-                return AlarmCodes.Gray.ToString();
             }
 
             return AlarmCodes.Blank.ToString();
@@ -254,6 +255,7 @@ namespace Abiomed.DotNetCore.Business
                 int placementSignalTextStartPosition = ocrResponse.RawMessage.IndexOf(PlacementSignalKeyword);
                 if (placementSignalTextStartPosition > 0)
                 {
+                    //ocrResponse.RawMessage = "AIC SN: IC01 20 AIC V6.\nCp SN: 471\nZZ Impella stopped\nMotor Current High ZZ\nSuction\nZZ\nAC Power\nDisconnected\nPlacement\n57/08\nP.0\nMotor\n708/494\n(600)\nImpella Flow\n0.0 Max\n|One\nPurge Flow.\nPurge Pressure:\n0.0 Min U.\n100%\n";
                     //ocrResponse.RawMessage = "5.0 SN: 122409\nAIC SN: IC1023 AIC ng TAF V7 RC 4\nZZ\nZZ\nPlacement\n-49/-51\nP-1\nMotor\n7/62\nImpella Flow\n0.5 Max\n0.4 Min\n0.5\nPurge Flow: 18.7 ml/\nPurge Pressure: 398 mn\n100%\n";
                     var messages = GetMessageSegments(ocrResponse.RawMessage);
 
@@ -322,7 +324,7 @@ namespace Abiomed.DotNetCore.Business
             string plainMessage = StandardizeMessageFormat(new StringBuilder(rawOcrResponseText, rawOcrResponseText.Length * 2), _generalReplacements);
 
             // Bracket/Format the Quadrants...
-            string[] messageSegments = plainMessage.Replace("ZZ", "ZZ_ALARMSTART_ZZ").Replace("Purge Pressure: ", "Purge Pressure ").Replace("Purge Pressure ", "Purge Pressure\n").Replace("Purge Flow: ", "Purge Flow ").Replace("Purge Flow ", "Purge Flow\n").Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] messageSegments = plainMessage.Replace("ZZ", "ZZ_ALARMSTART_ZZ").Replace("Purge Pressure:", "Purge Pressure ").Replace("Purge Pressure ", "Purge Pressure\n").Replace("Purge Flow:", "Purge Flow ").Replace("Purge Flow ", "Purge Flow\n").Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             int type = 0;
             foreach (string segment in messageSegments)
@@ -435,7 +437,7 @@ namespace Abiomed.DotNetCore.Business
             {
                 foreach (string part in headerParts)
                 {
-                    var cleanedPart = StandardizeMessageFormat(new StringBuilder(part), _headerReplacements);
+                    var cleanedPart = StandardizeMessageFormat(new StringBuilder(part.ToUpper()), _headerReplacements);
 
                     int firstAicPosition = cleanedPart.IndexOf(AicKeyword);
                     if (!foundAicSection && firstAicPosition > -1)

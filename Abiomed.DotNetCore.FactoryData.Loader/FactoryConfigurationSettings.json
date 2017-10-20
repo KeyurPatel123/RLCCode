@@ -157,7 +157,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": "AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:"
+    "Value": "AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V"
   },
   {
     "Category": "mediamanager",
@@ -212,12 +212,12 @@
   {
     "Category": "mediamanager",
     "Name": "ocralarmcodegray",
-    "Value": "#808080"
+    "Value": "#DCDCDC"
   },
   {
     "Category": "mediamanager",
     "Name": "ocralarmcodematchtolerance",
-    "Value": "10"
+    "Value": "30"
   },
   {
     "Category": "mediamanager",
