@@ -50,6 +50,17 @@ namespace Abiomed.DotNetCore.Business
             return result;
         }
 
+        public static string FormatDouble(string value, string format)
+        {
+            string formattedValue = value;
+            if (General.IsValidDouble(value))
+            {
+                formattedValue = double.Parse(value).ToString(format);
+            }
+
+            return value;
+        }
+
         public static bool CompareDictionaries<TKey, TValue>(ConcurrentDictionary<TKey, TValue> dict1, ConcurrentDictionary<TKey, TValue> dict2)
         {
             IEqualityComparer<TValue> valueComparer = EqualityComparer<TValue>.Default;

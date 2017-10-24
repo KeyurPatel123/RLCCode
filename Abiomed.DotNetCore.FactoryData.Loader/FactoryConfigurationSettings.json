@@ -152,12 +152,12 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsgeneral",
-    "Value": "SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella|Flow.^Flow:|.CP ^CP "
+    "Value": "SNe^SN: |SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella|Flow.^Flow:|.CP ^CP |\nMin\n^ Min\n"
   },
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": "ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V"
+    "Value": "ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V|CPCS ^CPC8 "
   },
   {
     "Category": "mediamanager",
