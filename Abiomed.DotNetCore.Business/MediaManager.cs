@@ -232,7 +232,6 @@ namespace Abiomed.DotNetCore.Business
             bool processPlacementSignalScreen = false;
             try
             {
-                //ocrResponse.RawMessage = "AIC SN: IC1023 AIC ng TAF v7 FC 4\nCPCs Optical SNe100011\n(ZZ Impella stopped,\nRetrograde Flow ZZ\nImpella stopped,\nMotor Current High\nZZ Optical sensor\nNot supported\nPlacement\nOFF\nMotor\nImpella Flow\n0.0 Max\n0.0 U.\nMin\n0.0\nPurge Flow: 18.6 ml /\nPurge Pressure : 325 mm\n100%\n";
                 int placementSignalTextStartPosition = ocrResponse.RawMessage.IndexOf(PlacementSignalKeyword);
                 if (placementSignalTextStartPosition > 0)
                 {
@@ -363,7 +362,7 @@ namespace Abiomed.DotNetCore.Business
             string plainMessage = StandardizeMessageFormat(new StringBuilder(rawOcrResponseText, rawOcrResponseText.Length * 2), _generalReplacements);
 
             // Bracket/Format the Quadrants...
-            string[] messageSegments = plainMessage.Replace("zz", "ZZ").Replace("ZZ", "ZZ_ALARMSTART_ZZ").Replace("Purge Pressure:", "Purge Pressure ").Replace("Purge Pressure ", "Purge Pressure\n").Replace("Purge Flow:", "Purge Flow ").Replace("Purge Flow ", "Purge Flow\n").Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] messageSegments = plainMessage.Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             int type = 0;
             foreach (string segment in messageSegments)
@@ -836,11 +835,11 @@ namespace Abiomed.DotNetCore.Business
                     // Is Systole/Distole Part - it has a '/'
                     if (string.IsNullOrWhiteSpace(systole))
                     {
-                        int slash = part.IndexOf('/');
+                        int slash = cleanedPart.IndexOf('/');
                         if (slash > 0)
                         {
-                            systole = part.Substring(0, slash);
-                            distole = part.Substring(slash + 1);
+                            systole = cleanedPart.Substring(0, slash);
+                            distole = cleanedPart.Substring(slash + 1);
                             usedPart = true;
                         }
                     }
@@ -848,10 +847,10 @@ namespace Abiomed.DotNetCore.Business
                     // Is the Average - has a '('
                     if (string.IsNullOrWhiteSpace(average) && !usedPart)
                     {
-                        int openParenthesisPosition = part.IndexOf('(');
+                        int openParenthesisPosition = cleanedPart.IndexOf('(');
                         if (openParenthesisPosition > -1)
                         {
-                            average = new string(part.Where(c => char.IsDigit(c)).ToArray());
+                            average = new string(cleanedPart.Where(c => char.IsDigit(c)).ToArray());
                             usedPart = true;
                         }
                     }
@@ -859,7 +858,7 @@ namespace Abiomed.DotNetCore.Business
                     // Performance Level - All But Above...
                     if (!usedPart)
                     {
-                        pLevel = DeterminePLevelValue(part, pLevel, parts.Count);
+                        pLevel = DeterminePLevelValue(cleanedPart, pLevel, parts.Count);
                     }
                 }
             }

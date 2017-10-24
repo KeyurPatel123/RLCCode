@@ -152,17 +152,17 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsgeneral",
-    "Value": "SNe^SN: |SN^ SN| : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella|Flow.^Flow:|.CP ^CP |\nMin\n^ Min\n"
+    "Value": "\" : ^: |Purgo^Purge|Impalla^Impella| , ^|Impolla^Impella|Flow.^Flow:|\nMin\n^ Min\n| Min ^ Min\n|zz^ZZ|ZZ^ZZ_ALARMSTART_ZZ|Purge Pressure:^Purge Pressure |Purge Pressure ^Purge Pressure\n|Purge Flow:^Purge Flow |Purge Flow ^Purge Flow\n|SNe^SN: "
   },
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": "ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V|CPCS ^CPC8 "
+    "Value": ".CP ^CP |SN^ SN|ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V|CPCS ^CPC8 | : ^ |. ^."
   },
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsplacement",
-    "Value": " / ^/|P.^P-| ) .^|).^|(^|)^|,^/"
+    "Value": "P . ^P-|P - ^P-| / ^/|P.^P-| ) .^|).^|(^|)^|,^/"
   },
   {
     "Category": "mediamanager",
@@ -177,7 +177,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsimpellaflow",
-    "Value": "ml/hr^|Ming^Min|U.^| Mar ^ Max | Marx^ Max"
+    "Value": "ml/hr^|Ming^Min|U.^| Marx^ Max| Mar^ Max|Mir^Min"
   },
   {
     "Category": "mediamanager",
