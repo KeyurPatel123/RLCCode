@@ -157,7 +157,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": "ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V"
+    "Value": "ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V"
   },
   {
     "Category": "mediamanager",
@@ -213,11 +213,6 @@
     "Category": "mediamanager",
     "Name": "ocralarmcodewhite",
     "Value": "#FFFFFF"
-  },
-  {
-    "Category": "mediamanager",
-    "Name": "ocralarmcodegray",
-    "Value": "#DCDCDC"
   },
   {
     "Category": "mediamanager",

@@ -60,7 +60,6 @@ namespace Abiomed.DotNetCore.Business
         private Point _alarm3Point;
         private MagickImage _imageMask;
         private HttpClient _httpClient;
-        private MagickColor _alarmCodeGray;
         private MagickColor _alarmCodeWhite;
         private MagickColor _alarmCodeYellow;
         private MagickColor _alarmCodeRed;
@@ -140,11 +139,6 @@ namespace Abiomed.DotNetCore.Business
             if (_alarmCodeYellow.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.Yellow.ToString();
-            }
-
-            if (_alarmCodeGray.FuzzyEquals(alarmColor, new Percentage(5)))
-            {
-                return AlarmCodes.Gray.ToString();
             }
 
             if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
@@ -328,7 +322,7 @@ namespace Abiomed.DotNetCore.Business
             string plainMessage = StandardizeMessageFormat(new StringBuilder(rawOcrResponseText, rawOcrResponseText.Length * 2), _generalReplacements);
 
             // Bracket/Format the Quadrants...
-            string[] messageSegments = plainMessage.Replace("ZZ", "ZZ_ALARMSTART_ZZ").Replace("Purge Pressure:", "Purge Pressure ").Replace("Purge Pressure ", "Purge Pressure\n").Replace("Purge Flow:", "Purge Flow ").Replace("Purge Flow ", "Purge Flow\n").Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] messageSegments = plainMessage.Replace("zz","ZZ").Replace("ZZ", "ZZ_ALARMSTART_ZZ").Replace("Purge Pressure:", "Purge Pressure ").Replace("Purge Pressure ", "Purge Pressure\n").Replace("Purge Flow:", "Purge Flow ").Replace("Purge Flow ", "Purge Flow\n").Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             int type = 0;
             foreach (string segment in messageSegments)
@@ -400,7 +394,6 @@ namespace Abiomed.DotNetCore.Business
             _alarmCodeRed = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodered"));
             _alarmCodeYellow = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodeyellow"));
             _alarmCodeWhite = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodewhite"));
-            _alarmCodeGray = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodegray"));
             _alarmCodeColorMatchTolerance = new Percentage(int.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodematchtolerance")));
             _ocrDebugMode = bool.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrdebug"));
             _performanceLevelValidationValues = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationperformancelevel").Split('|').ToList();
