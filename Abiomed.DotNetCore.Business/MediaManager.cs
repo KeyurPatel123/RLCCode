@@ -30,6 +30,7 @@ namespace Abiomed.DotNetCore.Business
         private const string PurgeFlowKeyword = "Purge Flow";
         private const string PurgePressureKeyword = "Purge Pressure";
         private const string AlarmStartKeyword = "_ALARMSTART_";
+        private const string ImpellaFlowValidationFormat = "0.0";
         private const string MaxKeyword = "Max";
         private const string MinKeyword = "Min";
         private const string AicKeyword = "AIC";
@@ -45,12 +46,15 @@ namespace Abiomed.DotNetCore.Business
         private const string _ocrJsonPackagePart1 = "{\"requests\":[ {\"image\":{\"content\":\"";
         private const string _ocrJsonPackagePart2 = "\"},\"features\":[{\"type\":\"DOCUMENT_TEXT_DETECTION\", \"maxResults\":1}]}]}";
         private List<string> _impellaPumpTypes;
+        private List<string> _aicSerialNumberPrefix;
         private Dictionary<string, string> _headerReplacements;
         private Dictionary<string, string> _generalReplacements;
         private Dictionary<string, string> _placementReplacements;
         private Dictionary<string, string> _motorReplacements;
         private Dictionary<string, string> _purgePressureReplacements;
         private Dictionary<string, string> _impellaFlowReplacements;
+        private Dictionary<string, string> _numericFieldReplacements;
+        private List<string> _performanceLevelValidationValues;
         private Point _alarm1Point;
         private Point _alarm2Point;
         private Point _alarm3Point;
@@ -255,8 +259,6 @@ namespace Abiomed.DotNetCore.Business
                 int placementSignalTextStartPosition = ocrResponse.RawMessage.IndexOf(PlacementSignalKeyword);
                 if (placementSignalTextStartPosition > 0)
                 {
-                    //ocrResponse.RawMessage = "AIC SN: IC01 20 AIC V6.\nCp SN: 471\nZZ Impella stopped\nMotor Current High ZZ\nSuction\nZZ\nAC Power\nDisconnected\nPlacement\n57/08\nP.0\nMotor\n708/494\n(600)\nImpella Flow\n0.0 Max\n|One\nPurge Flow.\nPurge Pressure:\n0.0 Min U.\n100%\n";
-                    //ocrResponse.RawMessage = "5.0 SN: 122409\nAIC SN: IC1023 AIC ng TAF V7 RC 4\nZZ\nZZ\nPlacement\n-49/-51\nP-1\nMotor\n7/62\nImpella Flow\n0.5 Max\n0.4 Min\n0.5\nPurge Flow: 18.7 ml/\nPurge Pressure: 398 mn\n100%\n";
                     var messages = GetMessageSegments(ocrResponse.RawMessage);
 
                     // Get Header 
@@ -305,6 +307,8 @@ namespace Abiomed.DotNetCore.Business
                     }
                     ocrResponse.PurgePressure = purgePressureSection.Item3;
                     processPlacementSignalScreen = true;
+
+                    ValidateOcrResponse(ocrResponse);
                 }
             } catch (Exception EX)
             {
@@ -389,6 +393,7 @@ namespace Abiomed.DotNetCore.Business
             _motorReplacements = LoadReplacementRules("ocrreplacementsmotor");
             _purgePressureReplacements = LoadReplacementRules("ocrreplacementspurgepressure");
             _impellaFlowReplacements = LoadReplacementRules("ocrreplacementsimpellaflow");
+            _numericFieldReplacements = LoadReplacementRules("ocrreplacementsnumericfield");
             _alarm1Point = LoadAlarmPoint("ocralarm1coordinates");
             _alarm2Point = LoadAlarmPoint("ocralarm2coordinates");
             _alarm3Point = LoadAlarmPoint("ocralarm3coordinates");
@@ -398,6 +403,8 @@ namespace Abiomed.DotNetCore.Business
             _alarmCodeGray = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodegray"));
             _alarmCodeColorMatchTolerance = new Percentage(int.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodematchtolerance")));
             _ocrDebugMode = bool.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrdebug"));
+            _performanceLevelValidationValues = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationperformancelevel").Split('|').ToList();
+            _aicSerialNumberPrefix = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationaicserialnumber").Split('|').ToList();
         }
 
         private Point LoadAlarmPoint(string configurationName)
@@ -412,8 +419,7 @@ namespace Abiomed.DotNetCore.Business
             foreach (var item in _configurationCache.GetConfigurationItem(ConfigurationSectionName, configuredParseRuleName).Split('|'))
             {
                 var parts = item.Split('^');
-                if (parts[0] != "\n") // TO DO REMOVE
-                    dictionary.Add(parts[0], parts.Count() > 1 ? parts[1] : string.Empty);
+                dictionary.Add(parts[0], parts.Count() > 1 ? parts[1] : string.Empty);
             }
 
             return dictionary;
@@ -566,7 +572,22 @@ namespace Abiomed.DotNetCore.Business
                 var xxx = EX.Message; // TODO Remove - for working/tweaking the OCR porocessing.
             }
 
+            flowMax = FormatDouble(flowMax, ImpellaFlowValidationFormat);
+            flowMin = FormatDouble(flowMin, ImpellaFlowValidationFormat);
+            flow = FormatDouble(flow, ImpellaFlowValidationFormat);
+            
             return new Tuple<string, string, string>(flowMax, flowMin, flow);
+        }
+
+        private string FormatDouble(string value, string format)
+        {
+            string formattedValue = value;
+            if (General.IsValidDouble(value))
+            {
+                formattedValue = double.Parse(value).ToString(format);
+            }
+
+            return value;
         }
 
         private Tuple<string, string, string> GetImpellaFlowSection(StringBuilder section)
@@ -771,13 +792,22 @@ namespace Abiomed.DotNetCore.Business
                 }
             }
 
+            if (!General.IsNumeric(result))
+            {
+                result = StandardizeMessageFormat(new StringBuilder(result), _numericFieldReplacements);
+                if (!General.IsNumeric(result))
+                {
+                    result = string.Empty;
+                }
+            }
+
             return result;
         }
 
         private string GetAicSerialNumber(string ocrText)
         {
             string result = string.Empty;
-            int startPos = ocrText.IndexOf(AicSnKeyword) + AicSnKeyword.Length+1;
+            int startPos = ocrText.IndexOf(AicSnKeyword) + AicSnKeyword.Length + 1;
 
             if (startPos >= AicSnKeyword.Length + 1)
             {
@@ -785,6 +815,18 @@ namespace Abiomed.DotNetCore.Business
                 if (endPos > 0)
                 {
                     result = ocrText.Substring(startPos, endPos).Trim();
+                }
+            }
+
+            if (_aicSerialNumberPrefix.Contains(result.Substring(0, 2)))
+            {
+                if (!General.IsNumeric(result.Substring(2)))
+                {
+                    string cleanResult =StandardizeMessageFormat(new StringBuilder(result.Substring(2)), _numericFieldReplacements);
+                    if (General.IsNumeric(cleanResult))
+                    {
+                        result = string.Format("{0}{1}", result.Substring(0, 2), cleanResult);
+                    }
                 }
             }
 
@@ -1089,6 +1131,56 @@ namespace Abiomed.DotNetCore.Business
             }
 
             return battery;
+        }
+
+        private void ValidateOcrResponse(OcrResponse ocrResponse)
+        {
+            ocrResponse.Result.PumpTypeValid = !string.IsNullOrEmpty(ocrResponse.PumpType);
+            ocrResponse.Result.PumpSerialNumberValid = IsValidPumpSerialNumber(ocrResponse.PumpSerialNumber);
+            ocrResponse.Result.AicSerialNumberValid = IsValidAicSerialNumber(ocrResponse.AicSerialNumber);
+            ocrResponse.Result.PerformanceLevelValid = IsValidPerformanceLevel(ocrResponse.PerformanceLevel);
+            ocrResponse.Result.FlowRateMaxValid = General.IsValidDouble(ocrResponse.FlowRateMax);
+            ocrResponse.Result.FlowRateMinValid = General.IsValidDouble(ocrResponse.FlowRateMin);
+            ocrResponse.Result.FlowRateAverageValid = General.IsValidDouble(ocrResponse.FlowRateAverage);
+
+            ocrResponse.Result.Success = (ocrResponse.Result.PumpTypeValid &&
+                                            ocrResponse.Result.PumpSerialNumberValid &&
+                                            ocrResponse.Result.AicSerialNumberValid &&
+                                            ocrResponse.Result.PerformanceLevelValid &&
+                                            ocrResponse.Result.FlowRateMaxValid &&
+                                            ocrResponse.Result.FlowRateMinValid &&
+                                            ocrResponse.Result.FlowRateAverageValid);
+
+        }
+
+        private bool IsValidPumpSerialNumber(string pumpSerialNumber)
+        {
+            return (pumpSerialNumber.Length < 7 && int.TryParse(pumpSerialNumber, out int n));
+        }
+
+        private bool IsValidPerformanceLevel(string performanceLevel)
+        {
+            if (_performanceLevelValidationValues.Contains(performanceLevel))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsValidAicSerialNumber(string aicSerialNumber)
+        {
+            if (aicSerialNumber.Length == 6)
+            {
+                if (_aicSerialNumberPrefix.Contains(aicSerialNumber.Substring(0, 2)))
+                {
+                    if (int.TryParse(aicSerialNumber.Substring(2), out int n))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion

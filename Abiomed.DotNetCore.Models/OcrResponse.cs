@@ -38,11 +38,25 @@ namespace Abiomed.DotNetCore.Models
         public string Alarm1Message { get; set; } = string.Empty;
         public string Alarm2Message { get; set; } = string.Empty;
         public string Alarm3Message { get; set; } = string.Empty;
+        public OcrResponseStatus Result { get; set; } = new OcrResponseStatus();
 
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);
         }
+    }
+
+    [Serializable]
+    public class OcrResponseStatus
+    {
+        public bool Success { get; set; } = false; 
+        public bool PumpTypeValid { get; set; } = false;
+        public bool PumpSerialNumberValid { get; set; } = false;
+        public bool AicSerialNumberValid { get; set; } = false;
+        public bool PerformanceLevelValid { get; set; } = false;
+        public bool FlowRateMinValid { get; set; } = false;
+        public bool FlowRateMaxValid { get; set; } = false;
+        public bool FlowRateAverageValid { get; set; } = false;
     }
 
     public enum ScreenName
