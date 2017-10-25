@@ -6,10 +6,10 @@
         <div class="col-10 CaseInfoBar" style="height:auto;">
 
             <div class="d-flex flex-wrap justify-content-between align-self-center ">
-                <div class="CaseInfo"><span class="CaseInfoTitle">Impella SN:</span> 123456</div>
-                <div class="CaseInfo"><span class="CaseInfoTitle">AIC SN:</span> 123456</div>
-                <div class="CaseInfo"><span class="CaseInfoTitle">Pump Type:</span> CP</div>
-                <div class="CaseInfo"><span class="CaseInfoTitle">Connection:</span> DD/MM/YYYY | HH:MM</div>
+                <div class="CaseInfo"><span class="CaseInfoTitle">Impella SN:</span> {{case.value.pumpSerialNumber}}</div>
+                <div class="CaseInfo"><span class="CaseInfoTitle">AIC SN:</span> {{case.value.aicSerialNumber}}</div>
+                <div class="CaseInfo"><span class="CaseInfoTitle">Pump Type:</span> {{case.value.pumpType}}</div>
+                <div class="CaseInfo"><span class="CaseInfoTitle">Connection:</span> {{case.value.connectionStartUtc | amDateFormat:'YYYY-MM-DD | HH:MM'}}</div>
                 <div class="Trouble"><a href="#"><span class="fa fa-question-circle"></span> Troubleshooting Guide</a></div>
 
             </div>
@@ -33,66 +33,16 @@
         <ngb-panel title="ALERT SUMMARY" class="HeaderLink">
             <ng-template ngbPanelContent>
                 <div class="AlertSummary">
-                    <!--Alert Instance-->
+                    <div *ngFor="let alert of case.value.alertSummary" class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
+                        <div class="AlertContainer"><div class="Alert{{alert.type}}"></div></div>
+                        <div class="AlertCopy"><div>{{alert.time | amDateFormat:'YYYY-MM-DD | HH:MM'}} {{alert.message}}</div></div>
+                    </div>
+                    <!--Alert Instance
                     <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
                         <div class="AlertContainer"><div class="AlertRed"></div></div>
-                        <div class="AlertCopy"><div>[timestamp] [alert info] [plevel change, etc.]</div>
+                        <div class="AlertCopy"><div>[timestamp] [alert info] [plevel change, etc.]</div></div>
                     </div>
-                    </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer"><div class="AlertRed"></div></div>
-                        <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                    </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertRed"></div>
-                        </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer"><div class="AlertWhite"></div></div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertYellow"></div>
-                        </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertWhite"></div>
-                        </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertRed"></div>
-                        </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertRed"></div>
-                        </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertYellow"></div>
-                            </div>
-                            <div class="AlertCopy"><span>[timestamp] [alert info] [plevel change, etc.]</span></div>
-                        </div>
-
-
+                    -->
                 </div>
             </ng-template>
         </ngb-panel>
@@ -122,10 +72,7 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        <div class="col-10 Timeline">
-            
-                        Timeline goes here
-              
+        <div class="col-10 Timeline">                          
         </div>
     </div>
         <footer-menu></footer-menu>

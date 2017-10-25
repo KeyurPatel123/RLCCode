@@ -7,6 +7,7 @@ import { DOCUMENT } from '@angular/common';
 import { AuthGuard } from "./shared/authguard.service";
 import { AuthenticationService } from "./shared/authentication.service";
 import { StorageService } from "./shared/storage.service";
+import { MomentModule } from 'angular2-moment';
 import { AgmCoreModule } from '@agm/core';
 import { CaseService } from "./shared/case.service";
 import { InstitutionService } from "./shared/institution.service";
@@ -20,6 +21,7 @@ import { InstitutionService } from "./shared/institution.service";
         FormsModule,
         ReactiveFormsModule,
         NgbModule.forRoot(),
+        MomentModule,
         AgmCoreModule.forRoot({
             apiKey: 'AIzaSyBcQ2QU5FUJS9r3zoGIiSxskY0kqWLtycc'
         }),        

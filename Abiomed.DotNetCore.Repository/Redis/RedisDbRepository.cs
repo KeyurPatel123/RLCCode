@@ -137,9 +137,10 @@ namespace Abiomed.DotNetCore.Repository
 
         #region String
 
-        public async Task StringSetAsync(string key, T data)
+        public async Task StringSetAsync(string key, T data, bool rawKey = false)
         {
-            key = GenerateKey(key);
+            if (!rawKey)
+                key = GenerateKey(key);
 
             byte[] bytes;
             using (var stream = new MemoryStream())
@@ -151,9 +152,10 @@ namespace Abiomed.DotNetCore.Repository
             await _db.StringSetAsync(key, bytes);
         }
 
-        public void StringSet(string key, T data)
+        public void StringSet(string key, T data, bool rawKey = false)
         {
-            key = GenerateKey(key);
+            if(!rawKey)
+                key = GenerateKey(key);
 
             byte[] bytes;
             using (var stream = new MemoryStream())
@@ -165,10 +167,19 @@ namespace Abiomed.DotNetCore.Repository
             _db.StringSet(key, bytes);
         }
 
-        public async Task StringSetAsync(string key, string JSON)
+        public async Task StringSetAsync(string key, string JSON, bool rawKey = false)
         {
-            key = GenerateKey(key);
+            if (!rawKey)
+                key = GenerateKey(key);
             await _db.StringSetAsync(key, JSON);
+        }
+
+        public void StringSet(string key, string JSON, bool rawKey = false)
+        {
+            if (!rawKey)
+                key = GenerateKey(key);
+
+            _db.StringSet(key, JSON);
         }
 
         public IEnumerable<RedisKey> GetKeys()
@@ -182,7 +193,7 @@ namespace Abiomed.DotNetCore.Repository
             _db.StringSet(key, JSON);
         }
 
-        public async Task<T> StringGetAsync(string key)
+        public async Task<T> StringGetAsync(string key, bool rawKey = false)
         {
             T returnObject = default(T);
             key = GenerateKey(key);
@@ -199,7 +210,18 @@ namespace Abiomed.DotNetCore.Repository
             return returnObject;
         }
 
-        public T StringGet(string key)
+        public async Task<string> StringGetBaseAsync(string key, bool rawKey = false)
+        {
+            string returnObject = string.Empty;
+            if(!rawKey)
+                key = GenerateKey(key);
+
+            returnObject = await _db.StringGetAsync(key);
+            return returnObject;
+        }
+        
+
+        public T StringGet(string key, bool rawKey = false)
         {
             T returnObject = default(T);
             key = GenerateKey(key);

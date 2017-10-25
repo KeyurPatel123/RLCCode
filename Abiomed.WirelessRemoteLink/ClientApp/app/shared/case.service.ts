@@ -18,7 +18,7 @@ export class CaseService implements OnDestroy {
             this.GetCasesServer();
         }, 10000);
         this.GetCasesServer();
-    }    
+    }
 
     ngOnDestroy(): void {
         clearInterval(this.caseTimer);
@@ -40,7 +40,10 @@ export class CaseService implements OnDestroy {
         return this.activeCases;
     }
 
-    GetActiveCase(pumpSerial:string) {
-
+    GetActiveCase(pumpSerial: string) {
+        var activeCase;
+        if (this.activeCases !== undefined)
+            activeCase = this.activeCases.find(x => x.value.pumpSerialNumber == pumpSerial);
+        return activeCase;
     }
 }

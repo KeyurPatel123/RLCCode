@@ -18,13 +18,14 @@ namespace Abiomed.DotNetCore.Models
         public Alarm Alarm1 { get; set; }
         public Alarm Alarm2 { get; set; }
         public Alarm Alarm3 { get; set; }
-        public List<Tuple<DateTime, Alarm, Alarm, Alarm>> AlarmHistory { get; set; }
+        public List<Tuple<DateTime, Alarm>> AlarmHistory { get; set; }
         public ImpellaFlow ImpellaFlow { get; set; } = new ImpellaFlow();
         public List<Tuple<DateTime, ImpellaFlow>> ImpellaFlowHistory {get;set;}
         public DateTime ConnectionStartUtc { get; set; } = DateTime.MinValue;
         public DateTime LastActiveUtc { get; set; } = DateTime.MinValue;
         public DateTime LastUpdateUtc { get; set; } = DateTime.MinValue;
         public bool Updated { get; set; } = false;
+        public List<AlertSummary> AlertSummary { get; set; }
     }
 
     [Serializable]
@@ -46,5 +47,13 @@ namespace Abiomed.DotNetCore.Models
     public class RemoteLinkCases
     {
         public ConcurrentDictionary<string, Case> Cases = new ConcurrentDictionary<string, Case>();
+    }
+
+    [Serializable]
+    public class AlertSummary
+    {
+        public string Type { get; set; } = string.Empty;
+        public DateTime Time { get; set; } = DateTime.MinValue;
+        public string Message { get; set; } = string.Empty;
     }
 }

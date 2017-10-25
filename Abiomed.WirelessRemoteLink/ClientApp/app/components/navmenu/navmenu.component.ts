@@ -20,10 +20,15 @@ export class NavMenuComponent implements OnInit {
 
         if (this.role === "ADMIN")
         {
-            var temp = new NavMenuLink();
-            temp.name = "Admin";
-            temp.link = "/admin"
-            this.links.push(temp);
+            var Admin = new NavMenuLink();
+            Admin.name = "Admin";
+            Admin.link = "/admin"
+            this.links.push(Admin);
+
+            var DeviceManagement = new NavMenuLink();
+            DeviceManagement.name = "Device Management";
+            DeviceManagement.link = "/device-management";
+            this.links.push(DeviceManagement);
         }
     }
 
