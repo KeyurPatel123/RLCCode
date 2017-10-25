@@ -32,24 +32,12 @@
     <ngb-accordion [closeOthers]="true" #acc="ngbAccordion" activeIds="ngb-panel-0">
         <ngb-panel title="ALERT SUMMARY" class="HeaderLink">
             <ng-template ngbPanelContent>
+                <!--Alert Instance-->
                 <div class="AlertSummary">
                     <div *ngFor="let alert of case.value.alertSummary" class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
                         <div class="AlertContainer"><div class="Alert{{alert.type}}"></div></div>
                         <div class="AlertCopy"><div>{{alert.time | amDateFormat:'YYYY-MM-DD | HH:MM'}} {{alert.message}}</div></div>
-                    <!--Alert Instance-->
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer">
-                            <div class="AlertP"></div>
-                             
-                        </div>
-                        <div class="AlertCopy"><div>[timestamp] [alert info] [plevel change, etc.]</div>
-                    </div>
-                    <!--Alert Instance
-                    <div class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
-                        <div class="AlertContainer"><div class="AlertRed"></div></div>
-                        <div class="AlertCopy"><div>[timestamp] [alert info] [plevel change, etc.]</div></div>
-                    </div>
-                    -->
+                    </div>           
                 </div>
             </ng-template>
         </ngb-panel>
