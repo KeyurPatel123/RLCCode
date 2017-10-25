@@ -27,9 +27,10 @@ namespace Abiomed.DotNetCore.Business
         private const string PlacementSignalKeyword = "Placement";
         private const string MotorCurrentKeyword = "Motor";
         private const string ImpellaFlowKeyword = "Impella Flow";
-        private const string PurgeFlowKeyword = "Purge Flow:";
-        private const string PurgePressureKeyword = "Purge Pressure:";
-        private const string PurgePlacementKeyword = "Purge Placement:";
+        private const string PurgeFlowKeyword = "Purge Flow";
+        private const string PurgePressureKeyword = "Purge Pressure";
+        private const string AlarmStartKeyword = "_ALARMSTART_";
+        private const string ImpellaFlowValidationFormat = "0.0";
         private const string MaxKeyword = "Max";
         private const string MinKeyword = "Min";
         private const string AicKeyword = "AIC";
@@ -43,14 +44,17 @@ namespace Abiomed.DotNetCore.Business
         private const string _ocrUrl = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyCAxnddJZfxRoQ0M0avm9nvaRrZrlAOyvQ";
         private const string _ocrContentType = "application/json; charset=utf-8";
         private const string _ocrJsonPackagePart1 = "{\"requests\":[ {\"image\":{\"content\":\"";
-        private const string _ocrJsonPackagePart2 =  "\"},\"features\":[{\"type\":\"DOCUMENT_TEXT_DETECTION\", \"maxResults\":1}]}]}";
+        private const string _ocrJsonPackagePart2 = "\"},\"features\":[{\"type\":\"DOCUMENT_TEXT_DETECTION\", \"maxResults\":1}]}]}";
         private List<string> _impellaPumpTypes;
+        private List<string> _aicSerialNumberPrefix;
         private Dictionary<string, string> _headerReplacements;
         private Dictionary<string, string> _generalReplacements;
         private Dictionary<string, string> _placementReplacements;
         private Dictionary<string, string> _motorReplacements;
         private Dictionary<string, string> _purgePressureReplacements;
         private Dictionary<string, string> _impellaFlowReplacements;
+        private Dictionary<string, string> _numericFieldReplacements;
+        private List<string> _performanceLevelValidationValues;
         private Point _alarm1Point;
         private Point _alarm2Point;
         private Point _alarm3Point;
@@ -74,6 +78,7 @@ namespace Abiomed.DotNetCore.Business
         #endregion
 
         #region Public Methods 
+
         public async Task<List<string>> GetLiveStreamsAsync()
         {
             var stringTaskResult = await _httpClient.GetStringAsync(_liveStreamUrl);
@@ -124,26 +129,7 @@ namespace Abiomed.DotNetCore.Business
 
         #region Private Methods 
 
-        private string DetermineAlarmCode(MagickImage image, Point point)
-        {
-            var alarmColor = new MagickColor(image.GetPixels().GetPixel(point.X, point.Y).ToColor().ToString());
-            if (_alarmCodeRed.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
-            {
-                return AlarmCodes.Red.ToString();
-            }
-
-            if (_alarmCodeYellow.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
-            {
-                return AlarmCodes.Yellow.ToString();
-            }
-
-            if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
-            {
-                return AlarmCodes.White.ToString();
-            }
-
-            return AlarmCodes.Blank.ToString();
-        }
+        #region OCR Worker
 
         private byte[] ApplyMaskToImage(byte[] thumbnail)
         {
@@ -161,7 +147,7 @@ namespace Abiomed.DotNetCore.Business
             {
                 byte[] rawImage = await _httpClient.GetByteArrayAsync(string.Format(_thumbnailUrl, serialNumber));
                 imageToOcr = new MagickImage(applyMaskToImage ? ApplyMaskToImage(rawImage) : rawImage);
- 
+
                 if (_ocrDebugMode)
                 {
                     var raw = new MagickImage(rawImage);
@@ -208,7 +194,7 @@ namespace Abiomed.DotNetCore.Business
             var streamReader = new StreamReader(httpResponse.GetResponseStream());
             var jsonText = JObject.Parse(streamReader.ReadToEnd());
 
-           return ParseOcrResponse(serialNumber, batchStartTimeUtc, jsonText["responses"][0]["fullTextAnnotation"]["text"].ToString());
+            return ParseOcrResponse(serialNumber, batchStartTimeUtc, jsonText["responses"][0]["fullTextAnnotation"]["text"].ToString());
         }
 
         private OcrResponse SetException(string serialNumber, DateTime batchStartTimeUtc, string exceptionText)
@@ -241,37 +227,6 @@ namespace Abiomed.DotNetCore.Business
             return ocrResponse;
         }
 
-        private string GetTextFrom(string text, string beginParseKey)
-        {
-            string result = string.Empty;
-
-            int beginPosition = text.IndexOf(beginParseKey);
-            if (beginPosition > 0)
-            {
-                result = text.Substring(beginPosition + beginParseKey.Length);
-            }
-
-            return result;
-        }
-
-        private string GetTextBetween(string text, string beginParseKey, string endParseKey)
-        {
-            string result = string.Empty;
-
-            int beginPosition = text.IndexOf(beginParseKey);
-            if (beginPosition > 0)
-            {
-                int beginPositionOffset = beginPosition + beginParseKey.Length;
-                int endPosition = text.Substring(beginPosition + beginParseKey.Length).IndexOf(endParseKey);
-                if (endPosition > 0)
-                {
-                    result = text.Substring(beginPositionOffset, endPosition);
-                }
-            }
-
-            return result;
-        }
-
         private bool ProcessPlacementSignalScreen(OcrResponse ocrResponse)
         {
             bool processPlacementSignalScreen = false;
@@ -280,85 +235,67 @@ namespace Abiomed.DotNetCore.Business
                 int placementSignalTextStartPosition = ocrResponse.RawMessage.IndexOf(PlacementSignalKeyword);
                 if (placementSignalTextStartPosition > 0)
                 {
-                   //ocrResponse.RawMessage = "5.0 SN: 122409\nAIC SN: IC1023 AIC ng TAF V7 RC 4\nZZ\nZZ\nPlacement\n49-51\nP-1\nMotor\n7/62\nImpella Flow\n0.5 Max\n0.4 Min\n0.5\nPurge Flow: 18.7 ml/\nPurge Pressure: 398 mn\n100%\n";
-                    int messageLengthBuffer = ocrResponse.RawMessage.Length * 2;
-                    StringBuilder message = new StringBuilder(ocrResponse.RawMessage, messageLengthBuffer);
+                    var messages = GetMessageSegments(ocrResponse.RawMessage);
 
-                    string plainMessage = StandardizeMessageFormat(message, _generalReplacements);
-                    placementSignalTextStartPosition = plainMessage.IndexOf(PlacementSignalKeyword);
-
-                    ocrResponse.ScreenName = ScreenName.PlacementSignal.ToString();
-                    processPlacementSignalScreen = true;
-
-                    bool foundAlarmSection = true;
-                    int endOfHeaderSection = plainMessage.IndexOf("ZZ");
-                    if (endOfHeaderSection < 0)
-                    {
-                        endOfHeaderSection = placementSignalTextStartPosition;
-                        foundAlarmSection = false;
-                    }
-
-                    var headerSection = GetHeaderSection(new StringBuilder(plainMessage.Substring(0, endOfHeaderSection).Trim(), messageLengthBuffer));
+                    // Get Header 
+                    var headerSection = GetHeaderSection(messages[0]);
                     ocrResponse.PumpType = headerSection.Item1;
                     ocrResponse.PumpSerialNumber = headerSection.Item2;
                     ocrResponse.AicSerialNumber = headerSection.Item3;
                     ocrResponse.AicSoftwareVersion = headerSection.Item4;
                     ocrResponse.IsDemo = ocrResponse.PumpSerialNumber.StartsWith('6') ? "true" : "false";
+                    ocrResponse.ScreenName = ScreenName.PlacementSignal.ToString();
 
-                    if (foundAlarmSection)
-                    {
-                        var alarms = GetAlarmSection(plainMessage.Substring(endOfHeaderSection + 2, placementSignalTextStartPosition - (endOfHeaderSection + 2)).Trim());
-                        ocrResponse.Alarm1Message = alarms.Item1;
-                        ocrResponse.Alarm2Message = alarms.Item2;
-                        ocrResponse.Alarm3Message = alarms.Item3;
-                    }
+                    // Get Alarms 
+                    ocrResponse.Alarm1Message = string.Join(" ", messages[1].ToArray()).Trim();
+                    ocrResponse.Alarm2Message = string.Join(" ", messages[2].ToArray()).Trim();
+                    ocrResponse.Alarm3Message = string.Join(" ", messages[3].ToArray()).Trim();
 
-                    var placementSignal = GetPlacementSignal(new StringBuilder(GetTextBetween(plainMessage, PlacementSignalKeyword, MotorCurrentKeyword).Trim(), messageLengthBuffer));
+                    // Get Placement
+                    var placementSignal = GetPlacementSignal(messages[4]);
                     ocrResponse.PlacementSignalSystole = placementSignal.Item1;
                     ocrResponse.PlacementSignalDistole = placementSignal.Item2;
                     ocrResponse.PlacementSignalAverage = placementSignal.Item3;
                     ocrResponse.PerformanceLevel = placementSignal.Item4;
 
-                    var motorCurrent = GetMotorCurrent(new StringBuilder(GetTextBetween(plainMessage, MotorCurrentKeyword, ImpellaFlowKeyword).Trim(), messageLengthBuffer));
+                    // Get Motor Current
+                    var motorCurrent = GetMotorCurrent(messages[5]);
                     ocrResponse.MotorCurrentSystole = motorCurrent.Item1;
                     ocrResponse.MotorCurrentDistole = motorCurrent.Item2;
                     ocrResponse.MotorCurrentAverage = motorCurrent.Item3;
 
-                    var impellaFlowSection = GetImpellaFlowSection(new StringBuilder(GetTextBetween(plainMessage, ImpellaFlowKeyword, PurgeFlowKeyword).Trim(), messageLengthBuffer), out bool foundFlowMin);
+                    // Get Impella Flow 
+                    var impellaFlowSection = GetImpellaFlowSection(messages[6]);
                     ocrResponse.FlowRateMax = impellaFlowSection.Item1;
                     ocrResponse.FlowRateMin = impellaFlowSection.Item2;
                     ocrResponse.FlowRateAverage = impellaFlowSection.Item3;
 
-                    ocrResponse.PurgeFlow = GetPurgeFlowSection(GetTextBetween(plainMessage, PurgeFlowKeyword, PurgePressureKeyword).Trim());
+                    // Get Purge Flow 
+                    ocrResponse.PurgeFlow = GetPurgeFlowSection(messages[7]);
 
-                    var purgePressureToEndSection = GetPurgePressureToEndSection(new StringBuilder(GetTextFrom(plainMessage, PurgePressureKeyword), messageLengthBuffer), foundFlowMin);
-                    ocrResponse.Battery = purgePressureToEndSection.Item1;
+                    // Get Purge Pressure
+                    bool foundFlowMin = !string.IsNullOrWhiteSpace(ocrResponse.FlowRateMin);
+                    var purgePressureSection = GetPurgePressureSection(messages[8], foundFlowMin);
+                    ocrResponse.Battery = purgePressureSection.Item1;
                     if (!foundFlowMin)
                     {
-                        ocrResponse.FlowRateMin = purgePressureToEndSection.Item2;
+                        ocrResponse.FlowRateMin = purgePressureSection.Item2;
                     }
+                    ocrResponse.PurgePressure = purgePressureSection.Item3;
+                    processPlacementSignalScreen = true;
 
-                    ocrResponse.PurgePressure = purgePressureToEndSection.Item3;
+                    ValidateOcrResponse(ocrResponse);
                 }
-            } catch(Exception EX)
+            } catch (Exception EX)
             {
                 var xxx = EX.Message; // TODO Remove - for working/tweaking the OCR porocessing.
             }
             return processPlacementSignalScreen;
         }
 
-        private string StandardizeMessageFormat(StringBuilder ocrText, Dictionary<string,string> replacements)
-        {
-            foreach (string key in replacements.Keys)
-            {
-                ocrText.Replace(key, replacements[key]);
-            }
+        #endregion
 
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex("[ ]{2,}", options);
-            return regex.Replace(ocrText.ToString(), " ").Trim();
-        }
-
+        #region Initialization
 
         private void Initialize()
         {
@@ -379,6 +316,7 @@ namespace Abiomed.DotNetCore.Business
             _motorReplacements = LoadReplacementRules("ocrreplacementsmotor");
             _purgePressureReplacements = LoadReplacementRules("ocrreplacementspurgepressure");
             _impellaFlowReplacements = LoadReplacementRules("ocrreplacementsimpellaflow");
+            _numericFieldReplacements = LoadReplacementRules("ocrreplacementsnumericfield");
             _alarm1Point = LoadAlarmPoint("ocralarm1coordinates");
             _alarm2Point = LoadAlarmPoint("ocralarm2coordinates");
             _alarm3Point = LoadAlarmPoint("ocralarm3coordinates");
@@ -387,6 +325,8 @@ namespace Abiomed.DotNetCore.Business
             _alarmCodeWhite = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodewhite"));
             _alarmCodeColorMatchTolerance = new Percentage(int.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodematchtolerance")));
             _ocrDebugMode = bool.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrdebug"));
+            _performanceLevelValidationValues = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationperformancelevel").Split('|').ToList();
+            _aicSerialNumberPrefix = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationaicserialnumber").Split('|').ToList();
         }
 
         private Point LoadAlarmPoint(string configurationName)
@@ -407,42 +347,166 @@ namespace Abiomed.DotNetCore.Business
             return dictionary;
         }
 
-        private Tuple<string,string,string> GetAlarmSection(string section)
+        #endregion
+
+        #region Cleanup Worker Methods
+
+        private Dictionary<int, List<string>> GetMessageSegments(string rawOcrResponseText)
         {
-            string alarm1 = string.Empty;
-            string alarm2 = string.Empty;
-            string alarm3 = string.Empty;
-
-            int i = 1;
-            foreach (string alarmMessage in section.Split("ZZ"))
+            Dictionary<int, List<string>> messages = new Dictionary<int, List<string>>();
+            for (int i = 0; i < 9; i++)
             {
-                switch (i)
-                {
-                    case 1:
-                        alarm1 = alarmMessage.Trim();
-                        break;
-                    case 2:
-                        alarm2 = alarmMessage.Trim();
-                        break;
-                    case 3:
-                        alarm3 = alarmMessage.Trim();
-                        break;
-                    default:
-                        alarm3 = string.Format("{0}. {1}", alarm3, alarmMessage.Trim());
-                        break;
-                }
-
-                i++;
+                messages.Add(i, new List<string>());
             }
 
-            return new Tuple<string, string, string>(alarm1, alarm2, alarm3);
+            string plainMessage = StandardizeMessageFormat(new StringBuilder(rawOcrResponseText, rawOcrResponseText.Length * 2), _generalReplacements);
+
+            // Bracket/Format the Quadrants...
+            string[] messageSegments = plainMessage.Split(new string[] { "ZZ", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            int type = 0;
+            foreach (string segment in messageSegments)
+            {
+                switch (segment)
+                {
+                    case AlarmStartKeyword:
+                        type++;
+                        break;
+                    case PlacementSignalKeyword:
+                        type = 4;
+                        break;
+                    case MotorCurrentKeyword:
+                        type = 5;
+                        break;
+                    case ImpellaFlowKeyword:
+                        type = 6;
+                        break;
+                    case PurgeFlowKeyword:
+                        type = 7;
+                        break;
+                    case PurgePressureKeyword:
+                        type = 8;
+                        break;
+                    default:
+                        messages[type].Add(segment);
+                        break;
+                }
+            }
+
+            return messages;
         }
 
+        private string StandardizeMessageFormat(StringBuilder ocrText, Dictionary<string, string> replacements)
+        {
+            foreach (string key in replacements.Keys)
+            {
+                ocrText.Replace(key, replacements[key]);
+            }
+
+            RegexOptions options = RegexOptions.None;
+            Regex regex = new Regex("[ ]{2,}", options);
+            return regex.Replace(ocrText.ToString(), " ").Trim();
+        }
+
+        private string CleanNumberField(string field)
+        {
+            return General.IsNumeric(field) ? field : StandardizeMessageFormat(new StringBuilder(field), _numericFieldReplacements);
+        }
+
+        #endregion
+
+        #region Field Processing
+
+        private string DetermineAlarmCode(MagickImage image, Point point)
+        {
+            var alarmColor = new MagickColor(image.GetPixels().GetPixel(point.X, point.Y).ToColor().ToString());
+            if (_alarmCodeRed.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
+            {
+                return AlarmCodes.Red.ToString();
+            }
+
+            if (_alarmCodeYellow.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
+            {
+                return AlarmCodes.Yellow.ToString();
+            }
+
+            if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
+            {
+                return AlarmCodes.White.ToString();
+            }
+
+            return AlarmCodes.Blank.ToString();
+        }
+
+
+        private Tuple<string, string, string, string> GetHeaderSection(List<string> headerParts)
+        {
+            string pumpType = string.Empty;
+            string pumpSerialNumber = string.Empty;
+            string aicSerialNumber = string.Empty;
+            string aicSoftwareVersion = string.Empty;
+
+            bool foundAicSection = false;
+            bool foundPumpSection = false;
+            if (headerParts.Count > 1)
+            {
+                foreach (string part in headerParts)
+                {
+                    var cleanedPart = StandardizeMessageFormat(new StringBuilder(part.ToUpper()), _headerReplacements);
+
+                    int firstAicPosition = cleanedPart.IndexOf(AicKeyword);
+                    if (!foundAicSection && firstAicPosition > -1)
+                    {
+                        aicSerialNumber = GetAicSerialNumber(cleanedPart);
+                        aicSoftwareVersion = GetAicSoftwareVersion(cleanedPart, aicSerialNumber);
+                        foundAicSection = true;
+                    }
+                    else
+                    {
+                        // Are we processing a 'Pump' or is it 'AIC'
+                        // AIC is not in the same row as the 'Pump info'
+                        if (!foundPumpSection && string.IsNullOrWhiteSpace(pumpType))
+                        {
+                            pumpType = GetPumpType(cleanedPart);
+                            pumpSerialNumber = GetPumpSerialNumber(cleanedPart);
+                        }
+
+                        foundPumpSection = (pumpSerialNumber != string.Empty || pumpType != string.Empty);
+                    }
+                }
+            }
+            else
+            {
+                var parsedHeader = GetHeaderSection(new StringBuilder(headerParts[0]));
+                pumpType = parsedHeader.Item1;
+                pumpSerialNumber = CleanNumberField(parsedHeader.Item2);
+                aicSerialNumber = parsedHeader.Item3;
+                aicSoftwareVersion = parsedHeader.Item4;
+            }
+
+            return new Tuple<string, string, string, string>(pumpType, pumpSerialNumber, aicSerialNumber, aicSoftwareVersion);
+        }
+
+        /// <summary>
+        /// Header Section is Comprised of:
+        /// - Pump Type
+        /// - Pump Serial Number
+        /// - Aic Serial Number
+        /// - Aic Software Version
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
         private Tuple<string, string, string, string> GetHeaderSection(StringBuilder section)
         {
             string ocrText = StandardizeMessageFormat(section, _headerReplacements);
             string pumpType = GetPumpType(ocrText);
             string pumpSerialNumber = string.Empty;
+
+            // The Header Section in the screen is started by the Pump Type ... 
+            // However, the way the OCR works if a 'section' has pixels that are higher it can read those first.
+            // Since we support different versions of RL the text in one section can be higher resulting in the following Results:
+            // 1) The 'Pump Type' is folllowed by 'Pump Serial Number' followed by AIC SN Folloiwed by AIC Softare then ZZ
+            // 2) The AIC SN is followed by AIC SOftware which is followed by 'Pump Type' Followed by SN: # then ZZ
 
             if (!string.IsNullOrWhiteSpace(pumpType))
             {
@@ -454,17 +518,80 @@ namespace Abiomed.DotNetCore.Business
             {
                 aicSerialNumber = string.Empty;
             }
-            string aicSoftwareVersion = GetAicSoftwareVersion(ocrText, aicSerialNumber);
 
-            return new Tuple<string, string, string, string>(pumpType, pumpSerialNumber, aicSerialNumber, aicSoftwareVersion);
+            return new Tuple<string, string, string, string>(pumpType, pumpSerialNumber, aicSerialNumber, GetAicSoftwareVersion(ocrText, aicSerialNumber));
         }
 
-        private Tuple<string, string, string> GetImpellaFlowSection(StringBuilder section, out bool foundMinValue)
+        private Tuple<string, string, string> GetImpellaFlowSection(List<string> impellaFlowParts)
         {
             string flowMax = string.Empty;
             string flowMin = string.Empty;
             string flow = string.Empty;
-            foundMinValue = false;
+
+            try
+            {
+                if (impellaFlowParts.Count == 1)
+                {
+                    var impellaFlow = GetImpellaFlowSection(new StringBuilder(impellaFlowParts[0]));
+                    flowMax = impellaFlow.Item1;
+                    flowMin = impellaFlow.Item2;
+                    flow = impellaFlow.Item3;
+                }
+                else
+                {
+                    foreach (string part in impellaFlowParts)
+                    {
+                        bool usedPart = false;
+                        string cleanedPart = StandardizeMessageFormat(new StringBuilder(part), _impellaFlowReplacements);
+
+                        // MAX 
+                        if (string.IsNullOrWhiteSpace(flowMax))
+                        {
+                            int maxPosition = cleanedPart.IndexOf(MaxKeyword);
+                            if (maxPosition > 0)
+                            {
+                                flowMax = new string(cleanedPart.Substring(0, maxPosition).Where(c => char.IsDigit(c) || c == '.').ToArray());
+                                usedPart = true;
+                            }
+                        }
+
+                        // MIN - Sometimes Min is in this section - about 50% of the time it is in Purge Pressure Section...  So we check here too.
+                        // If we find it we want to pass a flag to the caller telling them we found it so we do not check for it again
+                        if (string.IsNullOrWhiteSpace(flowMin) && !usedPart)
+                        {
+                            int minPosition = cleanedPart.IndexOf(MinKeyword);
+                            if (minPosition > 0)
+                            {
+                                flowMin = new string(cleanedPart.Substring(0, minPosition).Where(c => char.IsDigit(c) || c == '.').ToArray());
+                                usedPart = true;
+                            }
+                        }
+
+                        if (string.IsNullOrWhiteSpace(flow) && !usedPart)
+                        {
+                            // Get the flow - it is the left over string
+                            flow = new string(cleanedPart.Where(c => char.IsDigit(c) || c == '.').ToArray());
+                        }
+                    }
+                }
+            }
+            catch (Exception EX)
+            {
+                var xxx = EX.Message; // TODO Remove - for working/tweaking the OCR porocessing.
+            }
+
+            flowMax = General.FormatDouble(CleanNumberField(flowMax), ImpellaFlowValidationFormat);
+            flowMin = General.FormatDouble(CleanNumberField(flowMin), ImpellaFlowValidationFormat);
+            flow = General.FormatDouble(CleanNumberField(flow), ImpellaFlowValidationFormat);
+
+            return new Tuple<string, string, string>(flowMax, flowMin, flow);
+        }
+
+        private Tuple<string, string, string> GetImpellaFlowSection(StringBuilder section)
+        {
+            string flowMax = string.Empty;
+            string flowMin = string.Empty;
+            string flow = string.Empty;
             try
             {
                 string ocrText = StandardizeMessageFormat(section, _impellaFlowReplacements);
@@ -486,23 +613,82 @@ namespace Abiomed.DotNetCore.Business
                     flowMin = new string(ocrText.Substring(0, minPosition).Where(c => char.IsDigit(c) || c == '.').ToArray());
                     int fieldLength = minPosition + MinKeyword.Length + 1;
                     ocrText = fieldLength >= ocrText.Length ? string.Empty : ocrText.Substring(fieldLength);
-                    foundMinValue = true;
                 }
 
                 // Get the flow - it is the left over string
                 flow = new string(ocrText.Where(c => char.IsDigit(c) || c == '.').ToArray());
             }
-            catch(Exception EX)
+            catch (Exception EX)
             {
                 var xxx = EX.Message; // TODO Remove - for working/tweaking the OCR porocessing.
             }
 
-            return new Tuple<string, string, string>(flowMax, flowMin, flow);
+            return new Tuple<string, string, string>(CleanNumberField(flowMax), CleanNumberField(flowMin), CleanNumberField(flow));
         }
 
-        private string GetPurgeFlowSection(string ocrText)
+        private string GetPurgeFlowSection(List<string> purgeFlowParts)
         {
-            return new string(ocrText.Where(c => char.IsDigit(c) || c == '.').ToArray());
+            string purgeFlow = string.Empty;
+            foreach (string part in purgeFlowParts)
+            {
+                purgeFlow = new string(part.Where(c => char.IsDigit(c) || c == '.').ToArray());
+                break;
+            }
+
+            return purgeFlow;
+        }
+
+        private Tuple<string, string, string> GetPurgePressureSection(List<string> purgePressureParts, bool hasFlowMinBeenFound)
+        {
+            string flowMin = string.Empty;
+            string purgePressure = string.Empty;
+            string battery = string.Empty;
+
+            if (purgePressureParts.Count == 1)
+            {
+                var purgePressureResults = GetPurgePressureToEndSection(new StringBuilder(purgePressureParts[0]), hasFlowMinBeenFound);
+                battery = purgePressureResults.Item1;
+                flowMin = purgePressureResults.Item2;
+                purgePressure = purgePressureResults.Item3;
+            }
+            else
+            {
+                foreach (string part in purgePressureParts)
+                {
+                    bool usedPart = false;
+                    string cleanedPart = StandardizeMessageFormat(new StringBuilder(part), _purgePressureReplacements);
+
+                    // Check For Flow Min
+                    if (!hasFlowMinBeenFound && string.IsNullOrWhiteSpace(flowMin))
+                    {
+                        int minPosition = cleanedPart.IndexOf(MinKeyword);
+                        if (minPosition > -1)
+                        {
+                            flowMin = cleanedPart.Substring(0, minPosition).Trim();
+                            usedPart = true;
+                        }
+                    }
+
+                    // Battery
+                    if (!usedPart && string.IsNullOrEmpty(battery))
+                    {
+                        int percentPosition = cleanedPart.IndexOf('%');
+                        if (percentPosition > 0)
+                        {
+                            battery = cleanedPart.Substring(0, percentPosition).Trim();
+                            usedPart = true;
+                        }
+                    }
+
+                    // Purge Pressure (if it is not one of the above - then assume)
+                    if (!usedPart && string.IsNullOrWhiteSpace(purgePressure))
+                    {
+                        purgePressure = new string(cleanedPart.Where(c => char.IsDigit(c) || c == '.').ToArray());
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(CleanNumberField(battery), CleanNumberField(flowMin), CleanNumberField(purgePressure));
         }
 
         private Tuple<string, string, string> GetPurgePressureToEndSection(StringBuilder section, bool hasFlowMinBeenFound)
@@ -536,18 +722,19 @@ namespace Abiomed.DotNetCore.Business
             }
 
             purgePressure = new string(ocrText.Where(c => char.IsDigit(c) || c == '.').ToArray());
-            return new Tuple<string, string, string>(battery, flowMin, purgePressure);
+            return new Tuple<string, string, string>(CleanNumberField(battery), CleanNumberField(flowMin), CleanNumberField(purgePressure));
         }
 
         private string GetPumpType(string ocrText)
         {
             string result = string.Empty;
 
-            foreach(string pumpType in _impellaPumpTypes)
+            foreach (string pumpType in _impellaPumpTypes)
             {
                 if (ocrText.StartsWith(pumpType))
                 {
-                    result = pumpType;
+                    int endPosition = ocrText.Substring(pumpType.Length).IndexOf("SN:");
+                    result = endPosition > -1 ? ocrText.Substring(0, endPosition + pumpType.Length).Trim() : pumpType;
                     break;
                 }
             }
@@ -571,43 +758,40 @@ namespace Abiomed.DotNetCore.Business
                 else
                 {
                     endPos = workString.IndexOf(' ');
-                    if (endPos > 0)
-                    {
-                        result = workString.Substring(0, endPos);
-                    }
-                    else
-                    {
-                        result = new string(ocrText.Where(c => char.IsDigit(c)).ToArray());
-                    }
+                    result = endPos > 0 ? workString.Substring(0, endPos) : workString;
                 }
             }
             else
             {
-                int spacePos = ocrText.IndexOf(' ') + 1;
-                if (spacePos > 0)
-                {
-                    result = ocrText.Substring(0, startPos).Trim();
-                }
-                else // There are no other strings...
-                {
-                    result = new string(ocrText.Where(c => char.IsDigit(c)).ToArray());
-                }
+                result = ocrText.IndexOf(' ') + 1 > 0 ? ocrText.Substring(0, startPos).Trim() : new string(ocrText.Where(c => char.IsDigit(c)).ToArray());
             }
 
-            return result;
+            return CleanNumberField(result);
         }
 
         private string GetAicSerialNumber(string ocrText)
         {
             string result = string.Empty;
-            int startPos = ocrText.IndexOf(AicSnKeyword) + AicSnKeyword.Length+1;
+            int startPos = ocrText.IndexOf(AicSnKeyword) + AicSnKeyword.Length + 1;
 
-            if (startPos > AicSnKeyword.Length + 1)
+            if (startPos >= AicSnKeyword.Length + 1)
             {
                 int endPos = ocrText.Substring(startPos).IndexOf(AicKeyword);
                 if (endPos > 0)
                 {
                     result = ocrText.Substring(startPos, endPos).Trim();
+                }
+            }
+
+            if (_aicSerialNumberPrefix.Contains(result.Substring(0, 2)))
+            {
+                if (!General.IsNumeric(result.Substring(2)))
+                {
+                    string cleanResult = CleanNumberField(result.Substring(2));
+                    if (General.IsNumeric(cleanResult))
+                    {
+                        result = string.Format("{0}{1}", result.Substring(0, 2), cleanResult);
+                    }
                 }
             }
 
@@ -634,6 +818,65 @@ namespace Abiomed.DotNetCore.Business
             return result;
         }
 
+        private Tuple<string, string, string, string> GetPlacementSignal(List<string> parts)
+        {
+            string systole = string.Empty;
+            string distole = string.Empty;
+            string average = string.Empty;
+            string pLevel = string.Empty;
+
+            if (parts.Count > 1)
+            {
+                foreach (string part in parts)
+                {
+                    string cleanedPart = StandardizeMessageFormat(new StringBuilder(part), _placementReplacements);
+                    bool usedPart = false;
+
+                    // Is Systole/Distole Part - it has a '/'
+                    if (string.IsNullOrWhiteSpace(systole))
+                    {
+                        int slash = cleanedPart.IndexOf('/');
+                        if (slash > 0)
+                        {
+                            systole = cleanedPart.Substring(0, slash);
+                            distole = cleanedPart.Substring(slash + 1);
+                            usedPart = true;
+                        }
+                    }
+
+                    // Is the Average - has a '('
+                    if (string.IsNullOrWhiteSpace(average) && !usedPart)
+                    {
+                        int openParenthesisPosition = cleanedPart.IndexOf('(');
+                        if (openParenthesisPosition > -1)
+                        {
+                            average = new string(cleanedPart.Where(c => char.IsDigit(c)).ToArray());
+                            usedPart = true;
+                        }
+                    }
+
+                    // Performance Level - All But Above...
+                    if (!usedPart)
+                    {
+                        pLevel = DeterminePLevelValue(cleanedPart, pLevel, parts.Count);
+                    }
+                }
+            }
+            else
+            {
+                if (parts.Count == 1)
+                {
+                    var placementSignal = GetPlacementSignal(new StringBuilder(parts[0]));
+                    systole = placementSignal.Item1;
+                    distole = placementSignal.Item2;
+                    average = placementSignal.Item3;
+                    pLevel = placementSignal.Item4;
+                }
+            }
+
+            return new Tuple<string, string, string, string>(CleanNumberField(systole), CleanNumberField(distole), CleanNumberField(average), pLevel.Replace('.', '-'));
+        }
+
         private Tuple<string, string, string, string> GetPlacementSignal(StringBuilder section)
         {
             string systole = string.Empty;
@@ -646,7 +889,6 @@ namespace Abiomed.DotNetCore.Business
             // Get the string between 'Placement Signal' And 'Motor Current'
             // This may Contain (in any order - well for the p-n) and may be missing average
             //   - systole/distole (average) P-n
-
             string[] pieces = ocrText.Trim().Split();
             foreach (string piece in pieces)
             {
@@ -660,32 +902,132 @@ namespace Abiomed.DotNetCore.Business
                 {
                     if (piece.Length > 0)
                     {
-                        switch (piece.Substring(0, 1))
+                        switch (piece.ToUpper())
                         {
-                            case "P":
-                                pLevel = string.IsNullOrWhiteSpace(pLevel) ? piece : piece + pLevel;
-                                break;
-                            case ".":
-                            case "-":
-                                if (pieces.Length > 1)
-                                {
-                                    if (piece.Substring(1).IndexOf('-') == -1)
-                                    {
-                                        pLevel += piece;
-                                    }
-                                }
-                                break;
-                            case "(":
-                                average = new string(piece.Where(c => char.IsDigit(c)).ToArray());
+                            case "AUTO":
+                            case "BOOST":
+                            case "OFF":
+                                pLevel = piece;
                                 break;
                             default:
+                                switch (piece.Substring(0, 1).ToUpper())
+                                {
+                                    case "P":
+                                        pLevel = string.IsNullOrWhiteSpace(pLevel) ? piece : piece + pLevel;
+                                        break;
+                                    case ".":
+                                    case "-":
+                                        if (pieces.Length > 1)
+                                        {
+                                            if (piece.Substring(1).IndexOf('-') == -1)
+                                            {
+                                                pLevel += piece;
+                                            }
+                                        }
+                                        break;
+                                    case "(":
+                                        average = new string(piece.Where(c => char.IsDigit(c)).ToArray());
+                                        break;
+                                    default:
+                                        break;
+                                }
                                 break;
                         }
                     }
                 }
             }
 
-            return new Tuple<string, string, string, string>(systole, distole, average, pLevel.Replace('.','-'));
+            return new Tuple<string, string, string, string>(CleanNumberField(systole), CleanNumberField(distole), CleanNumberField(average), pLevel.Replace('.', '-'));
+        }
+
+        private string DeterminePLevelValue(string stringToEvaluate, string currentPLevelValue, int size)
+        {
+            string pLevel = string.Empty;
+
+            if (stringToEvaluate.Length > 0)
+            {
+                string piece = stringToEvaluate.ToUpper();
+                switch (piece)
+                {
+                    case "AUTO":
+                    case "BOOST":
+                    case "OFF":
+                        pLevel = piece;
+                        break;
+                    default:
+                        switch (piece.Substring(0, 1).ToUpper())
+                        {
+                            case "P":
+                                pLevel = string.IsNullOrWhiteSpace(pLevel) ? piece : piece + pLevel;
+                                break;
+                            case ".":
+                            case "-":
+                                if (size > 1)
+                                {
+                                    if (stringToEvaluate.Substring(1).IndexOf('-') == -1)
+                                    {
+                                        pLevel += piece;
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            return pLevel;
+        }
+
+        private Tuple<string, string, string> GetMotorCurrent(List<string> parts)
+        {
+            string systole = string.Empty;
+            string distole = string.Empty;
+            string average = string.Empty;
+
+            if (parts.Count > 1)
+            {
+                foreach (string part in parts)
+                {
+                    string cleanedPart = StandardizeMessageFormat(new StringBuilder(part), _motorReplacements);
+                    bool usedPart = false;
+
+                    // Is Systole/Distole Part - it has a '/'
+                    if (string.IsNullOrWhiteSpace(systole))
+                    {
+                        int slash = part.IndexOf('/');
+                        if (slash > 0)
+                        {
+                            systole = part.Substring(0, slash);
+                            distole = part.Substring(slash + 1);
+                            usedPart = true;
+                        }
+                    }
+
+                    // get the average
+                    if (string.IsNullOrWhiteSpace(average) && !usedPart)
+                    {
+                        int openParenthesisPosition = part.IndexOf('(');
+                        if (openParenthesisPosition > -1)
+                        {
+                            average = new string(part.Where(c => char.IsDigit(c)).ToArray());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (parts.Count == 1)
+                {
+                    var motorCurrent = GetMotorCurrent(new StringBuilder(parts[0]));
+                    systole = motorCurrent.Item1;
+                    distole = motorCurrent.Item2;
+                    average = motorCurrent.Item3;
+                }
+            }
+
+            return new Tuple<string, string, string>(CleanNumberField(systole), CleanNumberField(distole), CleanNumberField(average));
         }
 
         private Tuple<string, string, string> GetMotorCurrent(StringBuilder section)
@@ -713,13 +1055,13 @@ namespace Abiomed.DotNetCore.Business
                     {
                         if (pieces.Length > 1)
                         {
-                            average = new string(piece.Where(c => char.IsDigit(c)).ToArray());
+                            average = (new string(piece.Where(c => char.IsDigit(c)).ToArray()));
                         }
                     }
                 }
             }
 
-            return new Tuple<string, string, string>(systole, distole, average);
+            return new Tuple<string, string, string>(CleanNumberField(systole), CleanNumberField(distole), CleanNumberField(average));
         }
 
         private string GetBattery(string ocrText)
@@ -753,8 +1095,62 @@ namespace Abiomed.DotNetCore.Business
                 }
             }
 
-            return battery;
+            return CleanNumberField(battery);
         }
+
+        #endregion
+
+        #region Validation
+        private void ValidateOcrResponse(OcrResponse ocrResponse)
+        {
+            ocrResponse.Result.PumpTypeValid = !string.IsNullOrEmpty(ocrResponse.PumpType);
+            ocrResponse.Result.PumpSerialNumberValid = IsValidPumpSerialNumber(ocrResponse.PumpSerialNumber);
+            ocrResponse.Result.AicSerialNumberValid = IsValidAicSerialNumber(ocrResponse.AicSerialNumber);
+            ocrResponse.Result.PerformanceLevelValid = IsValidPerformanceLevel(ocrResponse.PerformanceLevel);
+            ocrResponse.Result.FlowRateMaxValid = General.IsValidDouble(ocrResponse.FlowRateMax);
+            ocrResponse.Result.FlowRateMinValid = General.IsValidDouble(ocrResponse.FlowRateMin);
+            ocrResponse.Result.FlowRateAverageValid = General.IsValidDouble(ocrResponse.FlowRateAverage);
+
+            ocrResponse.Result.Success = (ocrResponse.Result.PumpTypeValid &&
+                                            ocrResponse.Result.PumpSerialNumberValid &&
+                                            ocrResponse.Result.AicSerialNumberValid &&
+                                            ocrResponse.Result.PerformanceLevelValid &&
+                                            ocrResponse.Result.FlowRateMaxValid &&
+                                            ocrResponse.Result.FlowRateMinValid &&
+                                            ocrResponse.Result.FlowRateAverageValid);
+
+        }
+
+        private bool IsValidPumpSerialNumber(string pumpSerialNumber)
+        {
+            return (pumpSerialNumber.Length < 7 && int.TryParse(pumpSerialNumber, out int n));
+        }
+
+        private bool IsValidPerformanceLevel(string performanceLevel)
+        {
+            if (_performanceLevelValidationValues.Contains(performanceLevel))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsValidAicSerialNumber(string aicSerialNumber)
+        {
+            if (aicSerialNumber.Length == 6)
+            {
+                if (_aicSerialNumberPrefix.Contains(aicSerialNumber.Substring(0, 2)))
+                {
+                    if (int.TryParse(aicSerialNumber.Substring(2), out int n))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        #endregion  
 
         #endregion
     }

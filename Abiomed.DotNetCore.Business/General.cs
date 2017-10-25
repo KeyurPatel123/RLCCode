@@ -31,6 +31,36 @@ namespace Abiomed.DotNetCore.Business
             return hex.ToString();
         }
 
+        public static bool IsNumeric(string value)
+        {
+            return int.TryParse(value, out var n);
+        }
+
+        public static bool IsValidDouble(string value, double max = 9.9, double min = 0.0)
+        {
+            bool result = false;
+            if (double.TryParse(value, out var f))
+            {
+                if (f >= min && f <= max)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
+        public static string FormatDouble(string value, string format)
+        {
+            string formattedValue = value;
+            if (General.IsValidDouble(value))
+            {
+                formattedValue = double.Parse(value).ToString(format);
+            }
+
+            return value;
+        }
+
         public static bool CompareDictionaries<TKey, TValue>(ConcurrentDictionary<TKey, TValue> dict1, ConcurrentDictionary<TKey, TValue> dict2)
         {
             IEqualityComparer<TValue> valueComparer = EqualityComparer<TValue>.Default;

@@ -28,27 +28,15 @@ namespace Abiomed.DotNetCore.OCRService
             Console.WriteLine("Starting Image Stream Reader");
             List<string> imageStreams = new List<string>();
             InitializeAsync().GetAwaiter().GetResult();
-
-            //  TODO Refine and make configurable - leaving this way to to test...
-            //  3600000 is equal to 1-hour in ms - so the check is for every hour
-            //  the hours to go back (the -4) needs to be configurable as well.
-            //  TODO POC Type Code, to prove out the removal.
-            var iterationsUntilClean = 3600000/_pollingInterval;
-            var iterations = 0;
-
+            
             while (true)
             {
-                if (iterations>iterationsUntilClean)
-                {
-                    CaseManager.CleanupExpiredCases(_redisDbRepositoryCase, DateTime.UtcNow.AddHours(-4));
-                    iterations = 0;
-                }
-                iterations++;
                 imageStreams = _mediaManager.GetLiveStreamsAsync().GetAwaiter().GetResult();
                 ListenInParallel(imageStreams);
-                PublishResults(imageStreams);  
+                PublishResults(imageStreams);
 
-                Thread.Sleep(_pollingInterval);
+                var pollingTime = _configurationCache.GetNumericConfigurationItem("ocrmanager", "polloinginterval");
+                Thread.Sleep(pollingTime);
             }
         }
 
@@ -67,12 +55,12 @@ namespace Abiomed.DotNetCore.OCRService
         private static async Task ProcessStreams(string serialNumber)
         {
             var ocrRetrievedText = await _mediaManager.GetImageTextAsync(serialNumber, _batchStartTimeUtc);
-            _redisDbRepositoryOcrResponse.StringSet(serialNumber, ocrRetrievedText);
 
             if (ocrRetrievedText.ScreenName != ScreenName.Unknown.ToString())
             {
-                CaseManager.AddOrUpdate(_redisDbRepositoryCase, ocrRetrievedText);
-                await _azureCosmosDB.AddAsync(ocrRetrievedText);
+                var jsonOcr = JsonConvert.SerializeObject(ocrRetrievedText);
+                await _redisDbRepositoryOcrResponse.StringSetAsync(serialNumber + ":OCR", jsonOcr, true);                
+                await _azureCosmosDB.AddAsync(ocrRetrievedText);                
             }
         }
 
@@ -90,14 +78,15 @@ namespace Abiomed.DotNetCore.OCRService
             _azureCosmosDB.SetContext(_configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
                 _configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));
 
+            
             _redisDbRepositoryOcrResponse = new RedisDbRepository<OcrResponse>(_configurationCache);
             _redisDbRepositoryCase = new RedisDbRepository<Case>(_configurationCache);
         }
 
         private static void PublishResults(List<string> imageStreams)
-        {
+        {            
             string activeStreams = JsonConvert.SerializeObject(imageStreams);            
-            _redisDbRepositoryOcrResponse.PublishAsync(Definitions.UpdatedRLMDevices, activeStreams);
+            _redisDbRepositoryOcrResponse.PublishAsync(Definitions.UpdatedRemoteLinkCases, activeStreams);
             _azureCosmosDB = new AzureCosmosDB(_configurationCache);
             _azureCosmosDB.SetContext(_configurationCache.GetConfigurationItem("mediamanager", "ocrdatabasename"), 
                 _configurationCache.GetConfigurationItem("mediamanager", "ocrcollectionname"));

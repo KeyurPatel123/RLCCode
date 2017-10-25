@@ -62,10 +62,11 @@ namespace Abiomed.DotNetCore.Repository
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        Task StringSetAsync(string key, T value);
-        Task StringSetAsync(string key, string value);
-        void StringSet(string key, T value);
-        void StringSet(string key, string value);
+        Task StringSetAsync(string key, T value, bool rawKey = false);
+        Task StringSetAsync(string key, string value, bool rawKey = false);        
+
+        void StringSet(string key, T value, bool rawKey = false);
+        void StringSet(string key, string value, bool rawKey = false);
 
 
         /// <summary>
@@ -73,8 +74,12 @@ namespace Abiomed.DotNetCore.Repository
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        Task<T> StringGetAsync(string key);
-        T StringGet(string key);
+        Task<T> StringGetAsync(string key, bool rawKey = false);
+        Task<string> StringGetBaseAsync(string key, bool rawKey = false);
+
+        T StringGet(string key, bool rawKey = false);
+
+        
 
         /// <summary>
         /// Delete String

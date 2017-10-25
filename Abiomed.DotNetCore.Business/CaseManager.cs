@@ -6,101 +6,139 @@ using Abiomed.DotNetCore.Models;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Linq;
 
 namespace Abiomed.DotNetCore.Business
 {
     public class CaseManager : ICaseManager
     {
         #region Private Member Variables
-
-        private const string LongDateFormat = "yyyy-MM-dd HH:mm:ss.fff"; // TODO - Move this to a common place
-
         private ConfigurationCache _configurationCache;
         private IRedisDbRepository<Case> _redisDbRepositoryCase;
         private RemoteLinkCases _remoteLinkCases = new RemoteLinkCases();
-
         #endregion
 
-        #region Constructors 
-
+        #region Constructor
         public CaseManager(ConfigurationCache configurationCache, IRedisDbRepository<Case> redisDbRepositoryCase)
         {
             _configurationCache = configurationCache;
             _redisDbRepositoryCase = redisDbRepositoryCase;
             Initialize();
         }
-
         #endregion
 
         #region Server Side
 
-        #region public Methods
+        #region Private Methods 
 
-        public static void CleanupExpiredCases(IRedisDbRepository<Case> redisDbRepositoryCase, DateTime expireTimeBeforeUtc)
+        private void Initialize()
         {
-            var keys = redisDbRepositoryCase.GetKeys();
-            foreach (var key in keys)
+            _redisDbRepositoryCase.Subscribe(Definitions.UpdatedRemoteLinkCases, async (channel, message) =>
             {
-                redisDbRepositoryCase.StringDelete(key);
-            }
-            redisDbRepositoryCase.Publish(Definitions.CleanupRemoteLinkCases, expireTimeBeforeUtc.ToString(LongDateFormat, CultureInfo.InvariantCulture));
+                var RlmDevices = (List<string>)JsonConvert.DeserializeObject<List<string>>(message);
+                await GetCases(RlmDevices);
+
+                CleanupExpiredCases();                
+            });
         }
 
-        public static void AddOrUpdate(IRedisDbRepository<Case> redisDbRepositoryCase, OcrResponse ocrResponse)
+        private Task GetCases(List<string> RlmDevices)
         {
-            Case activeCase = new Case();
+            var tasks = RlmDevices.Select(i =>
+                {
+                    return AddOrUpdate(i);
+                });
+            return Task.WhenAll(tasks);
+        }
+
+        private async Task AddOrUpdate(string RlmDevice)
+        {
             try
             {
-                activeCase = redisDbRepositoryCase.StringGet(ocrResponse.PumpSerialNumber);
+                OcrResponse ocrResponse = JsonConvert.DeserializeObject<OcrResponse>(await _redisDbRepositoryCase.StringGetBaseAsync(RlmDevice + ":OCR", true));
+                
+                if (ocrResponse.PumpSerialNumber != string.Empty)
+                {
+                    Case activeCase = new Case();
+                    activeCase = await _redisDbRepositoryCase.StringGetAsync(ocrResponse.PumpSerialNumber);
 
-            } catch(Exception EX)
-            {
-                var yyy = EX.Message; // TODO - Remove (Interim Testing Only
+                    // Add/Update return new entry to store. 
+                    activeCase = (activeCase == null || activeCase.LastActiveUtc == DateTime.MinValue) ? CreateCase(ocrResponse) : UpdateCase(ocrResponse, activeCase);
+
+                    // Add entry back to the redis repository...
+                    await _redisDbRepositoryCase.StringSetAsync(ocrResponse.PumpSerialNumber, activeCase);
+
+                    // Add/Update active case to list
+                    _remoteLinkCases.Cases.AddOrUpdate(activeCase.PumpSerialNumber, activeCase, (key, oldValue) => activeCase);
+                }
             }
-
-            try
+            catch(Exception e)
             {
-                // Add/Update return new entry to store. 
-                activeCase = (activeCase == null || activeCase.LastActiveUtc == DateTime.MinValue) ? CreateCase(ocrResponse) : UpdateCase(ocrResponse, activeCase);
-
-                // Add entry back to the redis repository...
-                redisDbRepositoryCase.StringSet(ocrResponse.PumpSerialNumber, activeCase);
-                redisDbRepositoryCase.Publish(Definitions.UpdatedRemoteLinkCase, ocrResponse.PumpSerialNumber);
-            }
-            catch (Exception EX)
-            {
-                var ttt = EX.Message; // TODO - Remove (Interim Testing Only
+                
             }
         }
 
+        private void CleanupExpiredCases()
+        {
+            DateTime dateTime = DateTime.UtcNow.AddHours(-4);
+
+            Parallel.ForEach(_remoteLinkCases.Cases, checkedCase =>
+            {
+                if (checkedCase.Value.LastActiveUtc < dateTime)
+                {
+                    // todo save case to Storage???
+                    _remoteLinkCases.Cases.TryRemove(checkedCase.Value.PumpSerialNumber, out Case caseBeingDeleted);
+                }
+            });            
+        }
         #endregion
 
         #region Private Methods
 
-        private static Case UpdateCase(OcrResponse ocrResponse, Case activeCase)
+        private Case UpdateCase(OcrResponse ocrResponse, Case activeCase)
         {
             DateTime updatedUtc = DateTime.UtcNow;
-
-            // Performance Level is a change in which the UI needs to be 'notified'.
-            if (ocrResponse.PerformanceLevel != activeCase.PerformanceLevel)
-            {
-                Tuple<DateTime, string> performanceLevel = new Tuple<DateTime, string>(activeCase.LastUpdateUtc, activeCase.PerformanceLevel);
-                activeCase.PerformanceLevelHistory.Add(performanceLevel);
-                activeCase.PerformanceLevel = ocrResponse.PerformanceLevel;
-                activeCase.LastUpdateUtc = updatedUtc;
-                activeCase.Updated = true;
-            }
-
+            
             // Alarms is a change in which the UI needs to be 'notified'.
             if ((ocrResponse.Alarm1 != activeCase.Alarm1.Type || ocrResponse.Alarm1Message != activeCase.Alarm1.Description) ||
                 (ocrResponse.Alarm2 != activeCase.Alarm2.Type || ocrResponse.Alarm2Message != activeCase.Alarm2.Description) ||
                 (ocrResponse.Alarm3 != activeCase.Alarm3.Type || ocrResponse.Alarm3Message != activeCase.Alarm3.Description))
             {
-                Tuple<DateTime, Alarm, Alarm, Alarm> alarms = new Tuple<DateTime, Alarm, Alarm, Alarm>(activeCase.LastUpdateUtc, activeCase.Alarm1, activeCase.Alarm2, activeCase.Alarm3);
+                Tuple<DateTime, Alarm> alarms = new Tuple<DateTime, Alarm>(activeCase.LastUpdateUtc, activeCase.Alarm1);
                 activeCase.AlarmHistory.Add(alarms);
+
+                alarms = new Tuple<DateTime, Alarm>(activeCase.LastUpdateUtc, activeCase.Alarm2);
+                activeCase.AlarmHistory.Add(alarms);
+
+                alarms = new Tuple<DateTime, Alarm>(activeCase.LastUpdateUtc, activeCase.Alarm3);
+                activeCase.AlarmHistory.Add(alarms);
+
+                // Figure out change of state and add to alertHistory, prior to overriding old values
+                NewAlarm(ocrResponse.Alarm1, ocrResponse.Alarm1Message, activeCase, updatedUtc);
+                NewAlarm(ocrResponse.Alarm2, ocrResponse.Alarm2Message, activeCase, updatedUtc);
+                NewAlarm(ocrResponse.Alarm3, ocrResponse.Alarm3Message, activeCase, updatedUtc);
+
                 activeCase.Alarm1 = new Alarm { Type = ocrResponse.Alarm1, Description = ocrResponse.Alarm1Message };
                 activeCase.Alarm2 = new Alarm { Type = ocrResponse.Alarm2, Description = ocrResponse.Alarm2Message };
                 activeCase.Alarm3 = new Alarm { Type = ocrResponse.Alarm3, Description = ocrResponse.Alarm3Message };
+                activeCase.LastUpdateUtc = updatedUtc;
+                
+                activeCase.Updated = true;
+            }
+
+            // Performance Level is a change in which the UI needs to be 'notified'.
+            if (ocrResponse.PerformanceLevel != activeCase.PerformanceLevel)
+            {
+                activeCase.AlertSummary.Add(new AlertSummary()
+                {
+                    Time = updatedUtc,
+                    Type = "PLevel",
+                    Message = string.Format("From {0} to {1}", activeCase.PerformanceLevel, ocrResponse.PerformanceLevel)
+                });
+
+                Tuple<DateTime, string> performanceLevel = new Tuple<DateTime, string>(activeCase.LastUpdateUtc, activeCase.PerformanceLevel);
+                activeCase.PerformanceLevelHistory.Add(performanceLevel);
+                activeCase.PerformanceLevel = ocrResponse.PerformanceLevel;
                 activeCase.LastUpdateUtc = updatedUtc;
                 activeCase.Updated = true;
             }
@@ -121,7 +159,29 @@ namespace Abiomed.DotNetCore.Business
             return activeCase;
         }
 
-        private static Case CreateCase(OcrResponse ocrResponse)
+        private void NewAlarm(string alarmType, string alarmDescription, Case activeCase, DateTime updatedUtc)
+        {
+            bool found = false;
+
+            // Check all active Alarms
+            if((alarmType == activeCase.Alarm1.Type && alarmDescription == activeCase.Alarm1.Description) ||
+               (alarmType == activeCase.Alarm2.Type && alarmDescription == activeCase.Alarm2.Description) ||
+               (alarmType == activeCase.Alarm3.Type && alarmDescription == activeCase.Alarm3.Description))
+            {
+                found = true;
+            }
+                        
+            if(!found)
+            {
+                activeCase.AlertSummary.Add(new AlertSummary()
+                {
+                    Time = updatedUtc,
+                    Type = alarmType                    
+                });
+            }
+        }
+
+        private Case CreateCase(OcrResponse ocrResponse)
         {
             DateTime timeCreated = DateTime.UtcNow;
 
@@ -137,12 +197,13 @@ namespace Abiomed.DotNetCore.Business
                 Alarm1 = new Alarm { Type = ocrResponse.Alarm1, Description = ocrResponse.Alarm1Message },
                 Alarm2 = new Alarm { Type = ocrResponse.Alarm2, Description = ocrResponse.Alarm2Message },
                 Alarm3 = new Alarm { Type = ocrResponse.Alarm3, Description = ocrResponse.Alarm3Message },
-                AlarmHistory = new List<Tuple<DateTime, Alarm, Alarm, Alarm>>(),
+                AlarmHistory = new List<Tuple<DateTime, Alarm>>(),
                 ImpellaFlow = new ImpellaFlow { Min = ocrResponse.FlowRateMin, Max = ocrResponse.FlowRateMax, Avg = ocrResponse.FlowRateAverage },
                 ImpellaFlowHistory = new List<Tuple<DateTime, ImpellaFlow>>(),
                 ConnectionStartUtc = timeCreated,
                 LastActiveUtc = timeCreated,
                 LastUpdateUtc = timeCreated,
+                AlertSummary = new List<AlertSummary>(),
                 Updated = true
             };
         }
@@ -212,29 +273,6 @@ namespace Abiomed.DotNetCore.Business
 
         #endregion
 
-        #region Private Methods 
 
-        private void Initialize()
-        {
-            _redisDbRepositoryCase.Subscribe(Definitions.UpdatedRemoteLinkCase, (channel, message) =>
-            {
-                var theCase = GetCase((string)JsonConvert.DeserializeObject<string>(message));
-                _remoteLinkCases.Cases.AddOrUpdate(theCase.PumpSerialNumber, theCase, (key, oldValue) => theCase);
-            });
-
-            _redisDbRepositoryCase.Subscribe(Definitions.CleanupRemoteLinkCases, (channel, message) =>
-            {
-                var expiredTimeUtc = (DateTime)JsonConvert.DeserializeObject<DateTime>(message);
-                foreach (var item in _remoteLinkCases.Cases)
-                {
-                    if (item.Value.LastActiveUtc < expiredTimeUtc)
-                    {
-                        _remoteLinkCases.Cases.Remove(item.Key, out Case caseBeingDeleted);
-                    }
-                }
-            });
-        }
-
-        #endregion
     }
 }

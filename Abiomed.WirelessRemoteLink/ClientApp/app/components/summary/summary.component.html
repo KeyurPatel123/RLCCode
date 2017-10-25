@@ -4,8 +4,8 @@
     <div class="row" style="min-height: calc(100vh - 80px);">
         <div class="col">
             <div class="d-flex flex-wrap justify-content-center">
-                <div *ngFor="let device of deviceList" class="p-2" [routerLink]="['/summary']">
-                    <a [routerLink]="['/case', device.key]" class="test">
+                <div *ngFor="let case of cases" class="p-2" [routerLink]="['/summary']">
+                    <a [routerLink]="['/case', case.key]" class="test">
                         <div class="card2">
                             <div class="SummaryTop d-flex justify-content-between">
                                 <!-- InfoContainer -->
@@ -13,12 +13,12 @@
                                     <!-- Impella SN -->
                                     <div class="ImpellaSN">
                                         <p class="InfoTitle">Impella SN</p>
-                                        <p class="InfoData">{{device.value.pumpSerialNumber}}</p>
+                                        <p class="InfoData">{{case.value.pumpSerialNumber}}</p>
                                     </div>
                                     <!-- Pump Type -->
                                     <div class="PumpType">
                                         <p class="InfoTitle">Pump Type</p>
-                                        <p class="InfoData">{{device.value.pumpType}}</p>
+                                        <p class="InfoData">{{case.value.pumpType}}</p>
                                     </div>
                                     <!-- Bed Number -->
                                     <div class="UserInput">
@@ -33,9 +33,9 @@
                             </div>
                             <!-- LEDs -->
                             <div class="LedBackground d-flex justify-content-around">
-                                <div class="led-{{device.value.alarm1}}"></div>
-                                <div class="led-{{device.value.alarm2}}"></div>
-                                <div class="led-{{device.value.alarm3}}"></div>
+                                <div class="led-{{case.value.alarm1.type}}"></div>
+                                <div class="led-{{case.value.alarm2.type}}"></div>
+                                <div class="led-{{case.value.alarm3.type}}"></div>
                             </div>
                             <!-- END LEDs -->
                             <!-- RLM INFO -->
@@ -44,20 +44,20 @@
                                     <div class="InfoTitle">Impella Flow</div>
                                     <div class=" d-flex justify-content-between">
                                         <div class="MaxMinCell">
-                                            <div class="MaxMinValues">{{device.value.flowRateMax}} <span class="MaxMinSmall">Max</span></div>
-                                            <div class="MaxMinValues">{{device.value.flowRateMin}} <span class="MaxMinSmall">Min</span></div>
+                                            <div class="MaxMinValues">{{case.value.impellaFlow.max}} <span class="MaxMinSmall">Max</span></div>
+                                            <div class="MaxMinValues">{{case.value.impellaFlow.min}} <span class="MaxMinSmall">Min</span></div>
                                         </div>
                                         <div>
-                                            <div class="LMin">{{device.value.flowRateAverage}}<span class="MaxMinSmall">L/min</span></div>
+                                            <div class="LMin">{{case.value.impellaFlow.avg}}<span class="MaxMinSmall">L/min</span></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="PLevel">
                                     <div class="InfoTitle">P-Level</div>
-                                    <div class="LMin">{{device.value.performanceLevel}}</div>
+                                    <div class="LMin">{{case.value.performanceLevel}}</div>
                                 </div>
                             </div>
-                            <div class="LastUpdate">Last updated: 5 minutes ago | (No past alerts. No active alerts.)</div>
+                            <div class="LastUpdate">Last updated: {{case.value.lastActiveUtc | amTimeAgo}}</div>
                         </div>
                     </a>
                 </div>

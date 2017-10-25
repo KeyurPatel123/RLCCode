@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading;
 using Abiomed.DotNetCore.Business;
 using Abiomed.DotNetCore.Repository;
+using System.Reflection;
 
 namespace Abiomed.RLR
 {
@@ -50,13 +51,17 @@ namespace Abiomed.RLR
                 .AddSingleton(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
                 .BuildServiceProvider();
 
+                // Get Version of RLR and publish to Console and update Def.
+                var version = _configuration.GetSection("Version").Value;
+
+
                 //configure console logging
                 var _logger = serviceProvider
                     .GetService<ILoggerFactory>()
                     .AddConsole(LogLevel.Trace)                    
                     .CreateLogger<Program>();  
                                                 
-                _logger.LogInformation("Starting RLR");
+                _logger.LogInformation("Starting RLR - {0}",version);
 
                 var configurationCache = serviceProvider.GetService<IConfigurationCache>();
                 configurationCache.LoadCacheAsync().Wait();

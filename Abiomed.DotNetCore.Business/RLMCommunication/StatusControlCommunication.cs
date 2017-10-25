@@ -326,7 +326,7 @@ namespace Abiomed.DotNetCore.Business
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 deviceSerialNumber = rlmDevice.SerialNo;
 
-                var returnList = Definitions.BearerAuthenticationUpdateIndication;
+                var returnList = Definitions.BearerAuthenticationUpdateIndication.ToList();
 
                 // Update Slot
                 returnList[11] = Convert.ToByte(wifiCredentials.Slot);
@@ -370,7 +370,7 @@ namespace Abiomed.DotNetCore.Business
                 _rlmDeviceList.RLMDevices.TryGetValue(deviceIpAddress, out rlmDevice);
                 deviceSerialNumber = rlmDevice.SerialNo;
 
-                var returnList = Definitions.BearerAuthenticationUpdateIndication;
+                var returnList = Definitions.BearerAuthenticationUpdateIndication.ToList();
 
                 // Update Slot
                 returnList[11] = Convert.ToByte(wifiDelete.Slot);

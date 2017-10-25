@@ -17,7 +17,6 @@
                 <div class="CogDropdown" id="dropdownBasic1" ngbDropdownToggle><span class="fa fa-cog"></span></div>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">                    
                     <div class="dropdown-item DropdownCog" *ngFor="let link of links" (click)="openLink(link)">{{link.name}}</div>
-                    <div class="dropdown-item DropdownCog" [routerLink]="['/devicemanagement']">Device Management</div>
                     <div class="dropdown-item DropdownCog" [routerLink]="['/map']">Map</div>
                     <div class="dropdown-item DropdownCog" [routerLink]="['/summary']">Summary</div>
                     <div><hr></div>
