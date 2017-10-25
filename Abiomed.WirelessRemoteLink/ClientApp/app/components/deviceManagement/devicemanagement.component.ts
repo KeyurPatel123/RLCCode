@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from "../../shared/authentication.service";
 import { Router} from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserRegistrationInterface } from "../../shared/authentication.interface";
 import { AuthGuard } from "../../shared/authguard.service";
+import { InstitutionService } from "../../shared/institution.service";
+
 
 @Component({
     selector: 'devicemanagement',
     templateUrl: './devicemanagement.component.html',
     styleUrls: ['./devicemanagement.component.css'],
-    providers: [AuthenticationService]
+    providers: [InstitutionService]
   
 })
-    
+
+
 export class DeviceManagementComponent implements OnInit {
     records: {
         RLMSerialNo: string;
@@ -21,6 +23,7 @@ export class DeviceManagementComponent implements OnInit {
         AICSerialNo: string;
         AICSoftwareNo: string;
     }[];
+    institutions: any;
     created: boolean;
     creationResponse: any;
     creationStatus: any;
@@ -31,9 +34,11 @@ export class DeviceManagementComponent implements OnInit {
     institution: string;
     aicserialnumber: string;
     aicsoftwarenumber: string;
-    constructor(private authenticationService: AuthenticationService) { }
+    isCollapsed = true;
+    constructor(private institutionService: InstitutionService) { }
 
     ngOnInit() {
+        this.GetInstitutions();
         this.ValidateForm();
         this.created = false;
         this.creationStatus = "";
@@ -47,9 +52,16 @@ export class DeviceManagementComponent implements OnInit {
      // this.sort(this.column);
     }
 
+    private GetInstitutions() {
+        this.institutionService.GetInstitutions().subscribe(institutions => {
+            this.institutions = institutions;
+        });
+    }
+
     private ValidateForm() {
         this.createForm = new FormGroup({
             rlmsn: new FormControl('', [Validators.required]),
+            rlmpw: new FormControl('', [Validators.required]),
             institution: new FormControl('', [Validators.required]),
             aicserialnumber: new FormControl('', [Validators.required]),
             aicsoftwarenumber: new FormControl('', [Validators.required])
@@ -75,6 +87,7 @@ export class DeviceManagementComponent implements OnInit {
         
         var addDevice = {
             rlmsn: this.rlmsn,
+            rlmpw: this.rlmpw,
             institution: this.institution,
             aicserialnumber: this.aicserialnumber,
             aicsoftwarenumber: this.aicsoftwarenumber
@@ -82,5 +95,4 @@ export class DeviceManagementComponent implements OnInit {
         
     }
 }
-
 

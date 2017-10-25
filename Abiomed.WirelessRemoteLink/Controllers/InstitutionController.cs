@@ -30,24 +30,35 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpGet]
         [Route("GetInstitutions")]
         [Authorize(Roles = "ADMIN")]
-        public string GetInstitutions()
+        public JArray GetInstitutions()
         {
-            string returnResult = string.Empty;
-            returnResult = @"
-            { 'Institutions' : [
-                { 'Id': 12340, 'DisplayName' : 'Henry Ford Hospital'},
-                { 'Id': 12341, 'DisplayName' : 'Harper Hospital'},
-                { 'Id': 12342, 'DisplayName' : 'Mercy General Hospital'},
-                { 'Id': 12343, 'DisplayName' : 'Univ of Washington Medical Ctr'},
-                { 'Id': 12344, 'DisplayName' : 'Wellstar Kennestone Hospital'},
-                { 'Id': 12345, 'DisplayName' : 'Ochsner Foundation Hospital'},
-                { 'Id': 12346, 'DisplayName' : 'New York Presbyterian Columbia'},
-                { 'Id': 12347, 'DisplayName' : 'Inova Fairfax Hospital'},
-                { 'Id': 12348, 'DisplayName' : 'Banner University Medical Ctr'},
-                { 'Id': 12349, 'DisplayName' : 'Cedars - Sinai Medical Center'}    
-            ]
-           }";            
-            return returnResult;
+            JArray institutions = new JArray();
+
+            institutions.Add(new JObject(
+                            new JProperty("Id", 12340),
+                            new JProperty("DisplayName", "Henry Ford Hospital")));
+
+            institutions.Add(new JObject(
+                new JProperty("Id", 12341),
+                new JProperty("DisplayName", "Harper Hospital")));
+
+
+            institutions.Add(new JObject(
+                new JProperty("Id", 12342),
+                new JProperty("DisplayName", "Mercy General Hospital")));
+
+
+            institutions.Add(new JObject(
+                new JProperty("Id", 12343),
+                new JProperty("DisplayName", "Univ of Washington Medical Ctr")));
+
+
+            institutions.Add(new JObject(
+                new JProperty("Id", 12344),
+                new JProperty("DisplayName", "Wellstar Kennestone Hospital")));
+
+
+            return institutions;
         }       
     }
 }

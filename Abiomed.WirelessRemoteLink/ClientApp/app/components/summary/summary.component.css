@@ -1,4 +1,4 @@
-﻿body {background-color:#efefef;}
+﻿body {background-color:#ededed;}
 
 h1 {
     color: #69a1cc;
@@ -35,7 +35,7 @@ p {
 .card2 {
     background-color: #fff;
     width: 350px;
-    height: 210px;
+    height: 200px;
     box-shadow: 0 0 8px #a5a5a5;
     border-radius: 3px;
     margin: 20px;
@@ -174,7 +174,7 @@ p {
     border: .5px #fff solid;
     margin: 10px 0 10px 10px;
     width: 260px;
-    border-radius: 5px;
+    border-radius: 3px;
     color: #1d1d1d;
     font-size: 20px;
 }
@@ -190,6 +190,7 @@ p {
 
 .InfoTitle {
     font-size: 9px;
+    font-weight:bold;
     color: #1d1d1d;
     text-transform: uppercase;
 }
@@ -221,7 +222,7 @@ p {
     margin-bottom: 5px;
     height: auto;
     border-left: .5px dotted #fff;
-    width: 35%;
+    width: 40%;
     font-size: 24px;
     padding-left: 5px;
 }
@@ -230,18 +231,18 @@ p {
 .RLMInfoMain {
     margin: 5px auto;
     width: 330px;
-    height: 80px;
+    height: 70px;
 }
 
 .PLevel {
-    width: 100px;
+    width: 125px;
     margin-top: 5px;
     padding-left: 10px;
     border-left: .5px #ccc dotted;
 }
 
 .ImpellaFlow {
-    width: 220px;
+    width: 190px;
     margin-top: 5px;
     padding-left: 10px;
 }
@@ -261,9 +262,8 @@ p {
 }
 
 .LMin {
-    font-size: 50px;
+    font-size: 40px;
     color: #1d1d1d;
-    margin-top: -4px;
 }
 
 
@@ -584,8 +584,7 @@ p {
 /* ACTIVE ALERTS */
 
 .ActiveWhite {
-    border-radius: 3px 3px 0 0;
-    height: 80px;
+
     background-color: #fff;
     border-radius: 2px 2px 0 0;
     box-shadow: inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 12px;
@@ -668,6 +667,183 @@ p {
 
     to {
         background-color: #fff;
+    }
+}
+
+/*Active Yellow*/
+.ActiveYellow {
+    background-color: #f0ff00;
+    border-radius: 2px 2px 0 0;
+    box-shadow: inset #e0ef09 0 -1px 9px, rgba(224, 239, 9, 0.5) 0 2px 12px;
+    -webkit-animation: blinkYellow .5s 5;
+    -moz-animation: blinkYellow .5s 5;
+    -ms-animation: blinkYellow .5s 5;
+    -o-animation: blinkYellow .5s 5;
+    animation: blinkYellow .5s 5;
+}
+
+@-webkit-keyframes blinkYellow {
+    from {
+        background-color: #f0ff00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #f0ff00;
+    }
+}
+
+@-moz-keyframes blinkYellow {
+    from {
+        background-color: #f0ff00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #f0ff00;
+    }
+}
+
+@-ms-keyframes blinkYellow {
+    from {
+        background-color: #f0ff00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #f0ff00;
+    }
+}
+
+@-o-keyframes blinkYellow {
+    from {
+        background-color: #f0ff00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #f0ff00;
+    }
+}
+
+@keyframes blinkYellow {
+    from {
+        background-color: #f0ff00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #f0ff00;
+    }
+}
+
+
+
+
+/*Active Red*/
+.ActiveRed {
+    background-color: #F00;
+    border-radius: 2px 2px 0 0;
+    box-shadow: inset #ef0202 0 -1px 9px, rgba(239, 2, 2, 0.5) 0 2px 12px;
+    -webkit-animation: blinkRed .5s 5;
+    -moz-animation: blinkRed .5s 5;
+    -ms-animation: blinkRed .5s 5;
+    -o-animation: blinkRed .5s 5;
+    animation: blinkRed .5s 5;
+}
+
+@-webkit-keyframes blinkRed {
+    from {
+        background-color: #F00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #F00;
+    }
+}
+
+@-moz-keyframes blinkRed {
+    from {
+        background-color: #F00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #F00;
+    }
+}
+
+@-ms-keyframes blinkRed {
+    from {
+        background-color: #F00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #F00;
+    }
+}
+
+@-o-keyframes blinkRed {
+    from {
+        background-color: #F00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #F00;
+    }
+}
+
+@keyframes blinkRed {
+    from {
+        background-color: #F00;
+    }
+
+    50% {
+        background-color: #69A1CC;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #85d9ee 0 -1px 9px, rgba(255, 255, 255, 0.5) 0 2px 0;
+    }
+
+    to {
+        background-color: #F00;
     }
 }
 

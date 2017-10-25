@@ -1,7 +1,10 @@
-﻿h1 {
-    color: #69a1cc;
-    font-size: 1.3em;
+﻿
+h1 {
+    color: #005fa9;
+    font-size: 1.4em;
+    font-weight:bold;
 }
+
 
 h2 {
     color: #69a1cc;
@@ -17,6 +20,7 @@ p {
     color: #555;
     font-size: .8em;
 }
+.card {margin-bottom:10px;}
 
 .red {
     color:red;
@@ -26,14 +30,31 @@ p {
     padding:10px;
 }
 
-.MainContent {
-    margin-top: 50px;
+.DeviceManagementHeader {
+    border:solid 1px #ccc;
+    padding:10px 0 5px 10px;
+    border-radius:3px;
+
 }
-.NewUserWell {
-    border: .5px solid #efefef;
-    margin: 10px 40px 20px 40px;
-    border-radius: 10px;
+.DeviceHeaderIcon {
+    height: 30px;
+    width: 60px;
+    padding: 0 25px;
+    background: url(../../assets/images/aic.svg);
+    background-repeat: no-repeat;
+}
+.MainContent {
     background-color:#fff;
+    margin-top:0;
+    padding-top:60px;
+    min-height: calc(100vh - 75px);
+    z-index:3;
+}
+
+.NewUserWell {
+    margin: 10px 10px 0px 10px;
+    border-radius: 5px;
+    background-color: #fff;
 }
 
 .ResponseUserWell {
@@ -62,9 +83,9 @@ p {
 }
 
 .AddAbioUserForm {
-    background-color: #efefef;
-    border-radius: 0 10px 10px 0;
-    padding: 20px 20px 10px 20px;
+    background-color: #ededed;
+    padding: 20px 20px 0 20px;
+    margin-bottom:10px;
 }
 .NewUserIntro {
     padding: 20px 20px 10px 20px;

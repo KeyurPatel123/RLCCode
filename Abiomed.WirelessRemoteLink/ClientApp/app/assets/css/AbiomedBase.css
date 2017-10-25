@@ -1,6 +1,5 @@
 ﻿body {
     min-height: 100vh;
-    background-color:#ff0000;
 }
 
 .flex-grow {
@@ -10,7 +9,12 @@
 button {
     cursor:pointer;
 }
-
+.MainContent {
+    background-color: #fff;
+    margin-top: 0;
+    padding-top: 60px;
+    min-height: calc(100vh - 75px);
+}
 .AbiomedLogoModal {
     height: 40px;
     width: 175px;
