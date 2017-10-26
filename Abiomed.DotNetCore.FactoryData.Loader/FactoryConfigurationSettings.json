@@ -147,7 +147,7 @@
   {
     "Category": "mediamanager",
     "Name": "impellapumptypes",
-    "Value": "6.0|5.0|LD|2.5|CP|RP|5.5|ECP"
+    "Value": "2.5|5.0|5.5|LD|CP|RP|ECP"
   },
   {
     "Category": "mediamanager",
@@ -157,7 +157,7 @@
   {
     "Category": "mediamanager",
     "Name": "ocrreplacementsheader",
-    "Value": ".CP ^CP |SN^ SN|ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V|CPCS ^CPC8 | : ^ |. ^."
+    "Value": "6.0^5.0|.CP ^CP |SN^ SN|ALC^AIC|ANC^AIC|AICS :^AIC SN:| IC SN:^ AIC SN:|ICSN:^ AIC SN:|A IC V^AIC |AIC_V^AIC |AIC V^AIC |AIIC _V^AIC |A IC _V^AIC | SN ^ SN: |S AN:^SN:|s/N:^SN:|AC V^AIC V|CPCS ^CPC8 | : ^ |. ^."
   },
   {
     "Category": "mediamanager",
@@ -216,6 +216,11 @@
   },
   {
     "Category": "mediamanager",
+    "Name": "ocralarmcodegray",
+    "Value": "#DCDCDC"
+  },
+  {
+    "Category": "mediamanager",
     "Name": "ocralarmcodematchtolerance",
     "Value": "30"
   },
@@ -233,5 +238,15 @@
     "Category": "mediamanager",
     "Name": "ocrvalidationaicserialnumber",
     "Value": "IC"
+  },
+  {
+    "Category": "azurecosmos",
+    "Name": "coredatabasename",
+    "Value": "RemoteLink"
+  },
+  {
+    "Category": "azurecosmos",
+    "Name": "institutioncollectionname",
+    "Value": "Institution"
   }
 ]

@@ -106,6 +106,8 @@ namespace Abiomed_WirelessRemoteLink
 
             RedisDbRepository<Case> redisDbRepository = new RedisDbRepository<Case>(configurationCache);
             services.AddSingleton<ICaseManager>(new CaseManager(configurationCache, redisDbRepository));
+
+            services.AddSingleton<IInstitutionManager>(new InstitutionManager(configurationCache));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

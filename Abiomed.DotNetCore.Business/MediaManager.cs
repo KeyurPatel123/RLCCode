@@ -63,6 +63,7 @@ namespace Abiomed.DotNetCore.Business
         private MagickColor _alarmCodeWhite;
         private MagickColor _alarmCodeYellow;
         private MagickColor _alarmCodeRed;
+        private MagickColor _alarmCodeGray;
         private Percentage _alarmCodeColorMatchTolerance;
         private bool _ocrDebugMode;
         #endregion
@@ -323,6 +324,7 @@ namespace Abiomed.DotNetCore.Business
             _alarmCodeRed = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodered"));
             _alarmCodeYellow = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodeyellow"));
             _alarmCodeWhite = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodewhite"));
+            _alarmCodeGray = new MagickColor(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodegray"));
             _alarmCodeColorMatchTolerance = new Percentage(int.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocralarmcodematchtolerance")));
             _ocrDebugMode = bool.Parse(_configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrdebug"));
             _performanceLevelValidationValues = _configurationCache.GetConfigurationItem(ConfigurationSectionName, "ocrvalidationperformancelevel").Split('|').ToList();
@@ -430,6 +432,11 @@ namespace Abiomed.DotNetCore.Business
                 return AlarmCodes.Yellow.ToString();
             }
 
+            if (_alarmCodeGray.FuzzyEquals(alarmColor, new Percentage(5)))
+            {
+                return AlarmCodes.Blank.ToString();
+            }
+
             if (_alarmCodeWhite.FuzzyEquals(alarmColor, _alarmCodeColorMatchTolerance))
             {
                 return AlarmCodes.White.ToString();
@@ -437,7 +444,6 @@ namespace Abiomed.DotNetCore.Business
 
             return AlarmCodes.Blank.ToString();
         }
-
 
         private Tuple<string, string, string, string> GetHeaderSection(List<string> headerParts)
         {

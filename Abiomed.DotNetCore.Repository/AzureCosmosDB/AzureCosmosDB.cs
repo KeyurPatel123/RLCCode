@@ -1,6 +1,8 @@
 ﻿using Abiomed.DotNetCore.Configuration;
 using Microsoft.Azure.Documents.Client;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Abiomed.DotNetCore.Repository
@@ -19,6 +21,8 @@ namespace Abiomed.DotNetCore.Repository
         private string _primaryKey = string.Empty; 
         private Uri _uri;
         private DocumentClient _client;
+        FeedOptions _queryOptions;
+
 
         #endregion
 
@@ -71,6 +75,22 @@ namespace Abiomed.DotNetCore.Repository
             }
         }
 
+        public List<T> ExecuteQuery<T>(Uri documentCollectionUri, string collectionName, string where)
+        {
+            return _client.CreateDocumentQuery<T>(
+                documentCollectionUri,
+                string.Format("SELECT * FROM {0} {1}", collectionName, where),
+                _queryOptions).ToList();
+        }
+
+        public List<T> ExecuteQuery<T>(string databaseName, string collectionName, string where)
+        {
+            return _client.CreateDocumentQuery<T>(
+                UriFactory.CreateDocumentCollectionUri(databaseName, collectionName),
+                string.Format("SELECT * FROM {0} {1}", collectionName, where),
+                _queryOptions).ToList();
+        }
+
         #endregion
 
         #region Private Methods 
@@ -81,6 +101,7 @@ namespace Abiomed.DotNetCore.Repository
             _primaryKey = _configurationCache.GetConfigurationItem("azurecosmosdb", "primarykey");
 
             _client = new DocumentClient(new Uri(_endpointUri), _primaryKey);
+            _queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true};
         }
 
         #endregion 

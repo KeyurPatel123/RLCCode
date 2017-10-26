@@ -21,33 +21,20 @@ namespace Abiomed_WirelessRemoteLink.Controllers
     public class InstitutionController : Controller
     {
         private readonly IAuditLogManager _auditLogManager;
+        private readonly IInstitutionManager _institutionManager;
         
-        public InstitutionController(IAuditLogManager auditLogManager)
+        public InstitutionController(IAuditLogManager auditLogManager, IInstitutionManager institutionManager)
         {
             _auditLogManager = auditLogManager;
+            _institutionManager = institutionManager;
         }
 
         [HttpGet]
         [Route("GetInstitutions")]
         [Authorize(Roles = "ADMIN")]
-        public string GetInstitutions()
+        public List<Institution> GetInstitutions()
         {
-            string returnResult = string.Empty;
-            returnResult = @"
-            { 'Institutions' : [
-                { 'Id': 12340, 'DisplayName' : 'Henry Ford Hospital'},
-                { 'Id': 12341, 'DisplayName' : 'Harper Hospital'},
-                { 'Id': 12342, 'DisplayName' : 'Mercy General Hospital'},
-                { 'Id': 12343, 'DisplayName' : 'Univ of Washington Medical Ctr'},
-                { 'Id': 12344, 'DisplayName' : 'Wellstar Kennestone Hospital'},
-                { 'Id': 12345, 'DisplayName' : 'Ochsner Foundation Hospital'},
-                { 'Id': 12346, 'DisplayName' : 'New York Presbyterian Columbia'},
-                { 'Id': 12347, 'DisplayName' : 'Inova Fairfax Hospital'},
-                { 'Id': 12348, 'DisplayName' : 'Banner University Medical Ctr'},
-                { 'Id': 12349, 'DisplayName' : 'Cedars - Sinai Medical Center'}    
-            ]
-           }";            
-            return returnResult;
+            return _institutionManager.GetInstitutions();
         }       
     }
 }
