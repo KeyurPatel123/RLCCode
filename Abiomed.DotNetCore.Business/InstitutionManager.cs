@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Abiomed.DotNetCore.Configuration;
 using Abiomed.DotNetCore.Repository;
 using Abiomed.DotNetCore.Models;
 using Microsoft.Azure.Documents.Client;
+using System.Linq;
 
 namespace Abiomed.DotNetCore.Business
 {
@@ -44,12 +44,12 @@ namespace Abiomed.DotNetCore.Business
 
         public List<Institution> GetInstitutions()
         {
-            return _azureCosmosDB.ExecuteQuery<Institution>(_uri, _collectionName, string.Empty);
+            return _azureCosmosDB.ExecuteQuery<Institution>(_uri, _collectionName, string.Empty).OrderBy(o => o.DisplayName).ToList();
         }
 
         public List<Institution> GetInstitution(string sapCustomerId)
         {
-            return _azureCosmosDB.ExecuteQuery<Institution>(_uri, _collectionName, string.Format("WHERE Institution.SapCustomerId = '{0}'", sapCustomerId));
+            return _azureCosmosDB.ExecuteQuery<Institution>(_uri, _collectionName, string.Format("WHERE {0}.SapCustomerId = '{1}'", _collectionName, sapCustomerId));
         }
 
         #endregion

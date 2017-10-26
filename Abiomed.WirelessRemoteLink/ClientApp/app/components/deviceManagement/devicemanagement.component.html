@@ -75,7 +75,7 @@
                                             <div class="form-group row">
                                                 <label for="example-text-input" class="col-5 col-form-label" style="font-size:1.1em">Institution:<span class="red">*</span></label>
                                                 <select class="form-control col-7" [(ngModel)]="GetInstitutions" formControlName="institution">
-                                                    <option style="padding:5px 0" *ngFor="let item of institutions" value="{{item.Id}}">{{item.DisplayName}}</option>
+                                                    <option style="padding:5px 0" *ngFor="let item of institutions" value="{{item.sapCustomerId}}">{{item.displayName}}</option>
 
                                                 </select>
                                             </div>
