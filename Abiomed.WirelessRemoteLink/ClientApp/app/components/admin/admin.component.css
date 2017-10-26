@@ -27,8 +27,12 @@ p {
 }
 
 .MainContent {
-    margin-top: 50px;
+    background-color: #fff;
+    margin-top: 0;
+    padding-top: 60px;
+    min-height: calc(100vh - 75px);
 }
+
 .NewUserWell {
     border: .5px solid #ccc;
     margin: 10px 40px 20px 40px;

@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { CaseService } from "../../shared/case.service";
+import { Subscription } from "rxjs/Subscription";
 
 @Component({
     selector: 'case',
@@ -9,20 +10,36 @@ import { CaseService } from "../../shared/case.service";
     styleUrls: ['./case.component.css'],    
 })
 export class CaseComponent implements OnInit {
-    serial: string;
-    device: any;
+    pumpSerial: string;
+    case: any;
+    subscription: Subscription;
+    videoPlaying: boolean = false;
 
     constructor(private route: ActivatedRoute, private caseService: CaseService) { }
     ngOnInit() {
         this.route.paramMap.subscribe((paramMap: Params) => {
-            this.serial = paramMap.params.serial;
-            this.getDevice();
-            this.startVideo(this.serial);
-        });                   
-    }
+            this.pumpSerial = paramMap.params.serial;
+            this.getCase();
 
-    getDevice() {
-               
+            this.subscription = this.caseService.caseUpdate$.subscribe(
+                event => this.getCase()
+            );
+        });                   
+    }    
+
+    getCase() {        
+        // Get Case
+        var caseTry = this.caseService.GetActiveCase(this.pumpSerial);
+
+        if (caseTry !== undefined) {
+            this.case = caseTry;
+            console.log(this.case);
+            // Check if video playing
+            if (!this.videoPlaying) {
+                this.videoPlaying = true;
+                this.startVideo(this.case.value.remoteLinkSerialNumber);
+            }
+        }
     }
 
     startVideo(serial:string)

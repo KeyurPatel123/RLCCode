@@ -9,16 +9,11 @@ export class InstitutionService {
         @Inject('ORIGIN_URL') private originUrl: string,
     ) {}    
 
-    GetInstitutions(): Observable<InstitutionInterface[]> {
+    GetInstitutions(): Observable<any[]> {
         return this.http.get('/api/Institution/GetInstitutions')
-            .map((response: InstitutionInterface[]) => {
+            .map((response: any[]) => {
                 console.log(response);
                 return response;
             });
     }
-}
-
-export interface InstitutionInterface {
-    Id: string;
-    DisplayName: string;
 }
