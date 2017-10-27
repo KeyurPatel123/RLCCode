@@ -123,7 +123,7 @@ namespace Abiomed.DotNetCore.Business
                 response = SetException(serialNumber, batchStartTimeUtc, ex.Message);
             }
 
-            return response;
+           return response;
         }
 
         #endregion
@@ -874,7 +874,7 @@ namespace Abiomed.DotNetCore.Business
                     }
 
                     // Performance Level - All But Above...
-                    if (!usedPart)
+                    if (string.IsNullOrWhiteSpace(pLevel) && !usedPart)
                     {
                         pLevel = DeterminePLevelValue(cleanedPart, pLevel, parts.Count);
                     }
