@@ -16,7 +16,7 @@ namespace Abiomed.DotNetCore.Models
         public string PumpSerialNumber { get; set; } = string.Empty;
         public string AicSerialNumber { get; set; } = string.Empty;
         public string AicSoftwareVersion { get; set; } = string.Empty;
-        public string IsDemo { get; set; } = string.Empty;
+        public string IsDemo { get; set; } = "true";
         public string PlacementSignalSystole { get; set; } = string.Empty;
         public string PlacementSignalDistole { get; set; } = string.Empty;
         public string PlacementSignalAverage { get; set; } = string.Empty;

@@ -244,7 +244,7 @@ namespace Abiomed.DotNetCore.Business
                     ocrResponse.PumpSerialNumber = headerSection.Item2;
                     ocrResponse.AicSerialNumber = headerSection.Item3;
                     ocrResponse.AicSoftwareVersion = headerSection.Item4;
-                    ocrResponse.IsDemo = ocrResponse.PumpSerialNumber.StartsWith('6') ? "true" : "false";
+                    ocrResponse.IsDemo = ocrResponse.PumpSerialNumber.StartsWith('6') || ocrResponse.PumpSerialNumber.Length < 6 ? "true" : "false";
                     ocrResponse.ScreenName = ScreenName.PlacementSignal.ToString();
 
                     // Get Alarms 
@@ -292,8 +292,7 @@ namespace Abiomed.DotNetCore.Business
                 var xxx = EX.Message; // TODO Remove - for working/tweaking the OCR porocessing.
             }
             return processPlacementSignalScreen;
-        }
-
+        }        
         #endregion
 
         #region Initialization
@@ -352,6 +351,19 @@ namespace Abiomed.DotNetCore.Business
         #endregion
 
         #region Cleanup Worker Methods
+        private string RemoveSpecialCharacters(string str)
+        {
+            string strUpper = str.ToUpper();
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in strUpper)
+            {
+                if ((c >= 'A' && c <= 'Z'))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
 
         private Dictionary<int, List<string>> GetMessageSegments(string rawOcrResponseText)
         {

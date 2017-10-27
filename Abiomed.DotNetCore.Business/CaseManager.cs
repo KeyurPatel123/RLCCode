@@ -16,6 +16,7 @@ namespace Abiomed.DotNetCore.Business
         private ConfigurationCache _configurationCache;
         private IRedisDbRepository<Case> _redisDbRepositoryCase;
         private RemoteLinkCases _remoteLinkCases = new RemoteLinkCases();
+        string _blank = AlarmCodes.Blank.ToString();
         #endregion
 
         #region Constructor
@@ -55,22 +56,18 @@ namespace Abiomed.DotNetCore.Business
         {
             try
             {
-                OcrResponse ocrResponse = JsonConvert.DeserializeObject<OcrResponse>(await _redisDbRepositoryCase.StringGetBaseAsync(RlmDevice + ":OCR", true));
-                
-                if (ocrResponse.PumpSerialNumber != string.Empty)
-                {
-                    Case activeCase = new Case();
-                    activeCase = await _redisDbRepositoryCase.StringGetAsync(ocrResponse.PumpSerialNumber);
+                OcrResponse ocrResponse = JsonConvert.DeserializeObject<OcrResponse>(await _redisDbRepositoryCase.StringGetBaseAsync(RlmDevice + ":OCR", true));                                
+                Case activeCase = new Case();
+                activeCase = await _redisDbRepositoryCase.StringGetAsync(ocrResponse.PumpSerialNumber);
 
-                    // Add/Update return new entry to store. 
-                    activeCase = (activeCase == null || activeCase.LastActiveUtc == DateTime.MinValue) ? CreateCase(ocrResponse) : UpdateCase(ocrResponse, activeCase);
+                // Add/Update return new entry to store. 
+                activeCase = (activeCase == null || activeCase.LastActiveUtc == DateTime.MinValue) ? CreateCase(ocrResponse) : UpdateCase(ocrResponse, activeCase);
 
-                    // Add entry back to the redis repository...
-                    await _redisDbRepositoryCase.StringSetAsync(ocrResponse.PumpSerialNumber, activeCase);
+                // Add entry back to the redis repository...
+                await _redisDbRepositoryCase.StringSetAsync(ocrResponse.PumpSerialNumber, activeCase);
 
-                    // Add/Update active case to list
-                    _remoteLinkCases.Cases.AddOrUpdate(activeCase.PumpSerialNumber, activeCase, (key, oldValue) => activeCase);
-                }
+                // Add/Update active case to list
+                _remoteLinkCases.Cases.AddOrUpdate(activeCase.PumpSerialNumber, activeCase, (key, oldValue) => activeCase);                
             }
             catch(Exception e)
             {
@@ -98,11 +95,38 @@ namespace Abiomed.DotNetCore.Business
         private Case UpdateCase(OcrResponse ocrResponse, Case activeCase)
         {
             DateTime updatedUtc = DateTime.UtcNow;
+
+            // Performance Level is a change in which the UI needs to be 'notified'.
+            if (ocrResponse.PerformanceLevel != activeCase.PerformanceLevel)
+            {                
+                activeCase.AlertSummary.Insert(0,new AlertSummary()
+                {
+                    Time = updatedUtc,
+                    Type = "PLevel",
+                    Message = string.Format("From {0} to {1}", activeCase.PerformanceLevel, ocrResponse.PerformanceLevel)
+                });
+
+                Tuple<DateTime, string> performanceLevel = new Tuple<DateTime, string>(activeCase.LastUpdateUtc, activeCase.PerformanceLevel);
+                activeCase.PerformanceLevelHistory.Add(performanceLevel);
+                activeCase.PerformanceLevel = ocrResponse.PerformanceLevel;
+                activeCase.LastUpdateUtc = updatedUtc;
+                activeCase.Updated = true;
+            }
+
+            // Figure out change of state and add to alertHistory, prior to overriding old values
+            NewAlarmCheck(ocrResponse, activeCase, updatedUtc);
             
+            // Update Case
+            activeCase.Alarm1 = new Alarm { Type = ocrResponse.Alarm1, Description = ocrResponse.Alarm1Message };
+            activeCase.Alarm2 = new Alarm { Type = ocrResponse.Alarm2, Description = ocrResponse.Alarm2Message };
+            activeCase.Alarm3 = new Alarm { Type = ocrResponse.Alarm3, Description = ocrResponse.Alarm3Message };
+
+            #region old
+            /*
             // Alarms is a change in which the UI needs to be 'notified'.
-            if ((ocrResponse.Alarm1 != activeCase.Alarm1.Type || ocrResponse.Alarm1Message != activeCase.Alarm1.Description) ||
-                (ocrResponse.Alarm2 != activeCase.Alarm2.Type || ocrResponse.Alarm2Message != activeCase.Alarm2.Description) ||
-                (ocrResponse.Alarm3 != activeCase.Alarm3.Type || ocrResponse.Alarm3Message != activeCase.Alarm3.Description))
+            if ((ocrResponse.Alarm1 != activeCase.Alarm1.Type && ocrResponse.Alarm1Message != activeCase.Alarm1.Description) ||
+                (ocrResponse.Alarm2 != activeCase.Alarm2.Type && ocrResponse.Alarm2Message != activeCase.Alarm2.Description) ||
+                (ocrResponse.Alarm3 != activeCase.Alarm3.Type && ocrResponse.Alarm3Message != activeCase.Alarm3.Description))
             {
                 Tuple<DateTime, Alarm> alarms = new Tuple<DateTime, Alarm>(activeCase.LastUpdateUtc, activeCase.Alarm1);
                 activeCase.AlarmHistory.Add(alarms);
@@ -124,24 +148,9 @@ namespace Abiomed.DotNetCore.Business
                 activeCase.LastUpdateUtc = updatedUtc;
                 
                 activeCase.Updated = true;
-            }
-
-            // Performance Level is a change in which the UI needs to be 'notified'.
-            if (ocrResponse.PerformanceLevel != activeCase.PerformanceLevel)
-            {
-                activeCase.AlertSummary.Add(new AlertSummary()
-                {
-                    Time = updatedUtc,
-                    Type = "PLevel",
-                    Message = string.Format("From {0} to {1}", activeCase.PerformanceLevel, ocrResponse.PerformanceLevel)
-                });
-
-                Tuple<DateTime, string> performanceLevel = new Tuple<DateTime, string>(activeCase.LastUpdateUtc, activeCase.PerformanceLevel);
-                activeCase.PerformanceLevelHistory.Add(performanceLevel);
-                activeCase.PerformanceLevel = ocrResponse.PerformanceLevel;
-                activeCase.LastUpdateUtc = updatedUtc;
-                activeCase.Updated = true;
-            }
+            }            
+            */
+            #endregion
 
             // Changes to the Impella Flow do not need to 'notify' the UI.
             if (ocrResponse.FlowRateAverage != activeCase.ImpellaFlow.Avg ||
@@ -159,26 +168,194 @@ namespace Abiomed.DotNetCore.Business
             return activeCase;
         }
 
+        /// <summary>
+        /// Concept of Algorithm
+        /// If alarm color exist in previous and current reading, do not update.
+        /// If new, push.
+        /// </summary>
+        /// <param name="ocrResponse"></param>
+        /// <param name="activeCase"></param>
+        /// <param name="updatedUtc"></param>
+        private void NewAlarmCheck(OcrResponse ocrResponse, Case activeCase, DateTime updatedUtc)
+        {           
+            bool alarmInOcr = AlarmExistOcr(ocrResponse);
+
+            // If there exist an alarm OCR keep processing, otherwise ignore
+            if (alarmInOcr)
+            {
+                // Check if OCR alarm exist in current case
+               // checked for blank!
+                var activeAlarms = new List<string>();
+
+                if (ocrResponse.Alarm1 != _blank)
+                {
+                    if (!AlarmExistInCase(activeCase, ocrResponse.Alarm1))
+                    {
+                        activeAlarms.Add(ocrResponse.Alarm1);
+                    }
+                }
+
+                if (ocrResponse.Alarm2 != _blank)
+                {
+                    if (!AlarmExistInCase(activeCase, ocrResponse.Alarm2))
+                    {
+                        if (!activeAlarms.Contains(ocrResponse.Alarm2))
+                        {
+                            activeAlarms.Add(ocrResponse.Alarm2);
+                        }
+                    }
+                }
+
+                if (ocrResponse.Alarm3 != _blank)
+                {
+                    if (!AlarmExistInCase(activeCase, ocrResponse.Alarm3))
+                    {
+                        if (!activeAlarms.Contains(ocrResponse.Alarm3))
+                        {
+                            activeAlarms.Add(ocrResponse.Alarm3);
+                        }
+                    }
+                }
+
+                foreach(var alarm in activeAlarms)
+                {
+                    activeCase.AlertSummary.Insert(0,new AlertSummary()
+                    {
+                        Time = updatedUtc,
+                        Type = alarm
+                    });
+
+                    // Update Case
+                    activeCase.LastUpdateUtc = updatedUtc;
+                    activeCase.Updated = true;
+                }                
+            }
+        }
+
+        /// <summary>
+        /// Determine if alarm exist in OCR Response             
+        /// </summary>
+        /// <param name="ocrResponse"></param>
+        /// <returns></returns>
+        private bool AlarmExistOcr(OcrResponse ocrResponse)
+        {            
+            return (ocrResponse.Alarm1 != _blank || ocrResponse.Alarm2 != _blank || ocrResponse.Alarm3 != _blank);
+        }
+
+        private bool AlarmExistInCase(Case activeCase, string ocrAlarmColor)
+        {
+            return (activeCase.Alarm1.Type == ocrAlarmColor ||
+                activeCase.Alarm2.Type == ocrAlarmColor ||
+                activeCase.Alarm3.Type == ocrAlarmColor);
+        }
+
+        private bool CheckAlarmColor(string alarmType1, string alarmType2)
+        {
+            bool found = false;
+
+            if (alarmType1 == alarmType2)
+            {
+                found = true;
+            }
+            return found;
+        }
+
         private void NewAlarm(string alarmType, string alarmDescription, Case activeCase, DateTime updatedUtc)
         {
             bool found = false;
 
-            // Check all active Alarms
-            if((alarmType == activeCase.Alarm1.Type && alarmDescription == activeCase.Alarm1.Description) ||
-               (alarmType == activeCase.Alarm2.Type && alarmDescription == activeCase.Alarm2.Description) ||
-               (alarmType == activeCase.Alarm3.Type && alarmDescription == activeCase.Alarm3.Description))
+            // If incoming alarm is blank, exit out
+            if(alarmDescription == "")
             {
-                found = true;
+                return;
             }
-                        
+
+            // Check all active Alarms
+            found = CheckAlarmText(alarmType, activeCase.Alarm1.Type, alarmDescription, activeCase.Alarm1.Description);
+            
             if(!found)
+                found = CheckAlarmText(alarmType, activeCase.Alarm2.Type, alarmDescription, activeCase.Alarm2.Description);
+
+            if (!found)
+                found = CheckAlarmText(alarmType, activeCase.Alarm3.Type, alarmDescription, activeCase.Alarm3.Description);
+            
+            if (!found)
             {
                 activeCase.AlertSummary.Add(new AlertSummary()
                 {
                     Time = updatedUtc,
                     Type = alarmType                    
                 });
+
+                // Update Case
+                activeCase.LastUpdateUtc = updatedUtc;
+                activeCase.Updated = true;
             }
+        }        
+
+        private bool CheckAlarmText(string alarmType1, string alarmType2, string alarmDescription1, string alarmDescription2)
+        {
+            bool found = false;
+
+            if (alarmType1 == alarmType2 && alarmDescription1 == alarmDescription2)
+            {
+                found = true;
+            }
+            else
+            {
+                // If distance greater than 2, then we def. found it
+                var distance = ComputeStringDistance(alarmDescription1, alarmDescription2);
+                if (distance < 4)
+                {
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        private int ComputeStringDistance(string s, string t)
+        {
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
+
+            // Step 1
+            if (n == 0)
+            {
+                return m;
+            }
+
+            if (m == 0)
+            {
+                return n;
+            }
+
+            // Step 2
+            for (int i = 0; i <= n; d[i, 0] = i++)
+            {
+            }
+
+            for (int j = 0; j <= m; d[0, j] = j++)
+            {
+            }
+
+            // Step 3
+            for (int i = 1; i <= n; i++)
+            {
+                //Step 4
+                for (int j = 1; j <= m; j++)
+                {
+                    // Step 5
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+
+                    // Step 6
+                    d[i, j] = Math.Min(
+                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                        d[i - 1, j - 1] + cost);
+                }
+            }
+            // Step 7
+            return d[n, m];
         }
 
         private Case CreateCase(OcrResponse ocrResponse)
