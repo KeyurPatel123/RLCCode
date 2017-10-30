@@ -4,12 +4,14 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Wireless Remote Link</title>  
-        <base href="/" />
+        <base href="/" />        
+        <meta name="format-detection" content="telephone=no" />
         <script src="~/dist/shim.min.js"></script>
         <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
         <script>document.msCapsLockWarningOff = true;</script>
-        <script src="https://content.jwplatform.com/libraries/V8XhCJFq.js"></script>            
-        <script>jwplayer.key = "uKRuFyZbVRO2vqdgICcfAK+WZhFJS8LcMbBK8anMh/U=";</script>
+        <!--<script src="https://content.jwplatform.com/libraries/V8XhCJFq.js"></script>-->
+        <script src="~/dist/jwplayer.js"></script>
+        <script>jwplayer.key = "qjXIyWaUbqF0eo4cPBi6hgl+bURPiEKBfFsd8nOIkic=";</script>
     </head>
     <body>
         @RenderBody()

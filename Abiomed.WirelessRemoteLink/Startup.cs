@@ -72,7 +72,8 @@ namespace Abiomed_WirelessRemoteLink
                 .AddDefaultTokenProviders()
                 .CreateAzureTablesIfNotExists<ApplicationDbContext>();
 
-            services.AddMvc();            
+            services.AddMvc();
+            services.AddCors();
 
             services.AddAuthentication()
             .AddJwtBearer(cfg =>
@@ -136,10 +137,13 @@ namespace Abiomed_WirelessRemoteLink
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            // Shows UseCors with CorsPolicyBuilder.
+            app.UseCors(builder =>
+               builder.AllowAnyOrigin()                
+            );
+
             app.UseStaticFiles();
-            app.UseAuthentication();
-
-
+            app.UseAuthentication();            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

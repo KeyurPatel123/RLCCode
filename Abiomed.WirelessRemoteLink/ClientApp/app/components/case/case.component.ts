@@ -31,9 +31,9 @@ export class CaseComponent implements OnInit {
         // Get Case
         var caseTry = this.caseService.GetActiveCase(this.pumpSerial);
 
-        if (caseTry !== undefined) {
+        if (caseTry !== undefined) {            
             this.case = caseTry;
-            console.log(this.case);
+            console.log(caseTry.value.connectionStartUtc);
             // Check if video playing
             if (!this.videoPlaying) {
                 this.videoPlaying = true;
@@ -48,15 +48,16 @@ export class CaseComponent implements OnInit {
         playerInstance.setup({
             playlist: [{
                 sources: [
-                    { file: "rtsp://rlv.abiomed.com:443/live/" +  serial},
-                    { file: "rtmps://rlv.abiomed.com:443/live/" + serial },
                     { file: "https://rlv.abiomed.com:443/live/" + serial + "/playlist.m3u8" },
+                    { file: "rtsp://rlv.abiomed.com:443/live/" + serial },
+                    { file: "rtmps://rlv.abiomed.com:443/live/" + serial }                    
                 ],
             }],
             width: "100%",
             aspectratio: "4:3",
             autostart: true,
-            stretching: 'exactfit',
+            stretching: 'uniform',
+            mute: 'true',
             preload: "none",
             androidhls: true,
             primary: "flash",

@@ -9,7 +9,7 @@
                 <div class="CaseInfo"><span class="CaseInfoTitle">Impella SN:</span> {{case.value.pumpSerialNumber}}</div>
                 <div class="CaseInfo"><span class="CaseInfoTitle">AIC SN:</span> {{case.value.aicSerialNumber}}</div>
                 <div class="CaseInfo"><span class="CaseInfoTitle">Pump Type:</span> {{case.value.pumpType}}</div>
-                <div class="CaseInfo"><span class="CaseInfoTitle">Connection:</span> {{case.value.connectionStartUtc | amDateFormat:'YYYY-MM-DD | HH:MM'}}</div>
+                <div class="CaseInfo"><span class="CaseInfoTitle">Connection:</span> {{case.value.connectionStartUtc| amFromUtc | amLocal | amDateFormat:'YYYY-MM-DD | HH:mm'}}</div>
                 <div class="Trouble"><a href="#"><span class="fa fa-question-circle"></span> Troubleshooting Guide</a></div>
 
             </div>
@@ -36,7 +36,7 @@
                 <div class="AlertSummary">
                     <div *ngFor="let alert of case.value.alertSummary" class="AlertInstance d-flex flex-wrap justify-content-left align-items-center">
                         <div class="AlertContainer"><div class="Alert{{alert.type}}"></div></div>
-                        <div class="AlertCopy"><div>{{alert.time | amDateFormat:'YYYY-MM-DD | HH:MM'}} {{alert.message}}</div></div>
+                        <div class="AlertCopy"><div>{{alert.time | amFromUtc | amLocal | amDateFormat:'YYYY-MM-DD | HH:mm'}} {{alert.message}}</div></div>
                     </div>           
                 </div>
             </ng-template>

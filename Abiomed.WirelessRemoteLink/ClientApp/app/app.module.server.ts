@@ -11,11 +11,12 @@ import { MomentModule } from 'angular2-moment';
 import { AgmCoreModule } from '@agm/core';
 import { CaseService } from "./shared/case.service";
 import { InstitutionService } from "./shared/institution.service";
+import { DeviceService } from "./shared/device.service";
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
     declarations: sharedConfig.declarations,
-    providers: [AuthGuard, AuthenticationService, StorageService, CaseService, InstitutionService],
+    providers: [AuthGuard, AuthenticationService, StorageService, CaseService, InstitutionService, DeviceService],
     imports: [
         ServerModule,
         FormsModule,

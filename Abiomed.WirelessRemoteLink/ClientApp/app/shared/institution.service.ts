@@ -12,7 +12,6 @@ export class InstitutionService {
     GetInstitutions(): Observable<any[]> {
         return this.http.get('/api/Institution/GetInstitutions')
             .map((response: any[]) => {
-                console.log(response);
                 return response;
             });
     }

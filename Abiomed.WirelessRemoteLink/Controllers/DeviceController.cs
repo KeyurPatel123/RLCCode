@@ -29,9 +29,15 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         [HttpPost]
         [Route("CreateDevice")]
         [Authorize(Roles = "ADMIN")]
-        public bool CreateDevice()
+        public RegisterResponse CreateDevice(RLMDeviceWeb device)
         {
-            return true;
+            RegisterResponse response = new RegisterResponse();
+            
+            // Check if device exist
+
+            // Add device
+
+            return response;
         }
 
         [HttpPost]
@@ -43,9 +49,9 @@ namespace Abiomed_WirelessRemoteLink.Controllers
         }
 
         [HttpGet]
-        [Route("GetDevice")]
+        [Route("GetDevices")]
         [Authorize(Roles = "ADMIN")]
-        public bool GetDevice()
+        public bool GetDevices()
         {
             return true;
         }
