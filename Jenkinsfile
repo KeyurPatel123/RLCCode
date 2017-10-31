@@ -30,7 +30,7 @@ try {
 
 	}
 	mail ( 
-        to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com',
+        to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com,msami@abiomed.com,rweigand@abiomed.com,glim@abiomed.com,rsrinivasan@abiomed.com',
         subject: "RemoteLinkCloud ${BRANCH_NAME} -  Build Notification - SUCCESS - New Code Pushed to Git", 
         body: """RemoteLinkCloud ${BRANCH_NAME} - SUCCESS
 	Download the artifacts from the below link:
@@ -39,7 +39,7 @@ try {
     )
 } catch(e) {
     echo e.message
-    mail( to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com',
+    mail( to: 'ppamidi@abiomed.com,aagnello@abiomed.com,plemay@abiomed.com,rlussier@abiomed.com,msami@abiomed.com,rweigand@abiomed.com,glim@abiomed.com,rsrinivasan@abiomed.com',
           subject: 'RemoteLinkCloud ${BRANCH_NAME} -  Build Notification - FAILED - New Code Pushed to Git', 
           body: "See buildlog at ${env.BUILD_URL}/console")
     error e.message
