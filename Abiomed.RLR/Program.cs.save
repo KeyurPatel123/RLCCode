@@ -21,19 +21,18 @@ namespace Abiomed.RLR
         {
             try
             {
-                 //  Console.WriteLine("Hello World!");
+                 Console.WriteLine("Hello World!");
                 // Get the current settings.
                 int minWorker, minIOC;
                 ThreadPool.GetMinThreads(out minWorker, out minIOC);
                 ThreadPool.SetMinThreads(1000, 1000);
-                //Console.WriteLine("Hello");
-
+                Console.WriteLine("Step 0");
                 var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile("AppSettings.json");
+                            .AddJsonFile("appsettings.json");
 
                 _configuration = builder.Build();
-                //Console.WriteLine("Step 1");
+                Console.WriteLine("Step 1");
                 //setup our DI
                 var serviceProvider = new ServiceCollection()
                 .AddLogging()
@@ -52,7 +51,7 @@ namespace Abiomed.RLR
                 .AddSingleton<ITableStorage, TableStorage>()
                 .AddSingleton(typeof(IRedisDbRepository<>), typeof(RedisDbRepository<>))
                 .BuildServiceProvider();
-		//Console.WriteLine("Step 2");
+		Console.WriteLine("Step 2");
                 // Get Version of RLR and publish to Console and update Def.
                 var version = _configuration.GetSection("Version").Value;
 
